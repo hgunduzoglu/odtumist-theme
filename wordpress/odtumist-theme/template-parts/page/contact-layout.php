@@ -6,6 +6,12 @@ if (!defined('ABSPATH')) {
 $social      = odtumist_get_social_links();
 $contact     = odtumist_get_contact_content();
 $departments = odtumist_get_contact_departments();
+$form_title  = get_theme_mod('odtumist_contact_form_title', __('Sizi Dinlemeye Hazırız', 'odtumist'));
+$form_desc   = get_theme_mod('odtumist_contact_form_desc', __('Bize her konuda yazabilirsiniz Hocam.', 'odtumist'));
+$form_provider = get_theme_mod('odtumist_contact_form_provider', 'cf7');
+$cf7_form_id = (int) get_theme_mod('odtumist_contact_cf7_form_id', 0);
+$wpforms_form_id = (int) get_theme_mod('odtumist_contact_wpforms_form_id', 0);
+$form_shortcode = trim((string) get_theme_mod('odtumist_contact_form_shortcode', '[contact-form-7 id="123" title="İletişim Formu"]'));
 ?>
 
 <section class="contact-hero">
@@ -93,17 +99,29 @@ $departments = odtumist_get_contact_departments();
 <section class="contact-form-block">
     <div class="site-container">
         <div class="contact-form-header">
-            <h2><?php esc_html_e('Sizi Dinlemeye Hazırız', 'odtumist'); ?></h2>
-            <p><?php esc_html_e('Bize her konuda yazabilirsiniz Hocam.', 'odtumist'); ?></p>
+            <h2><?php echo esc_html($form_title); ?></h2>
+            <p><?php echo esc_html($form_desc); ?></p>
         </div>
         <div class="contact-form-card prose-block">
             <?php
-            if (trim((string) get_the_content()) !== '') {
-                the_content();
+            $rendered_form = '';
+
+            if ($form_provider === 'cf7' && $cf7_form_id > 0) {
+                $rendered_form = do_shortcode('[contact-form-7 id="' . (int) $cf7_form_id . '"]');
+            } elseif ($form_provider === 'wpforms' && $wpforms_form_id > 0 && function_exists('wpforms_display')) {
+                ob_start();
+                wpforms_display($wpforms_form_id, false, false, false);
+                $rendered_form = (string) ob_get_clean();
+            } elseif ($form_provider === 'shortcode' && $form_shortcode !== '') {
+                $rendered_form = do_shortcode($form_shortcode);
+            }
+
+            if (trim((string) $rendered_form) !== '' && trim((string) $rendered_form) !== $form_shortcode) {
+                echo wp_kses_post($rendered_form);
             } else {
                 ?>
-                <h3><?php esc_html_e('Bize Mesaj Gönderin', 'odtumist'); ?></h3>
-                <p><?php esc_html_e('Bu alana WordPress panelinden bir iletişim formu eklentisi (Contact Form 7, WPForms vb.) kısa kodu ekleyebilirsin.', 'odtumist'); ?></p>
+                <h3><?php esc_html_e('Form kurulumu bekleniyor', 'odtumist'); ?></h3>
+                <p><?php esc_html_e('Görünüm > Özelleştir > İletişim ve Footer Bilgileri bölümünden form sağlayıcı ve form seçimini yapın.', 'odtumist'); ?></p>
                 <?php
             }
             ?>

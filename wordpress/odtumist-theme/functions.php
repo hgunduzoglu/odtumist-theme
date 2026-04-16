@@ -66,6 +66,10 @@ function odtumist_should_render_with_elementor($post_id = 0)
         return false;
     }
 
+    if (odtumist_templates_are_locked() && odtumist_is_locked_template_page($post_id)) {
+        return false;
+    }
+
     $template_slug = (string) get_page_template_slug($post_id);
     if (in_array($template_slug, array('elementor_canvas', 'elementor_header_footer'), true)) {
         return true;
@@ -73,6 +77,122 @@ function odtumist_should_render_with_elementor($post_id = 0)
 
     return odtumist_is_built_with_elementor($post_id);
 }
+
+function odtumist_get_locked_template_page_slugs()
+{
+    return array(
+        'anasayfa',
+        'home',
+        'hakkimizda',
+        'about',
+        'etkinlikler',
+        'events',
+        'uyelik',
+        'membership',
+        'dayanisma',
+        'solidarity',
+        'iletisim',
+        'contact',
+    );
+}
+
+function odtumist_templates_are_locked()
+{
+    $is_locked = (bool) get_option('odtumist_lock_templates', false);
+
+    /**
+     * Kilit davranisini merkezi olarak ac/kapat.
+     * Varsayilan: false (Elementor duzenleme serbest).
+     */
+    return (bool) apply_filters('odtumist_templates_are_locked', $is_locked);
+}
+
+function odtumist_get_cf7_form_choices()
+{
+    $choices = array(
+        0 => __('Form Seçilmedi', 'odtumist'),
+    );
+
+    if (!post_type_exists('wpcf7_contact_form')) {
+        return $choices;
+    }
+
+    $forms = get_posts(array(
+        'post_type'      => 'wpcf7_contact_form',
+        'post_status'    => array('publish', 'draft'),
+        'posts_per_page' => 100,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ));
+
+    foreach ($forms as $form) {
+        $choices[(int) $form->ID] = get_the_title($form);
+    }
+
+    return $choices;
+}
+
+function odtumist_get_wpforms_form_choices()
+{
+    $choices = array(
+        0 => __('Form Seçilmedi', 'odtumist'),
+    );
+
+    if (!post_type_exists('wpforms')) {
+        return $choices;
+    }
+
+    $forms = get_posts(array(
+        'post_type'      => 'wpforms',
+        'post_status'    => array('publish', 'draft'),
+        'posts_per_page' => 100,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ));
+
+    foreach ($forms as $form) {
+        $choices[(int) $form->ID] = get_the_title($form);
+    }
+
+    return $choices;
+}
+
+function odtumist_sanitize_contact_form_provider($value)
+{
+    $allowed = array('cf7', 'wpforms', 'shortcode');
+    $value   = sanitize_key((string) $value);
+
+    return in_array($value, $allowed, true) ? $value : 'cf7';
+}
+
+function odtumist_is_locked_template_page($post_id = 0)
+{
+    $post_id = (int) ($post_id ?: get_the_ID());
+    if ($post_id <= 0) {
+        return false;
+    }
+
+    if (get_post_type($post_id) !== 'page') {
+        return false;
+    }
+
+    $slug = sanitize_title((string) get_post_field('post_name', $post_id));
+    if ($slug === '') {
+        return false;
+    }
+
+    return in_array($slug, odtumist_get_locked_template_page_slugs(), true);
+}
+
+function odtumist_filter_elementor_editability_for_locked_pages($can_edit, $post_id)
+{
+    if (odtumist_templates_are_locked() && odtumist_is_locked_template_page((int) $post_id)) {
+        return false;
+    }
+
+    return $can_edit;
+}
+add_filter('elementor/can_edit_post', 'odtumist_filter_elementor_editability_for_locked_pages', 10, 2);
 
 function odtumist_register_elementor_locations($elementor_theme_manager)
 {
@@ -914,6 +1034,9 @@ function odtumist_customize_register($wp_customize)
         'odtumist_contact_email'   => array('label' => 'E-posta', 'default' => 'dernek@odtumist.org', 'type' => 'email', 'sanitize' => 'sanitize_email'),
         'odtumist_contact_map_url' => array('label' => 'Google Maps Embed URL', 'default' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.38870198594!2d29.02340337656644!3d41.06047247134375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab660f7e4f35b%3A0x868b20463c630807!2zT0RUw5xNwLBTVCBWacWfbmVsaWsgVGVzaXNsZXJp!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str', 'type' => 'url', 'sanitize' => 'esc_url_raw'),
         'odtumist_contact_hero_text' => array('label' => 'İletişim Hero Açıklama', 'default' => __('İstanbuldaki ODTÜ ruhunun buluşma noktasına ulaşmak için bize yazabilir, arayabilir veya ziyaret edebilirsin.', 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
+        'odtumist_contact_form_title' => array('label' => 'İletişim Form Alanı Başlığı', 'default' => __('Sizi Dinlemeye Hazırız', 'odtumist'), 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
+        'odtumist_contact_form_desc'  => array('label' => 'İletişim Form Alanı Açıklaması', 'default' => __('Bize her konuda yazabilirsiniz Hocam.', 'odtumist'), 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
+        'odtumist_contact_form_shortcode' => array('label' => 'Gelişmiş: Manuel Form Shortcode', 'default' => '[contact-form-7 id="123" title="İletişim Formu"]', 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
         'odtumist_footer_description' => array('label' => 'Footer Açıklama', 'default' => __('ODTÜMİST; İstanbul\'daki ODTÜ mezunlarını dayanışma, burs, mentorluk ve ortak projelerde bir araya getiren mezunlar topluluğudur.', 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
     );
 
@@ -938,6 +1061,43 @@ function odtumist_customize_register($wp_customize)
         'label'   => __('İletişim Hero Görseli', 'odtumist'),
         'section' => 'odtumist_contact_footer_section',
     )));
+
+    $wp_customize->add_setting('odtumist_contact_form_provider', array(
+        'default'           => 'cf7',
+        'sanitize_callback' => 'odtumist_sanitize_contact_form_provider',
+    ));
+    $wp_customize->add_control('odtumist_contact_form_provider', array(
+        'label'   => __('Form Sağlayıcı', 'odtumist'),
+        'section' => 'odtumist_contact_footer_section',
+        'type'    => 'select',
+        'choices' => array(
+            'cf7'       => __('Contact Form 7', 'odtumist'),
+            'wpforms'   => __('WPForms Lite/Pro', 'odtumist'),
+            'shortcode' => __('Manuel Shortcode', 'odtumist'),
+        ),
+    ));
+
+    $wp_customize->add_setting('odtumist_contact_cf7_form_id', array(
+        'default'           => 0,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('odtumist_contact_cf7_form_id', array(
+        'label'   => __('Contact Form 7 Formu', 'odtumist'),
+        'section' => 'odtumist_contact_footer_section',
+        'type'    => 'select',
+        'choices' => odtumist_get_cf7_form_choices(),
+    ));
+
+    $wp_customize->add_setting('odtumist_contact_wpforms_form_id', array(
+        'default'           => 0,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('odtumist_contact_wpforms_form_id', array(
+        'label'   => __('WPForms Formu', 'odtumist'),
+        'section' => 'odtumist_contact_footer_section',
+        'type'    => 'select',
+        'choices' => odtumist_get_wpforms_form_choices(),
+    ));
 }
 add_action('customize_register', 'odtumist_customize_register');
 
