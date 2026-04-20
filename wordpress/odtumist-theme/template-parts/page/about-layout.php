@@ -3,7 +3,15 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$raw_content = (string) get_post_field('post_content', get_the_ID());
+$current_page_id = (int) get_the_ID();
+$current_slug    = sanitize_title((string) get_post_field('post_name', $current_page_id));
+$about_root_page = odtumist_get_page_by_slug(array('hakkimizda', 'about'));
+$about_root_id   = ($about_root_page instanceof WP_Post) ? (int) $about_root_page->ID : 0;
+
+$is_about_root = in_array($current_slug, array('hakkimizda', 'about'), true) || ($about_root_id > 0 && $about_root_id === $current_page_id);
+$content_source_id = $is_about_root ? $current_page_id : ($about_root_id > 0 ? $about_root_id : $current_page_id);
+
+$raw_content = (string) get_post_field('post_content', $content_source_id);
 $sections    = odtumist_extract_content_sections($raw_content);
 
 $doing_section      = odtumist_pick_content_section($sections, array('neler-yapiyoruz'));
@@ -12,13 +20,23 @@ $join_section       = odtumist_pick_content_section($sections, array('sen-de-kat
 $history_section    = odtumist_pick_content_section($sections, array('tarihce'));
 $management_section = odtumist_pick_content_section($sections, array('yonetim'));
 
-$groups_query = odtumist_get_working_groups(12);
+$groups_query = odtumist_get_working_groups(-1);
 $ctas         = odtumist_get_primary_cta_links();
 $contact_page = odtumist_get_page_by_slug(array('iletisim', 'contact'));
 
-$about_intro = get_the_excerpt()
-    ? get_the_excerpt()
+$about_intro = (string) get_post_field('post_excerpt', $content_source_id);
+$about_intro = trim($about_intro) !== ''
+    ? $about_intro
     : "İstanbul'un dinamizminde ODTÜ ruhunu, dayanışmasını ve kültürünü yaşatan topluluğumuza hoş geldin.";
+
+$about_initial_tab_map = array(
+    'neler-yapiyoruz'      => 'doing',
+    'calisma-gruplarimiz'  => 'groups',
+    'sen-de-katil'         => 'join',
+    'tarihce'              => 'history',
+    'yonetim'              => 'management',
+);
+$initial_tab = isset($about_initial_tab_map[$current_slug]) ? $about_initial_tab_map[$current_slug] : 'doing';
 
 $history_facts = array();
 $hf_defaults = array(
@@ -62,11 +80,12 @@ $about_tabs = array(
     </div>
 </section>
 
-<section class="about-page-nav" data-about-nav>
+<section class="about-page-nav" data-about-nav data-about-initial="<?php echo esc_attr($initial_tab); ?>">
     <div class="site-container about-page-nav-wrap">
         <div class="about-page-nav-list" role="tablist" aria-label="<?php esc_attr_e('Hakkımızda Alt Menü', 'odtumist'); ?>">
             <?php foreach ($about_tabs as $i => $tab) : ?>
-                <button type="button" class="about-page-nav-btn<?php echo $i === 0 ? ' is-active' : ''; ?>" data-about-tab="<?php echo esc_attr($tab['id']); ?>" aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>">
+                <?php $is_active_tab = ($tab['id'] === $initial_tab); ?>
+                <button type="button" class="about-page-nav-btn<?php echo $is_active_tab ? ' is-active' : ''; ?>" data-about-tab="<?php echo esc_attr($tab['id']); ?>" aria-selected="<?php echo $is_active_tab ? 'true' : 'false'; ?>">
                     <span class="about-tab-icon"><?php echo $tab['icon']; ?></span>
                     <?php echo esc_html($tab['label']); ?>
                 </button>
@@ -79,7 +98,7 @@ $about_tabs = array(
     <div class="site-container">
 
         <!-- Neler Yapıyoruz -->
-        <article class="about-tab-panel is-active" data-about-panel="doing" data-about-anchors="neler-yapiyoruz">
+        <article class="about-tab-panel<?php echo $initial_tab === 'doing' ? ' is-active' : ''; ?>" data-about-panel="doing" data-about-anchors="neler-yapiyoruz">
             <section id="neler-yapiyoruz">
                 <h2 class="about-panel-title"><?php esc_html_e('Etkileşimi Güçlendiren Bir Köprü', 'odtumist'); ?></h2>
                 <div class="about-richtext">
@@ -97,7 +116,7 @@ $about_tabs = array(
         </article>
 
         <!-- Çalışma Gruplarımız -->
-        <article class="about-tab-panel" data-about-panel="groups" data-about-anchors="calisma-gruplarimiz">
+        <article class="about-tab-panel<?php echo $initial_tab === 'groups' ? ' is-active' : ''; ?>" data-about-panel="groups" data-about-anchors="calisma-gruplarimiz">
             <section id="calisma-gruplarimiz">
                 <h2 class="about-panel-title"><?php esc_html_e('Çalışma Gruplarımız', 'odtumist'); ?></h2>
 
@@ -113,7 +132,7 @@ $about_tabs = array(
                             <article class="about-group-card">
                                 <a class="about-group-media" href="<?php the_permalink(); ?>">
                                     <?php if (has_post_thumbnail()) : ?>
-                                        <?php the_post_thumbnail('large', array('loading' => 'lazy')); ?>
+                                        <?php the_post_thumbnail('full', array('loading' => 'lazy')); ?>
                                     <?php else : ?>
                                         <img src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&q=80&w=800" alt="<?php the_title_attribute(); ?>" loading="lazy">
                                     <?php endif; ?>
@@ -136,7 +155,7 @@ $about_tabs = array(
         </article>
 
         <!-- Sen de Katıl -->
-        <article class="about-tab-panel" data-about-panel="join" data-about-anchors="sen-de-katil">
+        <article class="about-tab-panel<?php echo $initial_tab === 'join' ? ' is-active' : ''; ?>" data-about-panel="join" data-about-anchors="sen-de-katil">
             <section id="sen-de-katil">
                 <h2 class="about-panel-title"><?php esc_html_e('ODTÜ Ruhunu Birlikte Yaşatalım', 'odtumist'); ?></h2>
 
@@ -161,7 +180,7 @@ $about_tabs = array(
         </article>
 
         <!-- Tarihçe -->
-        <article class="about-tab-panel" data-about-panel="history" data-about-anchors="tarihce">
+        <article class="about-tab-panel<?php echo $initial_tab === 'history' ? ' is-active' : ''; ?>" data-about-panel="history" data-about-anchors="tarihce">
             <section id="tarihce">
                 <div class="about-history-intro">
                     <h2><?php esc_html_e('Bir Meşalenin İstanbul Yolculuğu', 'odtumist'); ?></h2>
@@ -193,7 +212,7 @@ $about_tabs = array(
         </article>
 
         <!-- Yönetim -->
-        <article class="about-tab-panel" data-about-panel="management" data-about-anchors="yonetim">
+        <article class="about-tab-panel<?php echo $initial_tab === 'management' ? ' is-active' : ''; ?>" data-about-panel="management" data-about-anchors="yonetim">
             <section id="yonetim">
                 <div class="about-management-intro">
                     <h2><?php esc_html_e('Yönetim', 'odtumist'); ?></h2>

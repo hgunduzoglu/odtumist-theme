@@ -2181,6 +2181,11 @@ body.admin-bar .about-page-nav {
     padding: 0;
 }
 
+.solidarity-item.is-initial {
+    scroll-margin-top: 130px;
+    box-shadow: inset 0 0 0 2px rgba(227, 30, 36, 0.28);
+}
+
 .solidarity-item-inner {
     display: flex;
     align-items: flex-start;
@@ -2962,4 +2967,2556 @@ body.admin-bar .membership-nav {
         width: 100%;
         text-align: center;
     }
+}
+
+/* ===============================
+   Full Elementor Bootstrap Skin
+   =============================== */
+.elementor .odt-el-section {
+    margin: 0;
+}
+
+.elementor .odt-el-section > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-title .elementor-heading-title {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #0c1633;
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-subtitle,
+.elementor .odt-el-richtext {
+    color: #334155;
+    line-height: 1.7;
+}
+
+.elementor .odt-el-subtitle p,
+.elementor .odt-el-richtext p {
+    margin-bottom: 1rem;
+}
+
+.elementor .odt-el-btn .elementor-button {
+    border-radius: 999px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 0.9rem 1.55rem;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.elementor .odt-el-btn .elementor-button:hover {
+    transform: translateY(-1px);
+}
+
+.elementor .odt-el-btn-primary .elementor-button {
+    background: #153f8a;
+    color: #fff;
+}
+
+.elementor .odt-el-btn-secondary .elementor-button {
+    background: #0c1633;
+    color: #fff;
+}
+
+.elementor .odt-el-btn-tab .elementor-button {
+    background: #ffffff;
+    color: #64748b;
+    border: 1px solid #d7deec;
+    width: 100%;
+    min-height: 52px;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    letter-spacing: 0.09em;
+    font-size: 0.72rem;
+}
+
+.elementor .odt-el-btn-tab .elementor-button:hover {
+    color: #e11d2e;
+    border-color: #e11d2e;
+}
+
+.elementor .odt-el-home-hero .odt-el-home-slider,
+.elementor .odt-el-home-hero .odt-el-home-slider .elementor-widget-container {
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.elementor .odt-el-home-slider .elementor-slides-wrapper {
+    min-height: clamp(560px, 82vh, 880px);
+}
+
+.elementor .odt-el-home-slider .swiper-slide-contents {
+    max-width: min(880px, 92vw);
+    text-align: left;
+    padding-inline: clamp(1rem, 3vw, 2.2rem);
+}
+
+.elementor .odt-el-home-slider .elementor-slide-heading,
+.elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-heading {
+    font-size: clamp(2.2rem, 5.2vw, 4.8rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    text-shadow: 0 10px 24px rgba(2, 6, 23, 0.5);
+}
+
+.elementor .odt-el-home-slider .elementor-slide-description,
+.elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-description {
+    font-size: clamp(1rem, 1.55vw, 1.35rem);
+    max-width: 60ch;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button {
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    padding: 0.95rem 1.7rem;
+    border: 2px solid transparent;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button:hover {
+    transform: translateY(-1px);
+}
+
+.elementor .odt-el-home-events-intro,
+.elementor .odt-el-home-groups-intro,
+.elementor .odt-el-about-groups-intro,
+.elementor .odt-el-page-hero {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%);
+    border-top: 1px solid #e3e9f4;
+    border-bottom: 1px solid #e3e9f4;
+}
+
+.elementor .odt-el-home-events-intro .odt-el-title .elementor-heading-title,
+.elementor .odt-el-home-groups-intro .odt-el-title .elementor-heading-title,
+.elementor .odt-el-about-groups-intro .odt-el-title .elementor-heading-title,
+.elementor .odt-el-page-hero .odt-el-title .elementor-heading-title {
+    font-size: clamp(2rem, 4.2vw, 3.5rem);
+}
+
+.elementor .odt-el-home-ctas {
+    background: transparent;
+}
+
+.elementor .odt-el-cta-col {
+    border-radius: 22px;
+    padding: 2.2rem 1.9rem;
+    box-shadow: 0 20px 45px rgba(9, 22, 51, 0.22);
+    min-height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.elementor .odt-el-cta-col::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -70px;
+    top: -60px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    pointer-events: none;
+}
+
+.elementor .odt-el-cta-col .elementor-heading-title,
+.elementor .odt-el-cta-col .elementor-widget-text-editor,
+.elementor .odt-el-cta-col .elementor-widget-text-editor p {
+    color: #fff;
+}
+
+.elementor .odt-el-cta-col-blue {
+    background: linear-gradient(135deg, #113067 0%, #1d4f9f 100%);
+}
+
+.elementor .odt-el-cta-col-red {
+    background: linear-gradient(135deg, #7e1023 0%, #cc1b3d 100%);
+}
+
+.elementor .odt-el-btn-ghost .elementor-button {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+}
+
+.elementor .odt-el-btn-ghost .elementor-button:hover {
+    background: #fff;
+    color: #0f172a;
+}
+
+.elementor .odt-el-card-row {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+}
+
+.elementor .odt-el-card .elementor-image-box-wrapper {
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(12, 22, 51, 0.13);
+    border: 1px solid #e7edf8;
+    min-height: 100%;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.elementor .odt-el-card .elementor-image-box-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 26px 40px rgba(12, 22, 51, 0.2);
+    border-color: #d8e2f4;
+}
+
+.elementor .odt-el-card .elementor-image-box-img img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.elementor .odt-el-card .elementor-image-box-title {
+    font-size: 1.17rem;
+    font-weight: 800;
+    color: #0c1633;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+}
+
+.elementor .odt-el-card .elementor-image-box-description {
+    color: #334155;
+    font-size: 0.98rem;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-wrapper {
+    border-top: 4px solid #e33a4a;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-wrapper {
+    border-top: 4px solid #2153a3;
+}
+
+.elementor .odt-el-about-hero {
+    background: radial-gradient(circle at 20% 10%, rgba(236, 133, 54, 0.35) 0, rgba(236, 133, 54, 0) 28%),
+        radial-gradient(circle at 80% 0%, rgba(224, 59, 79, 0.35) 0, rgba(224, 59, 79, 0) 30%),
+        linear-gradient(135deg, #0b1a3e 0%, #151730 100%);
+}
+
+.elementor .odt-el-about-hero .odt-el-about-hero-title .elementor-heading-title,
+.elementor .odt-el-about-hero .odt-el-about-hero-subtitle,
+.elementor .odt-el-about-hero .odt-el-about-hero-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-about-hero .odt-el-about-hero-title .elementor-heading-title {
+    font-size: clamp(3rem, 8.5vw, 8.4rem);
+    color: #f08b3b;
+    text-shadow: 0 16px 36px rgba(2, 6, 23, 0.45);
+}
+
+.elementor .odt-el-about-hero .odt-el-about-hero-subtitle p {
+    font-size: clamp(1.15rem, 2vw, 2.05rem);
+    font-weight: 700;
+    max-width: 980px;
+    margin-inline: auto;
+}
+
+.elementor .odt-el-about-hero .odt-el-about-motto p {
+    color: #f34a53;
+    font-size: clamp(1.8rem, 3.2vw, 3.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 1rem 0 0;
+}
+
+.elementor .odt-el-about-nav {
+    background: #fff;
+    border-top: 1px solid #e4eaf4;
+    border-bottom: 1px solid #e4eaf4;
+}
+
+.elementor .odt-el-about-nav .elementor-container {
+    gap: 0;
+}
+
+.elementor .odt-el-about-panel {
+    background: #fff;
+    border-bottom: 1px solid #edf1f8;
+}
+
+.elementor .odt-el-about-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.elementor .odt-el-about-panel-neler-yapiyoruz .odt-el-richtext,
+.elementor .odt-el-about-panel-doing .odt-el-richtext {
+    font-size: 1.1rem;
+}
+
+.elementor .odt-el-about-panel,
+.elementor .odt-el-membership-panel,
+.elementor .odt-el-solidarity-panel,
+.elementor .odt-el-contact-main,
+.elementor .odt-el-contact-form-section {
+    background: #fff;
+}
+
+.elementor .odt-el-membership-hero {
+    background: radial-gradient(circle at 82% 6%, rgba(228, 31, 52, 0.22) 0, rgba(228, 31, 52, 0) 32%),
+        radial-gradient(circle at 10% 0%, rgba(24, 74, 158, 0.2) 0, rgba(24, 74, 158, 0) 28%),
+        linear-gradient(135deg, #091631 0%, #102551 100%);
+}
+
+.elementor .odt-el-membership-hero .odt-el-title .elementor-heading-title,
+.elementor .odt-el-membership-hero .odt-el-subtitle,
+.elementor .odt-el-membership-hero .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-membership-panel {
+    border-bottom: 1px solid #edf1f8;
+}
+
+.elementor .odt-el-membership-panel .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid #e6edf8;
+    box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
+    padding: clamp(1.3rem, 2vw, 1.8rem);
+}
+
+.elementor .odt-el-membership-panel-1 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    border-left: 8px solid #e33a4a;
+}
+
+.elementor .odt-el-membership-panel-2 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    border-left: 8px solid #1c4d9a;
+}
+
+.elementor .odt-el-membership-panel-3 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    border-left: 8px solid #f3901f;
+}
+
+.elementor .odt-el-membership-panel-4 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    border-left: 8px solid #0f172a;
+}
+
+.elementor .odt-el-membership-actions {
+    background: linear-gradient(90deg, #f7f9fd 0%, #ffffff 100%);
+    border-top: 1px solid #e5ecf7;
+    border-bottom: 1px solid #e5ecf7;
+}
+
+.elementor .odt-el-solidarity-hero {
+    background: radial-gradient(circle at 75% 0%, rgba(227, 30, 36, 0.3) 0, rgba(227, 30, 36, 0) 28%),
+        radial-gradient(circle at 18% 8%, rgba(0, 82, 155, 0.3) 0, rgba(0, 82, 155, 0) 30%),
+        linear-gradient(140deg, #050d20 0%, #101b3a 100%);
+}
+
+.elementor .odt-el-solidarity-hero .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-hero .odt-el-subtitle,
+.elementor .odt-el-solidarity-hero .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel {
+    border-bottom: 1px solid #edf1f8;
+}
+
+.elementor .odt-el-solidarity-panel .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    border-radius: 28px;
+    padding: clamp(1.6rem, 2.4vw, 2.2rem);
+}
+
+.elementor .odt-el-solidarity-panel-1 .elementor-column-gap-default > .elementor-column > .elementor-element-populated,
+.elementor .odt-el-solidarity-panel-3 .elementor-column-gap-default > .elementor-column > .elementor-element-populated,
+.elementor .odt-el-solidarity-panel-5 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    background: #0f172a;
+}
+
+.elementor .odt-el-solidarity-panel-1 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-1 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-1 .odt-el-richtext p,
+.elementor .odt-el-solidarity-panel-3 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-3 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-3 .odt-el-richtext p,
+.elementor .odt-el-solidarity-panel-5 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-5 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-5 .odt-el-richtext p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-2 .elementor-column-gap-default > .elementor-column > .elementor-element-populated,
+.elementor .odt-el-solidarity-panel-4 .elementor-column-gap-default > .elementor-column > .elementor-element-populated,
+.elementor .odt-el-solidarity-panel-6 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
+    background: #f8fafd;
+    border: 1px solid #e6edf7;
+}
+
+.elementor .odt-el-contact-hero {
+    position: relative;
+}
+
+.elementor .odt-el-contact-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(5, 12, 28, 0.65) 0%, rgba(5, 12, 28, 0.6) 60%, rgba(5, 12, 28, 0.68) 100%);
+    pointer-events: none;
+}
+
+.elementor .odt-el-contact-hero .elementor-container {
+    position: relative;
+    z-index: 1;
+}
+
+.elementor .odt-el-contact-hero .odt-el-title .elementor-heading-title,
+.elementor .odt-el-contact-hero .odt-el-subtitle,
+.elementor .odt-el-contact-hero .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-contact-main .odt-el-map iframe {
+    border-radius: 30px;
+    box-shadow: 0 20px 38px rgba(12, 22, 51, 0.2);
+}
+
+.elementor .odt-el-contact-main .elementor-column:first-child > .elementor-element-populated,
+.elementor .odt-el-contact-form-section .elementor-column > .elementor-element-populated {
+    background: #ffffff;
+    border-radius: 30px;
+    border: 1px solid #e8eef8;
+    box-shadow: 0 16px 34px rgba(12, 22, 51, 0.1);
+    padding: clamp(1.3rem, 2vw, 2rem);
+}
+
+.elementor .odt-el-contact-form-section {
+    background: #f8fafd;
+    border-top: 1px solid #e5ecf7;
+    border-bottom: 1px solid #e5ecf7;
+}
+
+.elementor .odt-el-contact-form input,
+.elementor .odt-el-contact-form textarea,
+.elementor .odt-el-contact-form select,
+.elementor .odt-el-contact-form .wpcf7-form-control {
+    border-radius: 16px !important;
+    border: 2px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+    padding: 0.9rem 1rem !important;
+}
+
+.elementor .odt-el-contact-form input:focus,
+.elementor .odt-el-contact-form textarea:focus,
+.elementor .odt-el-contact-form select:focus,
+.elementor .odt-el-contact-form .wpcf7-form-control:focus {
+    border-color: #1c4d9a !important;
+    background: #fff !important;
+}
+
+.elementor .odt-el-contact-form input[type="submit"],
+.elementor .odt-el-contact-form button[type="submit"],
+.elementor .odt-el-contact-form .wpforms-submit,
+.elementor .odt-el-contact-form .wpcf7-submit {
+    border-radius: 999px !important;
+    background: #1c4d9a !important;
+    color: #fff !important;
+    border: 0 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 0.95rem 1.8rem !important;
+}
+
+.elementor .odt-el-contact-form input[type="submit"]:hover,
+.elementor .odt-el-contact-form button[type="submit"]:hover,
+.elementor .odt-el-contact-form .wpforms-submit:hover,
+.elementor .odt-el-contact-form .wpcf7-submit:hover {
+    background: #0f172a !important;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-home-slider .elementor-slide-heading,
+    .elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-heading {
+        font-size: clamp(1.8rem, 7vw, 3.1rem);
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-btn-tab .elementor-button {
+        margin-bottom: 0.3rem;
+        min-height: 46px;
+    }
+
+    .elementor .odt-el-card .elementor-image-box-img img {
+        height: 190px;
+    }
+
+    .elementor .odt-el-home-slider .swiper-slide-contents {
+        text-align: left;
+    }
+
+    .elementor .odt-el-membership-actions .elementor-column {
+        margin-bottom: 0.8rem;
+    }
+
+    .elementor .odt-el-membership-actions .odt-el-btn .elementor-button {
+        width: 100%;
+    }
+}
+
+/* Iteration 3: JS referansina daha yakin gorunum (header + hero + about) */
+.site-header {
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.54) 68%, rgba(2, 6, 23, 0.08) 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.site-header .nav-inner {
+    min-height: 82px;
+    gap: 1.1rem;
+}
+
+.site-header.is-scrolled .nav-inner {
+    min-height: 72px;
+}
+
+.site-header .site-brand-title {
+    font-size: clamp(1.85rem, 2.2vw, 2.25rem);
+    letter-spacing: -0.035em;
+}
+
+.site-header .social-links {
+    gap: 0.68rem;
+    padding-right: 1.25rem;
+    margin-right: 0.38rem;
+}
+
+.site-header .social-links a svg {
+    width: 17px;
+    height: 17px;
+}
+
+.site-header .desktop-menu {
+    gap: 0.12rem;
+}
+
+.site-header .desktop-menu > li > a {
+    padding: 0.44rem 0.66rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.085em;
+}
+
+.site-header .desktop-menu > li.menu-item-has-children > a::after {
+    margin-left: 0.3rem;
+}
+
+.site-header .desktop-menu .sub-menu {
+    top: calc(100% + 10px);
+    border-radius: 16px;
+    box-shadow: 0 20px 36px -24px rgba(15, 23, 42, 0.54);
+}
+
+.site-header .desktop-menu .sub-menu li a {
+    font-size: 0.79rem;
+    letter-spacing: 0.02em;
+}
+
+.site-header .header-ctas {
+    gap: 0.55rem;
+    margin-left: 0.45rem;
+}
+
+.site-header .header-ctas .btn {
+    min-height: 44px;
+    padding: 0.62rem 1.25rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.085em;
+}
+
+.hero,
+.hero-content {
+    min-height: clamp(560px, 85vh, 900px);
+}
+
+.hero-slide > img {
+    transform: scale(1.05);
+    filter: brightness(0.5);
+}
+
+.hero-overlay {
+    background: linear-gradient(90deg, rgba(2, 6, 23, 0.82) 0%, rgba(2, 6, 23, 0.42) 56%, rgba(2, 6, 23, 0.12) 100%);
+}
+
+.hero-content {
+    max-width: 860px;
+    padding-top: 2.2rem;
+}
+
+.hero-content h1 {
+    font-size: clamp(2.3rem, 5.8vw, 5rem);
+    line-height: 1.07;
+}
+
+.hero-content p {
+    margin: 1rem 0 1.9rem;
+    font-size: clamp(1.03rem, 1.85vw, 1.32rem);
+    max-width: 58ch;
+}
+
+.hero-actions .btn {
+    min-height: 52px;
+    padding: 0.88rem 1.6rem;
+    font-size: 0.83rem;
+}
+
+.hero-actions .btn-secondary {
+    background: rgba(0, 82, 155, 0.78);
+    border-color: rgba(0, 82, 155, 0.95);
+}
+
+.hero-actions .btn-secondary:hover {
+    background: #0b5cb7;
+    color: #fff;
+    border-color: #0b5cb7;
+}
+
+.hero-controls {
+    right: 2rem;
+    bottom: 2rem;
+}
+
+.hero-dots {
+    left: 2rem;
+    bottom: 2.25rem;
+}
+
+.hero-dot {
+    height: 6px;
+}
+
+.about-hero {
+    padding: 6.2rem 0 4.4rem;
+}
+
+.about-hero-title {
+    font-size: clamp(3.2rem, 10vw, 8.9rem);
+    line-height: 0.95;
+}
+
+.about-hero-intro {
+    max-width: 920px;
+    font-size: clamp(1.2rem, 2.2vw, 2.12rem);
+}
+
+.about-hero-motto {
+    margin-top: 1.45rem;
+    font-size: clamp(2rem, 4vw, 4.2rem);
+}
+
+.about-page-nav {
+    top: 72px;
+}
+
+body.admin-bar .about-page-nav {
+    top: 104px;
+}
+
+.about-page-nav-btn {
+    padding: 1.25rem 1.45rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+}
+
+.about-tab-icon {
+    font-size: 0.98rem;
+    margin-right: 0.48rem;
+}
+
+.about-panels {
+    padding: 3.1rem 0 4.4rem;
+}
+
+.about-panel-title {
+    font-size: clamp(2.2rem, 5vw, 4.6rem);
+}
+
+.about-richtext {
+    max-width: 1020px;
+}
+
+.about-richtext p {
+    font-size: clamp(1.05rem, 1.9vw, 1.48rem);
+}
+
+.about-quote-block {
+    margin-top: 2.3rem;
+    padding: 2.2rem 2.3rem;
+    border-left-width: 10px;
+    border-radius: 0 30px 30px 0;
+}
+
+.about-quote-block p {
+    font-size: clamp(1.25rem, 2.25vw, 2.05rem);
+    line-height: 1.35;
+    font-weight: 800;
+}
+
+.about-pagination {
+    margin-top: 3.2rem;
+    padding-top: 2rem;
+}
+
+.about-pag-btn {
+    min-height: 48px;
+    padding: 0.82rem 1.4rem;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+}
+
+.elementor .odt-el-home-slider .elementor-background-overlay {
+    background: linear-gradient(90deg, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.35) 58%, rgba(2, 6, 23, 0.1) 100%);
+    opacity: 1 !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button {
+    min-height: 52px;
+    font-size: 0.82rem;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(15, 23, 42, 0.36);
+    color: #fff;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button:hover {
+    background: #fff;
+    color: #0f172a;
+}
+
+.elementor .odt-el-home-slider .swiper-pagination {
+    left: 2rem !important;
+    right: auto !important;
+    bottom: 2.1rem !important;
+    display: inline-flex !important;
+    gap: 0.35rem;
+}
+
+.elementor .odt-el-home-slider .swiper-pagination-bullet {
+    width: 18px;
+    height: 5px;
+    border-radius: 999px;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.36);
+}
+
+.elementor .odt-el-home-slider .swiper-pagination-bullet-active {
+    width: 42px;
+    background: #e31e24;
+}
+
+.elementor .odt-el-about-nav {
+    position: sticky;
+    top: 72px;
+    z-index: 35;
+    backdrop-filter: blur(8px);
+}
+
+body.admin-bar .elementor .odt-el-about-nav {
+    top: 104px;
+}
+
+.elementor .odt-el-about-nav .elementor-button {
+    min-height: 58px;
+    border: 0;
+    border-bottom: 4px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: #94a3b8;
+    letter-spacing: 0.17em;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    padding: 0.8rem 0.5rem;
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(1) .elementor-button {
+    color: #e31e24;
+    border-bottom-color: #e31e24;
+}
+
+.elementor .odt-el-about-nav .elementor-button:hover {
+    color: #334155;
+}
+
+.elementor .odt-el-about-nav .elementor-button::before {
+    display: inline-block;
+    margin-right: 0.45rem;
+    font-size: 0.95rem;
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(1) .elementor-button::before {
+    content: "✦";
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(2) .elementor-button::before {
+    content: "◉";
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(3) .elementor-button::before {
+    content: "👥";
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(4) .elementor-button::before {
+    content: "↻";
+}
+
+.elementor .odt-el-about-nav .elementor-column:nth-child(5) .elementor-button::before {
+    content: "ⓘ";
+}
+
+.elementor .odt-el-about-panel {
+    border-bottom-color: #e7edf8;
+}
+
+.elementor .odt-el-about-panel .elementor-column > .elementor-element-populated {
+    background: #fff;
+    border: 1px solid #e7edf8;
+    border-radius: 34px;
+    padding: clamp(1.4rem, 2vw, 2.1rem);
+    box-shadow: 0 12px 28px rgba(12, 22, 51, 0.08);
+}
+
+.elementor .odt-el-about-panel-neler-yapiyoruz .elementor-column > .elementor-element-populated {
+    border-left: 10px solid #e31e24;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.elementor .odt-el-about-panel-calisma-gruplarimiz .elementor-column > .elementor-element-populated {
+    border-left: 10px solid #00529b;
+}
+
+.elementor .odt-el-about-panel-sen-de-katil .elementor-column > .elementor-element-populated {
+    border-left: 10px solid #f97316;
+}
+
+.elementor .odt-el-about-panel-tarihce .elementor-column > .elementor-element-populated {
+    border-left: 10px solid #1e293b;
+}
+
+.elementor .odt-el-about-panel-yonetim .elementor-column > .elementor-element-populated {
+    border-left: 10px solid #334155;
+}
+
+.elementor .odt-el-about-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.1rem, 4.2vw, 4rem);
+}
+
+.elementor .odt-el-about-panel .odt-el-richtext p {
+    font-size: clamp(1.03rem, 1.7vw, 1.28rem);
+    color: #334155;
+}
+
+@media (max-width: 1140px) {
+    .site-header .nav-inner {
+        min-height: 76px;
+    }
+
+    .site-header.is-scrolled .nav-inner {
+        min-height: 70px;
+    }
+
+    .about-page-nav {
+        top: 76px;
+    }
+
+    body.admin-bar .about-page-nav {
+        top: 122px;
+    }
+
+    .elementor .odt-el-about-nav {
+        top: 76px;
+    }
+
+    body.admin-bar .elementor .odt-el-about-nav {
+        top: 122px;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero,
+    .hero-content {
+        min-height: clamp(500px, 72vh, 740px);
+    }
+
+    .hero-controls,
+    .hero-dots {
+        width: min(var(--max-width), calc(100% - 1.2rem));
+    }
+
+    .hero-controls {
+        right: auto;
+        bottom: 0.9rem;
+    }
+
+    .hero-dots {
+        left: auto;
+        bottom: 3.8rem;
+    }
+
+    .elementor .odt-el-about-nav .elementor-button {
+        min-height: 48px;
+        letter-spacing: 0.1em;
+        font-size: 0.64rem;
+    }
+}
+
+/* Iteration 4: Anasayfa module parity (events + groups + CTA blocks) */
+.elementor .odt-el-home-events-intro {
+    background: #fff;
+    border-top: 0;
+    border-bottom: 0;
+    padding-top: 2.6rem;
+    padding-bottom: 1.2rem;
+}
+
+.elementor .odt-el-home-events-intro .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.2rem, 4.4vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.elementor .odt-el-home-events-intro .odt-el-subtitle p {
+    max-width: 66ch;
+    color: #475569;
+    font-size: clamp(1rem, 1.45vw, 1.2rem);
+}
+
+.elementor .odt-el-home-events-intro .odt-el-btn-primary .elementor-button {
+    background: #f8fafc;
+    color: #e31e24;
+    border-color: #e2e8f0;
+    min-height: 44px;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+}
+
+.elementor .odt-el-home-events-intro .odt-el-btn-primary .elementor-button:hover {
+    background: #e31e24;
+    color: #fff;
+    border-color: #e31e24;
+}
+
+.elementor .odt-el-home-events-row {
+    background: #fff;
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+}
+
+.elementor .odt-el-home-events-row > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.7rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.elementor .odt-el-home-events-row > .elementor-container::-webkit-scrollbar {
+    display: none;
+}
+
+.elementor .odt-el-home-events-row .elementor-column {
+    min-width: min(350px, 86vw);
+    max-width: min(350px, 86vw);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-wrapper {
+    border-radius: 22px;
+    border: 1px solid #e7edf8;
+    box-shadow: 0 10px 26px rgba(12, 22, 51, 0.12);
+    background: #fff;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-img {
+    position: relative;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-img::before {
+    content: "ETKİNLİK";
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #e31e24;
+    font-size: 0.61rem;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-img img {
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-height: 270px;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-content {
+    padding: 1rem 1rem 1.1rem;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-title {
+    font-size: 1.05rem;
+    line-height: 1.25;
+    min-height: 2.7em;
+    text-transform: none;
+}
+
+.elementor .odt-el-event-card .elementor-image-box-description {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: #475569;
+}
+
+.elementor .odt-el-home-groups-intro,
+.elementor .odt-el-home-groups-row {
+    background: #0f172a;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.elementor .odt-el-home-groups-intro {
+    padding-top: 3rem;
+    padding-bottom: 1.2rem;
+}
+
+.elementor .odt-el-home-groups-intro .odt-el-title .elementor-heading-title,
+.elementor .odt-el-home-groups-intro .odt-el-subtitle,
+.elementor .odt-el-home-groups-intro .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-home-groups-intro .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.3rem, 4.8vw, 4.2rem);
+    font-weight: 900;
+}
+
+.elementor .odt-el-home-groups-intro .odt-el-subtitle p {
+    color: #cbd5e1;
+}
+
+.elementor .odt-el-home-groups-row {
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.8rem !important;
+}
+
+.elementor .odt-el-home-groups-row > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.95rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.elementor .odt-el-home-groups-row > .elementor-container::-webkit-scrollbar {
+    display: none;
+}
+
+.elementor .odt-el-home-groups-row .elementor-column {
+    min-width: min(310px, 86vw);
+    max-width: min(310px, 86vw);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-wrapper {
+    border-radius: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.45);
+    overflow: hidden;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-img {
+    position: relative;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0) 35%, rgba(2, 6, 23, 0.65) 100%);
+    pointer-events: none;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-img img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-content {
+    padding: 1.2rem 1rem 1.1rem;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-title {
+    font-size: 1.22rem;
+    text-transform: uppercase;
+    color: #0f172a;
+}
+
+.elementor .odt-el-group-card .elementor-image-box-description {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.elementor .odt-el-home-ctas {
+    margin-top: 0;
+}
+
+.elementor .odt-el-home-ctas > .elementor-container {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    display: block;
+}
+
+.elementor .odt-el-home-ctas .elementor-column {
+    width: 100% !important;
+}
+
+.elementor .odt-el-home-ctas .elementor-column + .elementor-column {
+    margin-top: 0 !important;
+}
+
+.elementor .odt-el-home-ctas .odt-el-cta-col {
+    border-radius: 0;
+    min-height: auto;
+    box-shadow: none;
+    padding: clamp(3rem, 6vw, 6rem) 0;
+}
+
+.elementor .odt-el-home-ctas .odt-el-cta-col::after {
+    width: 340px;
+    height: 340px;
+    right: -120px;
+    top: -120px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.elementor .odt-el-home-ctas .odt-el-cta-col .elementor-widget-wrap {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-home-ctas .odt-el-cta-col .odt-el-cta-title .elementor-heading-title {
+    font-size: clamp(2.3rem, 6vw, 5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-home-ctas .odt-el-cta-col .odt-el-cta-text p {
+    font-size: clamp(1.02rem, 2.3vw, 1.45rem);
+    font-weight: 700;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 66ch;
+}
+
+.elementor .odt-el-home-ctas .odt-el-btn-ghost .elementor-button {
+    min-height: 58px;
+    padding: 0.9rem 2.1rem;
+    font-size: 0.94rem;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-home-events-row > .elementor-container,
+    .elementor .odt-el-home-groups-row > .elementor-container {
+        width: calc(100% - 1.3rem);
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-home-events-intro,
+    .elementor .odt-el-home-groups-intro {
+        padding-top: 1.9rem;
+        padding-bottom: 1rem;
+    }
+
+    .elementor .odt-el-home-events-intro .odt-el-btn-primary .elementor-button {
+        width: 100%;
+    }
+
+    .elementor .odt-el-home-ctas .odt-el-cta-col {
+        padding: 2.3rem 0;
+    }
+
+    .elementor .odt-el-home-ctas .odt-el-btn-ghost .elementor-button {
+        width: 100%;
+    }
+}
+
+/* Iteration 5: Membership + Solidarity parity */
+.elementor .odt-el-membership-hero {
+    background: radial-gradient(circle at 82% 6%, rgba(228, 31, 52, 0.28) 0, rgba(228, 31, 52, 0) 32%),
+        radial-gradient(circle at 10% 0%, rgba(24, 74, 158, 0.24) 0, rgba(24, 74, 158, 0) 28%),
+        linear-gradient(135deg, #091631 0%, #102551 100%);
+    border-top: 0;
+    border-bottom: 0;
+    text-align: center;
+}
+
+.elementor .odt-el-membership-hero .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.elementor .odt-el-membership-hero .odt-el-subtitle p {
+    margin-inline: auto;
+    max-width: 72ch;
+    color: #e2e8f0;
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+}
+
+.elementor .odt-el-membership-panel {
+    border-bottom: 1px solid #edf1f8;
+    background: #fff;
+}
+
+.elementor .odt-el-membership-panel .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-membership-panel .elementor-column > .elementor-element-populated {
+    border-radius: 30px;
+    border: 1px solid #e6edf8;
+    box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
+    padding: clamp(1.4rem, 2vw, 2rem);
+    background: #fff;
+}
+
+.elementor .odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 10px solid #e33a4a;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.elementor .odt-el-membership-panel-2.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
+    border-left-color: #1c4d9a;
+}
+
+.elementor .odt-el-membership-panel-3.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
+    border-left-color: #f97316;
+}
+
+.elementor .odt-el-membership-panel-4.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
+    border-left-color: #0f172a;
+}
+
+.elementor .odt-el-membership-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(2rem, 4.2vw, 3.8rem);
+    line-height: 1.06;
+}
+
+.elementor .odt-el-membership-panel .odt-el-richtext p {
+    font-size: clamp(1rem, 1.7vw, 1.22rem);
+    color: #334155;
+}
+
+.elementor .odt-el-membership-panel .odt-el-btn .elementor-button {
+    min-height: 52px;
+    padding: 0.85rem 1.7rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+}
+
+.elementor .odt-el-membership-panel-aside > .elementor-element-populated {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.elementor .odt-el-membership-emoji .elementor-heading-title {
+    font-size: clamp(4rem, 8vw, 7.4rem);
+    line-height: 1;
+    margin: 0;
+}
+
+.elementor .odt-el-membership-actions {
+    background: linear-gradient(90deg, #f7f9fd 0%, #ffffff 100%);
+    border-top: 1px solid #e5ecf7;
+    border-bottom: 1px solid #e5ecf7;
+}
+
+.elementor .odt-el-membership-actions .odt-el-btn .elementor-button {
+    min-height: 54px;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+}
+
+.elementor .odt-el-solidarity-hero {
+    background: radial-gradient(circle at 75% 0%, rgba(227, 30, 36, 0.3) 0, rgba(227, 30, 36, 0) 28%),
+        radial-gradient(circle at 18% 8%, rgba(0, 82, 155, 0.3) 0, rgba(0, 82, 155, 0) 30%),
+        linear-gradient(140deg, #050d20 0%, #101b3a 100%);
+    text-align: center;
+}
+
+.elementor .odt-el-solidarity-hero .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.8rem, 7vw, 6.2rem);
+    letter-spacing: -0.03em;
+}
+
+.elementor .odt-el-solidarity-hero .odt-el-subtitle p {
+    margin-inline: auto;
+    max-width: 72ch;
+}
+
+.elementor .odt-el-solidarity-panel-layout .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+    align-items: center;
+}
+
+.elementor .odt-el-solidarity-panel-layout .elementor-column > .elementor-element-populated {
+    border-radius: 30px;
+    padding: clamp(1.4rem, 2.2vw, 2.3rem);
+}
+
+.elementor .odt-el-solidarity-icon-col > .elementor-element-populated {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    min-height: 100%;
+}
+
+.elementor .odt-el-solidarity-emoji .elementor-heading-title {
+    font-size: clamp(3.2rem, 6vw, 5.4rem);
+    line-height: 1;
+}
+
+.elementor .odt-el-solidarity-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(1.9rem, 4vw, 3.3rem);
+    line-height: 1.08;
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-solidarity-panel .odt-el-richtext p {
+    font-size: clamp(1rem, 1.7vw, 1.22rem);
+    line-height: 1.55;
+}
+
+.elementor .odt-el-solidarity-panel .odt-el-btn .elementor-button {
+    min-height: 52px;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+}
+
+.elementor .odt-el-solidarity-panel-1 .elementor-column:last-child > .elementor-element-populated {
+    background: #0f172a;
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-1 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-1 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-1 .odt-el-richtext p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-2 .elementor-column:last-child > .elementor-element-populated {
+    background: #f8fafc;
+    border: 1px solid #e5edf8;
+}
+
+.elementor .odt-el-solidarity-panel-3 .elementor-column:last-child > .elementor-element-populated {
+    background: #f97316;
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-3 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-3 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-3 .odt-el-richtext p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-4 .elementor-column:last-child > .elementor-element-populated {
+    background: #e31e24;
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-4 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-4 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-4 .odt-el-richtext p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-5 .elementor-column:last-child > .elementor-element-populated {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+}
+
+.elementor .odt-el-solidarity-panel-6 .elementor-column:last-child > .elementor-element-populated {
+    background: #0f172a;
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-6 .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-panel-6 .odt-el-richtext,
+.elementor .odt-el-solidarity-panel-6 .odt-el-richtext p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-panel-7 .elementor-column:last-child > .elementor-element-populated {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+.elementor .odt-el-solidarity-panel-8 .elementor-column:last-child > .elementor-element-populated {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+.elementor .odt-el-solidarity-final-cta {
+    background: #e31e24;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.elementor .odt-el-solidarity-final-cta .odt-el-title .elementor-heading-title,
+.elementor .odt-el-solidarity-final-cta .odt-el-subtitle,
+.elementor .odt-el-solidarity-final-cta .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor .odt-el-solidarity-final-cta .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.4rem, 6vw, 5.4rem);
+}
+
+.elementor .odt-el-solidarity-final-cta .odt-el-btn-secondary .elementor-button {
+    background: #fff;
+    color: #e31e24;
+    border-color: #fff;
+    min-height: 56px;
+    font-size: 0.86rem;
+}
+
+.elementor .odt-el-solidarity-final-cta .odt-el-btn-secondary .elementor-button:hover {
+    background: #0f172a;
+    color: #fff;
+    border-color: #0f172a;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-membership-panel-has-aside .elementor-column:first-child,
+    .elementor .odt-el-membership-panel-has-aside .elementor-column:last-child,
+    .elementor .odt-el-solidarity-panel-layout .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor .odt-el-membership-panel-aside > .elementor-element-populated {
+        margin-top: 0.7rem;
+    }
+
+    .elementor .odt-el-solidarity-icon-col > .elementor-element-populated {
+        margin-bottom: 0.7rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-membership-panel .odt-el-btn .elementor-button,
+    .elementor .odt-el-solidarity-panel .odt-el-btn .elementor-button,
+    .elementor .odt-el-solidarity-final-cta .odt-el-btn .elementor-button {
+        width: 100%;
+    }
+}
+
+/* Iteration 6: About page parity tightening */
+.elementor .odt-el-about-panel-neler-yapiyoruz .odt-el-about-quote {
+    margin-top: 1.6rem;
+}
+
+.elementor .odt-el-about-panel-neler-yapiyoruz .odt-el-about-quote p {
+    margin: 0;
+    padding: 1.45rem 1.65rem;
+    border-left: 8px solid #e31e24;
+    border-radius: 0 22px 22px 0;
+    background: linear-gradient(90deg, #fff1f2 0%, #fff 100%);
+    color: #991b1b;
+    font-size: clamp(1.08rem, 2.2vw, 1.46rem);
+    font-style: italic;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.elementor .odt-el-about-groups-intro {
+    border-bottom: 0;
+    padding-top: 1.1rem;
+    padding-bottom: 0.4rem;
+}
+
+.elementor .odt-el-about-groups-intro .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+}
+
+.elementor .odt-el-about-groups-intro .odt-el-subtitle p {
+    margin-inline: auto;
+    max-width: 74ch;
+}
+
+.elementor .odt-el-about-groups-row > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-about-groups-row .odt-el-group-card .elementor-image-box-wrapper {
+    border: 1px solid #e6edf8;
+    border-radius: 34px;
+    overflow: hidden;
+}
+
+.elementor .odt-el-about-groups-row .odt-el-group-card .elementor-image-box-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+}
+
+.elementor .odt-el-about-join-actions {
+    border-top: 0;
+    border-bottom: 1px solid #edf1f8;
+}
+
+.elementor .odt-el-about-join-actions .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+    align-items: stretch;
+}
+
+.elementor .odt-el-about-join-card > .elementor-element-populated {
+    border-radius: 34px;
+    border: 1px solid #e6edf8;
+    background: #fff;
+    box-shadow: 0 14px 28px rgba(12, 22, 51, 0.09);
+    padding: clamp(1.3rem, 2vw, 2rem);
+    min-height: 100%;
+}
+
+.elementor .odt-el-about-join-card-blue > .elementor-element-populated {
+    border-top: 8px solid #1d4e9e;
+}
+
+.elementor .odt-el-about-join-card-red > .elementor-element-populated {
+    border-top: 8px solid #e31e24;
+}
+
+.elementor .odt-el-about-join-icon .elementor-heading-title {
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    line-height: 1;
+}
+
+.elementor .odt-el-about-join-card .odt-el-title .elementor-heading-title {
+    font-size: clamp(2rem, 3.7vw, 3rem);
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-about-join-card .odt-el-about-join-btn .elementor-button {
+    min-height: 52px;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+}
+
+.elementor .odt-el-about-history-intro {
+    padding-top: 1.2rem;
+    padding-bottom: 0.6rem;
+}
+
+.elementor .odt-el-about-history-intro .odt-el-title .elementor-heading-title {
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.elementor .odt-el-about-history-row > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-about-history-card .elementor-image-box-wrapper {
+    border-radius: 30px;
+    overflow: hidden;
+    border: 3px solid #dbe7f5;
+    box-shadow: 0 14px 28px rgba(12, 22, 51, 0.1);
+}
+
+.elementor .odt-el-about-history-card .elementor-image-box-img {
+    width: 100%;
+}
+
+.elementor-page .elementor .odt-el-about-history-card .elementor-image-box-wrapper .elementor-image-box-img {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.elementor .odt-el-about-history-card .elementor-image-box-img img {
+    width: 100%;
+    height: clamp(220px, 22vw, 300px);
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.elementor-page .elementor .odt-el-about-history-card .elementor-image-box-wrapper .elementor-image-box-img img {
+    width: 100% !important;
+}
+
+.elementor .odt-el-about-history-card .elementor-image-box-title {
+    font-size: clamp(1.2rem, 2.2vw, 1.58rem);
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-about-history-card .elementor-image-box-description {
+    font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+    color: #475569;
+}
+
+.elementor .odt-el-about-history-card-red .elementor-image-box-wrapper {
+    border-color: #fecaca;
+}
+
+.elementor .odt-el-about-history-card-blue .elementor-image-box-wrapper {
+    border-color: #bfdbfe;
+}
+
+.elementor .odt-el-about-history-card-dark .elementor-image-box-wrapper {
+    border-color: #cbd5e1;
+}
+
+.elementor .odt-el-about-history-card-orange .elementor-image-box-wrapper {
+    border-color: #fed7aa;
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-about-history-card .elementor-image-box-img img {
+        height: clamp(190px, 48vw, 250px);
+    }
+}
+
+.elementor .odt-el-about-management-row {
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.elementor .odt-el-about-management-row > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+    border: 1px solid #e6edf8;
+    border-radius: 30px;
+    background: #fff;
+    box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
+}
+
+.elementor .odt-el-about-management-row .elementor-column > .elementor-element-populated {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
+}
+
+.elementor .odt-el-about-management-row .odt-el-about-management-icon .elementor-heading-title {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+}
+
+.elementor .odt-el-about-management-row .odt-el-about-management-title .elementor-heading-title {
+    font-size: clamp(1.3rem, 2.3vw, 1.95rem);
+    text-transform: uppercase;
+}
+
+.elementor .odt-el-about-management-row .odt-el-about-management-desc p {
+    margin: 0;
+    color: #475569;
+}
+
+.elementor .odt-el-about-management-row .odt-el-about-management-btn .elementor-button {
+    min-height: 46px;
+    font-size: 0.72rem;
+    padding-inline: 1.2rem;
+}
+
+.elementor .odt-el-about-management-row-blue > .elementor-container {
+    border-left: 8px solid #1d4e9e;
+}
+
+.elementor .odt-el-about-management-row-red > .elementor-container {
+    border-left: 8px solid #e31e24;
+}
+
+.elementor .odt-el-about-management-row-dark > .elementor-container {
+    border-left: 8px solid #0f172a;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-about-join-actions .elementor-column,
+    .elementor .odt-el-about-history-row .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor .odt-el-about-management-row .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor .odt-el-about-management-row .odt-el-about-management-action-col .elementor-button-align-right {
+        text-align: left;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-about-panel .elementor-column > .elementor-element-populated,
+    .elementor .odt-el-about-management-row > .elementor-container {
+        border-radius: 20px;
+    }
+
+    .elementor .odt-el-about-join-card .odt-el-about-join-btn .elementor-button,
+    .elementor .odt-el-about-management-row .odt-el-about-management-btn .elementor-button {
+        width: 100%;
+    }
+}
+
+/* Iteration 7: About tab behavior + team single page polish */
+.elementor .odt-el-about-nav .elementor-column:nth-child(1) .elementor-button {
+    color: #94a3b8;
+    border-bottom-color: transparent;
+}
+
+.elementor .odt-el-about-nav .elementor-column.is-active .elementor-button,
+.elementor .odt-el-about-nav .elementor-button.is-active {
+    color: #e31e24 !important;
+    border-bottom-color: #e31e24 !important;
+}
+
+.elementor .odt-el-about-groups-dynamic .about-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+}
+
+.elementor .odt-el-about-groups-dynamic .about-group-card {
+    height: 100%;
+}
+
+.elementor .odt-el-about-groups-dynamic .about-group-media img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+}
+
+.team-single-hero {
+    background: radial-gradient(circle at 85% 10%, rgba(227, 30, 36, 0.22) 0, rgba(227, 30, 36, 0) 36%),
+        radial-gradient(circle at 10% 90%, rgba(0, 82, 155, 0.22) 0, rgba(0, 82, 155, 0) 36%),
+        linear-gradient(135deg, #0b1b40 0%, #131a36 100%);
+    padding-top: clamp(3.7rem, 8vw, 5.8rem);
+    padding-bottom: 1.6rem;
+}
+
+.team-single-kicker {
+    margin: 0 0 0.7rem;
+    color: #fca5a5;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+.team-single-media-block {
+    padding: 0 0 1.5rem;
+}
+
+.team-single-media {
+    margin: 0;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.2);
+    background: #020617;
+}
+
+.team-single-media img {
+    display: block;
+    width: 100%;
+    height: clamp(250px, 55vw, 560px);
+    object-fit: cover;
+}
+
+.team-single-content-block {
+    padding-top: 0.4rem;
+}
+
+.team-single-content {
+    max-width: 860px;
+}
+
+.team-single-content p,
+.team-single-content li {
+    font-size: clamp(1rem, 1.45vw, 1.12rem);
+    line-height: 1.72;
+    color: #334155;
+}
+
+.team-single-content h2,
+.team-single-content h3,
+.team-single-content h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.6rem;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.team-single-back {
+    padding: 0.4rem 0 3rem;
+}
+
+.team-single-back .btn {
+    min-height: 48px;
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-about-groups-dynamic .about-groups-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-about-groups-dynamic .about-groups-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .team-single-media {
+        border-radius: 20px;
+    }
+
+    .team-single-back .btn {
+        width: 100%;
+    }
+}
+
+/* Iteration 8: Hero slider + about tab typography/padding parity */
+.elementor .odt-el-home-hero {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slides-wrapper,
+.elementor .odt-el-home-slider .swiper-slide,
+.elementor .odt-el-home-slider .swiper-slide-inner {
+    min-height: clamp(540px, 84vh, 900px) !important;
+}
+
+.elementor .odt-el-home-slider .swiper-slide-inner {
+    display: flex;
+    align-items: center;
+}
+
+.elementor .odt-el-home-slider .swiper-slide-contents {
+    max-width: min(760px, 92vw) !important;
+    width: 100%;
+    margin-left: clamp(0.8rem, 4.2vw, 5.2rem) !important;
+    margin-right: auto !important;
+    text-align: left !important;
+    padding: 0 !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-heading,
+.elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-heading {
+    margin-bottom: 1rem !important;
+    font-size: clamp(2.1rem, 5.5vw, 5.2rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.06 !important;
+    letter-spacing: -0.035em !important;
+    text-transform: uppercase !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-description,
+.elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-description {
+    margin-bottom: 1.35rem !important;
+    max-width: 58ch !important;
+    font-size: clamp(1rem, 1.65vw, 1.38rem) !important;
+    line-height: 1.58 !important;
+    color: #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button {
+    min-height: 56px !important;
+    padding: 0.9rem 1.8rem !important;
+    border-radius: 999px !important;
+    background: #e31e24 !important;
+    border-color: #e31e24 !important;
+    color: #fff !important;
+    font-size: 0.84rem !important;
+    letter-spacing: 0.1em !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button:hover {
+    background: #fff !important;
+    border-color: #fff !important;
+    color: #e31e24 !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button.elementor-secondary-button,
+.elementor .odt-el-home-slider .elementor-slide-button.elementor-button-secondary {
+    background: #00529b !important;
+    border-color: #00529b !important;
+    color: #fff !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-button.elementor-secondary-button:hover,
+.elementor .odt-el-home-slider .elementor-slide-button.elementor-button-secondary:hover {
+    background: #fff !important;
+    border-color: #fff !important;
+    color: #00529b !important;
+}
+
+.elementor .odt-el-about-nav .elementor-button {
+    min-height: 62px;
+    padding: 0.95rem 0.48rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+}
+
+.elementor .odt-el-about-panel .elementor-column > .elementor-element-populated {
+    padding: clamp(1.75rem, 2.6vw, 2.6rem);
+}
+
+.elementor .odt-el-about-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.25rem, 4.5vw, 4.4rem);
+    line-height: 1.03;
+    letter-spacing: -0.03em;
+}
+
+.elementor .odt-el-about-panel .odt-el-richtext p {
+    font-size: clamp(1.02rem, 1.55vw, 1.22rem);
+    line-height: 1.65;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-home-slider .swiper-slide-contents {
+        margin-left: clamp(0.8rem, 3.6vw, 2.3rem) !important;
+        max-width: min(680px, 94vw) !important;
+    }
+
+    .elementor .odt-el-about-nav .elementor-button {
+        min-height: 56px;
+        font-size: 0.69rem;
+        letter-spacing: 0.11em;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-home-slider .elementor-slides-wrapper,
+    .elementor .odt-el-home-slider .swiper-slide,
+    .elementor .odt-el-home-slider .swiper-slide-inner {
+        min-height: clamp(500px, 78vh, 720px) !important;
+    }
+
+    .elementor .odt-el-home-slider .swiper-slide-contents {
+        margin-left: 0.8rem !important;
+        margin-right: 0.8rem !important;
+    }
+
+    .elementor .odt-el-home-slider .elementor-slide-button {
+        width: 100%;
+    }
+
+    .elementor .odt-el-about-nav .elementor-button {
+        min-height: 50px;
+        font-size: 0.64rem;
+        letter-spacing: 0.09em;
+    }
+
+    .elementor .odt-el-about-panel .elementor-column > .elementor-element-populated {
+        padding: 1.35rem;
+    }
+}
+
+/* Iteration 9: Team single polish + slider arrow alignment/height tuning */
+.team-single-hero .site-container,
+.team-single-media-block .site-container,
+.team-single-content-block .site-container,
+.team-single-back .site-container {
+    width: min(1020px, calc(100% - 2rem));
+}
+
+.team-single-hero h1 {
+    margin: 0;
+    font-size: clamp(2.1rem, 6.2vw, 4.6rem);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+}
+
+.team-single-media {
+    border-radius: 26px;
+}
+
+.team-single-media img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+}
+
+.team-single-content {
+    max-width: 880px;
+    margin-inline: auto;
+}
+
+.team-single-content > p:first-of-type {
+    font-size: clamp(1.06rem, 1.7vw, 1.3rem);
+    line-height: 1.68;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.team-single-content p + p {
+    margin-top: 1rem;
+}
+
+.team-single-content ul,
+.team-single-content ol {
+    padding-left: 1.25rem;
+}
+
+.team-single-content figure,
+.team-single-content .wp-block-image {
+    margin: 1.3rem 0;
+}
+
+.team-single-content figure img,
+.team-single-content .wp-block-image img {
+    border-radius: 18px;
+}
+
+.elementor .odt-el-home-slider .elementor-slides-wrapper,
+.elementor .odt-el-home-slider .swiper-slide,
+.elementor .odt-el-home-slider .swiper-slide-inner {
+    min-height: clamp(430px, 68vh, 760px) !important;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button {
+    position: absolute;
+    top: 50% !important;
+    transform: translateY(-50%);
+    margin-top: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    z-index: 20;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button-prev {
+    left: clamp(0.7rem, 1.9vw, 1.7rem) !important;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button-next {
+    right: clamp(0.7rem, 1.9vw, 1.7rem) !important;
+}
+
+.elementor .odt-el-home-slider .elementor-swiper-button i,
+.elementor .odt-el-home-slider .elementor-swiper-button svg {
+    font-size: 0.9rem;
+    width: 0.9rem;
+    height: 0.9rem;
+}
+
+.elementor .odt-el-home-slider .swiper-pagination {
+    bottom: 1.3rem !important;
+    left: clamp(0.9rem, 2.1vw, 2rem) !important;
+}
+
+@media (max-width: 767px) {
+    .team-single-hero .site-container,
+    .team-single-media-block .site-container,
+    .team-single-content-block .site-container,
+    .team-single-back .site-container {
+        width: min(1020px, calc(100% - 1.2rem));
+    }
+
+    .team-single-media img {
+        aspect-ratio: 4 / 3;
+    }
+
+    .elementor .odt-el-home-slider .elementor-slides-wrapper,
+    .elementor .odt-el-home-slider .swiper-slide,
+    .elementor .odt-el-home-slider .swiper-slide-inner {
+        min-height: clamp(360px, 56vh, 560px) !important;
+    }
+
+    .elementor .odt-el-home-slider .elementor-swiper-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .elementor .odt-el-home-slider .elementor-swiper-button-prev {
+        left: 0.6rem !important;
+    }
+
+    .elementor .odt-el-home-slider .elementor-swiper-button-next {
+        right: 0.6rem !important;
+    }
+}
+
+/* Iteration 10: Slider title vertical position + Elementor about prev/next */
+.elementor .odt-el-home-slider .swiper-slide-inner {
+    align-items: flex-start !important;
+    padding-top: clamp(92px, 12vh, 150px) !important;
+}
+
+.elementor .odt-el-home-slider .swiper-slide-contents {
+    max-width: min(980px, 95vw) !important;
+}
+
+.elementor .odt-el-home-slider .elementor-slide-heading,
+.elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-heading {
+    font-size: clamp(1.95rem, 4.9vw, 4.8rem) !important;
+    line-height: 1.04 !important;
+}
+
+.elementor .odt-el-about-pagination {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 0.8rem;
+}
+
+.elementor .odt-el-about-pagination .elementor-container {
+    align-items: center;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-btn .elementor-button {
+    min-height: 52px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.085em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.35rem;
+    transition: all 0.2s ease;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-btn-prev .elementor-button {
+    border: 2px solid #cbd5e1;
+    background: #fff;
+    color: #475569;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-btn-prev .elementor-button:hover {
+    border-color: #e31e24;
+    color: #e31e24;
+    background: #fff;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-btn-next .elementor-button {
+    border: 2px solid #0f172a;
+    background: #0f172a;
+    color: #fff;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-btn-next .elementor-button:hover {
+    background: #e31e24;
+    border-color: #e31e24;
+    color: #fff;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-spacer {
+    min-height: 52px;
+}
+
+.elementor .odt-el-about-pagination .odt-el-about-pag-spacer p {
+    margin: 0;
+    min-height: 1px;
+}
+
+@media (max-width: 1024px) {
+    .elementor .odt-el-home-slider .swiper-slide-inner {
+        padding-top: clamp(84px, 10vh, 120px) !important;
+    }
+
+    .elementor .odt-el-about-pagination .odt-el-about-pag-btn .elementor-button {
+        font-size: 0.66rem;
+        letter-spacing: 0.07em;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-home-slider .swiper-slide-inner {
+        padding-top: clamp(74px, 10vh, 102px) !important;
+    }
+
+    .elementor .odt-el-home-slider .swiper-slide-contents {
+        max-width: 96vw !important;
+    }
+
+    .elementor .odt-el-home-slider .elementor-slide-heading,
+    .elementor .odt-el-home-slider .swiper-slide-contents .elementor-slide-heading {
+        font-size: clamp(1.65rem, 9vw, 2.8rem) !important;
+    }
+
+    .elementor .odt-el-about-pagination .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor .odt-el-about-pagination .odt-el-about-pag-btn .elementor-button,
+    .elementor .odt-el-about-pagination .odt-el-about-pag-btn .elementor-button-link {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Iteration 11: About pagination single-instance + working-group single layout refinement */
+.single-team .site-main {
+    padding-top: 94px;
+}
+
+.team-single-hero {
+    padding-top: clamp(4.8rem, 9vw, 6.4rem);
+    padding-bottom: clamp(1.2rem, 2.2vw, 1.9rem);
+}
+
+.team-single-hero h1 {
+    max-width: 18ch;
+}
+
+.team-single-media-block {
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+.team-single-media img {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    max-height: min(62vh, 560px);
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+}
+
+.team-single-content-block {
+    padding-top: 0.2rem;
+    padding-bottom: 2.4rem;
+}
+
+.team-single-content {
+    max-width: 820px;
+}
+
+.team-single-content > h1:first-child,
+.team-single-content > h2:first-child,
+.team-single-content > h3:first-child {
+    margin-top: 0;
+}
+
+.team-single-content img,
+.team-single-content video,
+.team-single-content iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.team-single-content .alignfull,
+.team-single-content .alignwide {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+}
+
+.team-single-content figure {
+    margin: 1.1rem 0 1.4rem;
+}
+
+.team-single-content p {
+    text-wrap: pretty;
+}
+
+.elementor .odt-el-about-pagination {
+    display: none;
+}
+
+.elementor .odt-el-about-pagination.is-active {
+    display: block;
+}
+
+@media (max-width: 767px) {
+    .single-team .site-main {
+        padding-top: 86px;
+    }
+
+    .team-single-hero {
+        padding-top: 4.3rem;
+    }
+
+    .team-single-media img {
+        aspect-ratio: 4 / 3;
+        max-height: 420px;
+    }
+}
+
+/* Iteration 12: Membership page style stabilization (Elementor-first) */
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero {
+    background: radial-gradient(circle at 82% 6%, rgba(228, 31, 52, 0.28) 0, rgba(228, 31, 52, 0) 32%),
+        radial-gradient(circle at 10% 0%, rgba(24, 74, 158, 0.24) 0, rgba(24, 74, 158, 0) 28%),
+        linear-gradient(135deg, #091631 0%, #102551 100%);
+    border-top: 0;
+    border-bottom: 0;
+    text-align: center;
+    padding-top: clamp(3.4rem, 6vw, 5.2rem);
+    padding-bottom: clamp(2.5rem, 4.6vw, 3.9rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero > .elementor-container {
+    width: min(1120px, calc(100% - 2.2rem));
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.5rem, 6.2vw, 5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #fff;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero .odt-el-subtitle,
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero .odt-el-subtitle p {
+    color: #e2e8f0;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero .odt-el-subtitle p {
+    margin-inline: auto;
+    max-width: 72ch;
+    font-size: clamp(1rem, 1.9vw, 1.28rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel {
+    --odt-membership-accent: #e33a4a;
+    background: #fff;
+    border-bottom: 1px solid #edf1f8;
+    padding-top: clamp(1.4rem, 3.2vw, 2.4rem);
+    padding-bottom: clamp(1.4rem, 3.2vw, 2.4rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-bilgi-guncelleme {
+    --odt-membership-accent: #1c4d9a;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-aidat-odeme {
+    --odt-membership-accent: #f97316;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-uyelik-avantajlari {
+    --odt-membership-accent: #0f172a;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel > .elementor-container {
+    width: min(1120px, calc(100% - 2.2rem));
+    align-items: stretch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .elementor-column:first-child > .elementor-element-populated {
+    border-radius: 30px;
+    border: 1px solid #e6edf8;
+    border-left: 9px solid var(--odt-membership-accent);
+    box-shadow: 0 12px 26px rgba(12, 22, 51, 0.08);
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    padding: clamp(1.4rem, 2.2vw, 2.1rem);
+    min-height: 100%;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-title .elementor-heading-title {
+    font-size: clamp(1.9rem, 3.9vw, 3.4rem);
+    line-height: 1.08;
+    margin-bottom: 0.3rem;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-richtext {
+    max-width: 70ch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-richtext p {
+    font-size: clamp(1rem, 1.55vw, 1.16rem);
+    line-height: 1.65;
+    color: #334155;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-btn .elementor-button {
+    min-height: 52px;
+    padding: 0.85rem 1.65rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel-has-aside .odt-el-membership-panel-aside > .elementor-element-populated {
+    border-radius: 30px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: clamp(1rem, 1.8vw, 1.3rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-membership-emoji .elementor-heading-title {
+    font-size: clamp(3.8rem, 7vw, 6.8rem);
+    line-height: 1;
+    margin: 0;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-actions {
+    background: linear-gradient(90deg, #f7f9fd 0%, #ffffff 100%);
+    border-top: 1px solid #e5ecf7;
+    border-bottom: 1px solid #e5ecf7;
+    padding-top: clamp(1.3rem, 2.8vw, 2rem);
+    padding-bottom: clamp(1.3rem, 2.8vw, 2rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-actions > .elementor-container {
+    width: min(1120px, calc(100% - 2.2rem));
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-actions .odt-el-btn .elementor-button {
+    min-height: 54px;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 1024px) {
+    .elementor-page .elementor .odt-el-section.odt-el-membership-panel-has-aside .elementor-column:first-child,
+    .elementor-page .elementor .odt-el-section.odt-el-membership-panel-has-aside .elementor-column:last-child {
+        width: 100% !important;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-membership-panel-has-aside .odt-el-membership-panel-aside > .elementor-element-populated {
+        margin-top: 0.8rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor-page .elementor .odt-el-section.odt-el-membership-hero {
+        padding-top: 3rem;
+        padding-bottom: 2.2rem;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-btn .elementor-button,
+    .elementor-page .elementor .odt-el-section.odt-el-membership-actions .odt-el-btn .elementor-button {
+        width: 100%;
+    }
+}
+
+/* Iteration 13: Solidarity cards height + bursiyerler readability */
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout > .elementor-container {
+    align-items: stretch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column {
+    display: flex;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column > .elementor-element-populated {
+    width: 100%;
+    min-height: clamp(220px, 22vw, 300px);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column:last-child > .elementor-element-populated {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Elementor 4 does not include custom percentages like 22/28/72/78 by default */
+@media (min-width: 768px) {
+    .elementor .elementor-column.elementor-col-22 {
+        width: 22% !important;
+        flex: 0 0 22% !important;
+    }
+
+    .elementor .elementor-column.elementor-col-28 {
+        width: 28% !important;
+        flex: 0 0 28% !important;
+    }
+
+    .elementor .elementor-column.elementor-col-72 {
+        width: 72% !important;
+        flex: 0 0 72% !important;
+    }
+
+    .elementor .elementor-column.elementor-col-78 {
+        width: 78% !important;
+        flex: 0 0 78% !important;
+    }
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-bursiyerler .elementor-column:last-child > .elementor-element-populated {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-bursiyerler .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-bursiyerler .odt-el-richtext,
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-bursiyerler .odt-el-richtext p {
+    color: #0f172a;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-bursiyerler .odt-el-btn .elementor-button {
+    background: #153f8a;
+    color: #fff;
+    border-color: #153f8a;
+}
+
+@media (max-width: 1024px) {
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column > .elementor-element-populated {
+        min-height: 0;
+    }
+}
+
+/* Iteration 14: Normalize Elementor image-box media width for ODTUMIST cards */
+.elementor-page .elementor .odt-el-event-card .elementor-image-box-wrapper .elementor-image-box-img,
+.elementor-page .elementor .odt-el-group-card .elementor-image-box-wrapper .elementor-image-box-img,
+.elementor-page .elementor .odt-el-about-history-card .elementor-image-box-wrapper .elementor-image-box-img {
+    width: 100% !important;
+    max-width: 100% !important;
 }

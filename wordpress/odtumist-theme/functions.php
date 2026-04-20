@@ -75,7 +75,38 @@ function odtumist_should_render_with_elementor($post_id = 0)
         return true;
     }
 
-    return odtumist_is_built_with_elementor($post_id);
+    if (!odtumist_is_built_with_elementor($post_id)) {
+        return false;
+    }
+
+    // Elementor "builder" meta'si kalmis ama dokuman bos ise,
+    // sayfayi custom tema layout'una dusur.
+    return odtumist_has_meaningful_elementor_data($post_id);
+}
+
+function odtumist_has_meaningful_elementor_data($post_id = 0)
+{
+    $post_id = (int) ($post_id ?: get_the_ID());
+    if ($post_id <= 0) {
+        return false;
+    }
+
+    $raw = get_post_meta($post_id, '_elementor_data', true);
+    if (!is_string($raw)) {
+        return false;
+    }
+
+    $raw = trim($raw);
+    if ($raw === '' || $raw === '[]') {
+        return false;
+    }
+
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        $decoded = json_decode(wp_unslash($raw), true);
+    }
+
+    return is_array($decoded) && !empty($decoded);
 }
 
 function odtumist_get_locked_template_page_slugs()
@@ -93,6 +124,26 @@ function odtumist_get_locked_template_page_slugs()
         'solidarity',
         'iletisim',
         'contact',
+        // Hakkimizda alt sayfalari
+        'neler-yapiyoruz',
+        'calisma-gruplarimiz',
+        'sen-de-katil',
+        'tarihce',
+        'yonetim',
+        // Uyelik alt sayfalari
+        'neden-uye-olmaliyim',
+        'bilgi-guncelleme',
+        'aidat-odeme',
+        'uyelik-avantajlari',
+        // Dayanisma alt sayfalari
+        'networking',
+        'burs',
+        'maraton',
+        'mentorluk',
+        'bursiyerler',
+        'gonulluler',
+        'bagiscilar',
+        'paydaslar',
     );
 }
 
@@ -513,7 +564,7 @@ function odtumist_get_working_groups($limit = 9)
         'post_type'      => 'team',
         'post_status'    => 'publish',
         'posts_per_page' => $limit,
-        'orderby'        => 'date',
+        'orderby'        => 'modified',
         'order'          => 'DESC',
     ));
 
@@ -705,16 +756,25 @@ function odtumist_render_fallback_menu($args)
     $contact_url    = $contact_page ? get_permalink($contact_page) : home_url('/iletisim/');
 
     if ('primary-menu' === $theme_location) {
+        $resolve_child_url = static function ($slug, $fallback_url) {
+            $child_page = get_page_by_path((string) $slug);
+            if ($child_page instanceof WP_Post) {
+                return get_permalink($child_page);
+            }
+
+            return $fallback_url;
+        };
+
         $items = array(
             array(
                 'title' => 'HAKKIMIZDA',
                 'url'   => $about_url,
                 'children' => array(
-                    array('title' => 'Neler Yapıyoruz?', 'url' => $about_url . '#neler-yapiyoruz'),
-                    array('title' => 'Çalışma Gruplarımız', 'url' => $about_url . '#calisma-gruplarimiz'),
-                    array('title' => 'Sen de katıl Hocam!', 'url' => $about_url . '#sen-de-katil'),
-                    array('title' => 'Tarihçe', 'url' => $about_url . '#tarihce'),
-                    array('title' => 'Yönetim', 'url' => $about_url . '#yonetim'),
+                    array('title' => 'Neler Yapıyoruz?', 'url' => $resolve_child_url('neler-yapiyoruz', $about_url . '#neler-yapiyoruz')),
+                    array('title' => 'Çalışma Gruplarımız', 'url' => $resolve_child_url('calisma-gruplarimiz', $about_url . '#calisma-gruplarimiz')),
+                    array('title' => 'Sen de katıl Hocam!', 'url' => $resolve_child_url('sen-de-katil', $about_url . '#sen-de-katil')),
+                    array('title' => 'Tarihçe', 'url' => $resolve_child_url('tarihce', $about_url . '#tarihce')),
+                    array('title' => 'Yönetim', 'url' => $resolve_child_url('yonetim', $about_url . '#yonetim')),
                 ),
             ),
             array(
@@ -726,24 +786,24 @@ function odtumist_render_fallback_menu($args)
                 'title' => 'ÜYELİK',
                 'url'   => $membership_url,
                 'children' => array(
-                    array('title' => 'Neden Üye Olmalıyım?', 'url' => $membership_url . '#neden-uye-olmaliyim'),
-                    array('title' => 'Bilgi Güncelleme', 'url' => $membership_url . '#bilgi-guncelleme'),
-                    array('title' => 'Aidat Ödeme', 'url' => $membership_url . '#aidat-odeme'),
-                    array('title' => 'Üyelik Avantajları', 'url' => $membership_url . '#uyelik-avantajlari'),
+                    array('title' => 'Neden Üye Olmalıyım?', 'url' => $resolve_child_url('neden-uye-olmaliyim', $membership_url . '#neden-uye-olmaliyim')),
+                    array('title' => 'Bilgi Güncelleme', 'url' => $resolve_child_url('bilgi-guncelleme', $membership_url . '#bilgi-guncelleme')),
+                    array('title' => 'Aidat Ödeme', 'url' => $resolve_child_url('aidat-odeme', $membership_url . '#aidat-odeme')),
+                    array('title' => 'Üyelik Avantajları', 'url' => $resolve_child_url('uyelik-avantajlari', $membership_url . '#uyelik-avantajlari')),
                 ),
             ),
             array(
                 'title' => 'DAYANIŞMA',
                 'url'   => $solidarity_url,
                 'children' => array(
-                    array('title' => 'Networking', 'url' => $solidarity_url . '#networking'),
-                    array('title' => 'Burs', 'url' => $solidarity_url . '#burs'),
-                    array('title' => 'Maraton', 'url' => $solidarity_url . '#maraton'),
-                    array('title' => 'Mentorluk', 'url' => $solidarity_url . '#mentorluk'),
-                    array('title' => 'Bursiyerler', 'url' => $solidarity_url . '#bursiyerler'),
-                    array('title' => 'Gönüllüler', 'url' => $solidarity_url . '#gonulluler'),
-                    array('title' => 'Bağışçılar', 'url' => $solidarity_url . '#bagiscilar'),
-                    array('title' => 'Paydaşlarımız', 'url' => $solidarity_url . '#paydaslar'),
+                    array('title' => 'Networking', 'url' => $resolve_child_url('networking', $solidarity_url . '#networking')),
+                    array('title' => 'Burs', 'url' => $resolve_child_url('burs', $solidarity_url . '#burs')),
+                    array('title' => 'Maraton', 'url' => $resolve_child_url('maraton', $solidarity_url . '#maraton')),
+                    array('title' => 'Mentorluk', 'url' => $resolve_child_url('mentorluk', $solidarity_url . '#mentorluk')),
+                    array('title' => 'Bursiyerler', 'url' => $resolve_child_url('bursiyerler', $solidarity_url . '#bursiyerler')),
+                    array('title' => 'Gönüllüler', 'url' => $resolve_child_url('gonulluler', $solidarity_url . '#gonulluler')),
+                    array('title' => 'Bağışçılar', 'url' => $resolve_child_url('bagiscilar', $solidarity_url . '#bagiscilar')),
+                    array('title' => 'Paydaşlarımız', 'url' => $resolve_child_url('paydaslar', $solidarity_url . '#paydaslar')),
                 ),
             ),
             array(
@@ -836,12 +896,29 @@ function odtumist_get_page_layout_slug($slug)
     $map = array(
         'hakkimizda' => 'about-layout',
         'about'      => 'about-layout',
+        'neler-yapiyoruz' => 'about-layout',
+        'calisma-gruplarimiz' => 'about-layout',
+        'sen-de-katil' => 'about-layout',
+        'tarihce' => 'about-layout',
+        'yonetim' => 'about-layout',
         'etkinlikler' => 'events-layout',
         'events'      => 'events-layout',
         'uyelik'      => 'membership-layout',
         'membership'  => 'membership-layout',
+        'neden-uye-olmaliyim' => 'membership-layout',
+        'bilgi-guncelleme' => 'membership-layout',
+        'aidat-odeme' => 'membership-layout',
+        'uyelik-avantajlari' => 'membership-layout',
         'dayanisma'   => 'solidarity-layout',
         'solidarity'  => 'solidarity-layout',
+        'networking'  => 'solidarity-layout',
+        'burs'        => 'solidarity-layout',
+        'maraton'     => 'solidarity-layout',
+        'mentorluk'   => 'solidarity-layout',
+        'bursiyerler' => 'solidarity-layout',
+        'gonulluler'  => 'solidarity-layout',
+        'bagiscilar'  => 'solidarity-layout',
+        'paydaslar'   => 'solidarity-layout',
         'iletisim'    => 'contact-layout',
         'contact'     => 'contact-layout',
     );

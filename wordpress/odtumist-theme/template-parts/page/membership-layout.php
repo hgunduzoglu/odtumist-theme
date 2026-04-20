@@ -3,19 +3,37 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$ctas        = odtumist_get_primary_cta_links();
-$tabs        = odtumist_get_membership_tab_defaults();
-$raw_content = (string) get_post_field('post_content', get_the_ID());
+$ctas           = odtumist_get_primary_cta_links();
+$tabs           = odtumist_get_membership_tab_defaults();
+$current_page_id = (int) get_the_ID();
+$current_slug    = sanitize_title((string) get_post_field('post_name', $current_page_id));
+$membership_root = odtumist_get_page_by_slug(array('uyelik', 'membership'));
+$membership_root_id = ($membership_root instanceof WP_Post) ? (int) $membership_root->ID : 0;
+
+$is_membership_root = in_array($current_slug, array('uyelik', 'membership'), true) || ($membership_root_id > 0 && $membership_root_id === $current_page_id);
+$content_source_id  = $is_membership_root ? $current_page_id : ($membership_root_id > 0 ? $membership_root_id : $current_page_id);
+
+$raw_content = (string) get_post_field('post_content', $content_source_id);
 $sections    = odtumist_extract_content_sections($raw_content);
+$hero_title  = $content_source_id > 0 ? get_the_title($content_source_id) : get_the_title();
+$hero_excerpt = (string) get_post_field('post_excerpt', $content_source_id);
+
+$membership_initial_tab_map = array(
+    'neden-uye-olmaliyim' => 'neden-uye-olmaliyim',
+    'uyelik-avantajlari'  => 'uyelik-avantajlari',
+    'bilgi-guncelleme'    => 'bilgi-guncelleme',
+    'aidat-odeme'         => 'aidat-odeme',
+);
+$initial_tab = isset($membership_initial_tab_map[$current_slug]) ? $membership_initial_tab_map[$current_slug] : 'neden-uye-olmaliyim';
 ?>
 
 <section class="page-hero page-hero-light">
     <div class="site-container">
-        <h1><?php the_title(); ?></h1>
+        <h1><?php echo esc_html($hero_title); ?></h1>
         <p>
             <?php
-            if (get_the_excerpt()) {
-                echo esc_html(get_the_excerpt());
+            if (trim($hero_excerpt) !== '') {
+                echo esc_html($hero_excerpt);
             } else {
                 esc_html_e('ODTÜMİST üyeliği; dayanışma, aidiyet ve öğrencilere uzanan etkiyi büyüten güçlü bir topluluk çatısıdır.', 'odtumist');
             }
@@ -24,11 +42,12 @@ $sections    = odtumist_extract_content_sections($raw_content);
     </div>
 </section>
 
-<section class="membership-nav" data-membership-nav>
+<section class="membership-nav" data-membership-nav data-membership-initial="<?php echo esc_attr($initial_tab); ?>">
     <div class="site-container membership-nav-wrap">
         <div class="membership-nav-list" role="tablist" aria-label="<?php esc_attr_e('Üyelik Alt Menü', 'odtumist'); ?>">
             <?php foreach ($tabs as $i => $tab) : ?>
-                <button type="button" class="membership-nav-btn<?php echo $i === 0 ? ' is-active' : ''; ?>" data-membership-tab="<?php echo esc_attr($tab['id']); ?>" aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"><?php echo esc_html($tab['label']); ?></button>
+                <?php $is_active_tab = ($tab['id'] === $initial_tab); ?>
+                <button type="button" class="membership-nav-btn<?php echo $is_active_tab ? ' is-active' : ''; ?>" data-membership-tab="<?php echo esc_attr($tab['id']); ?>" aria-selected="<?php echo $is_active_tab ? 'true' : 'false'; ?>"><?php echo esc_html($tab['label']); ?></button>
             <?php endforeach; ?>
         </div>
     </div>
@@ -38,7 +57,7 @@ $sections    = odtumist_extract_content_sections($raw_content);
     <div class="site-container">
 
         <!-- Neden Üye Olmalıyım -->
-        <article class="membership-panel is-active" data-membership-panel="neden-uye-olmaliyim" data-membership-anchors="neden-uye-olmaliyim">
+        <article class="membership-panel<?php echo $initial_tab === 'neden-uye-olmaliyim' ? ' is-active' : ''; ?>" data-membership-panel="neden-uye-olmaliyim" data-membership-anchors="neden-uye-olmaliyim">
             <?php $why_section = odtumist_pick_content_section($sections, array('neden-uye-olmaliyim', 'neden-uye-olmaliyim-2')); ?>
             <div class="membership-why-header">
                 <h2><?php esc_html_e('Neden Üye Olmalıyım?', 'odtumist'); ?></h2>
@@ -85,7 +104,7 @@ $sections    = odtumist_extract_content_sections($raw_content);
         </article>
 
         <!-- Üyelik Avantajları -->
-        <article class="membership-panel" data-membership-panel="uyelik-avantajlari" data-membership-anchors="uyelik-avantajlari">
+        <article class="membership-panel<?php echo $initial_tab === 'uyelik-avantajlari' ? ' is-active' : ''; ?>" data-membership-panel="uyelik-avantajlari" data-membership-anchors="uyelik-avantajlari">
             <?php $benefits_section = odtumist_pick_content_section($sections, array('uyelik-avantajlari')); ?>
             <div class="membership-why-header">
                 <h2><?php esc_html_e('Üyelik Avantajları', 'odtumist'); ?></h2>
@@ -104,7 +123,7 @@ $sections    = odtumist_extract_content_sections($raw_content);
         </article>
 
         <!-- Bilgi Güncelleme -->
-        <article class="membership-panel" data-membership-panel="bilgi-guncelleme" data-membership-anchors="bilgi-guncelleme">
+        <article class="membership-panel<?php echo $initial_tab === 'bilgi-guncelleme' ? ' is-active' : ''; ?>" data-membership-panel="bilgi-guncelleme" data-membership-anchors="bilgi-guncelleme">
             <?php $update_section = odtumist_pick_content_section($sections, array('bilgi-guncelleme')); ?>
             <div class="membership-why-header">
                 <h2><?php esc_html_e('Bilgi Güncelleme', 'odtumist'); ?></h2>
@@ -117,7 +136,7 @@ $sections    = odtumist_extract_content_sections($raw_content);
         </article>
 
         <!-- Aidat Ödeme -->
-        <article class="membership-panel" data-membership-panel="aidat-odeme" data-membership-anchors="aidat-odeme">
+        <article class="membership-panel<?php echo $initial_tab === 'aidat-odeme' ? ' is-active' : ''; ?>" data-membership-panel="aidat-odeme" data-membership-anchors="aidat-odeme">
             <?php $dues_section = odtumist_pick_content_section($sections, array('aidat-odeme')); ?>
             <div class="membership-why-header" style="text-align:center">
                 <h2><?php esc_html_e('Aidat Ödeme', 'odtumist'); ?></h2>
