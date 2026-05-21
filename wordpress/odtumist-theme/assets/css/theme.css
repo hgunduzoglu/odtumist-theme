@@ -260,6 +260,16 @@ body.admin-bar .site-header {
     flex: 0 0 auto;
 }
 
+/* Hover gap fix: parent ile dropdown arasinda kopma olmasin */
+.desktop-menu > li.menu-item-has-children::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    right: -10px;
+    top: 100%;
+    height: 14px;
+}
+
 .desktop-menu > li > a {
     display: block;
     padding: 0.4rem 0.7rem;
@@ -308,7 +318,7 @@ body.admin-bar .site-header {
 .desktop-menu .sub-menu {
     position: absolute;
     left: 0;
-    top: calc(100% + 8px);
+    top: 100%;
     width: 250px;
     background: #fff;
     border: 1px solid rgba(100, 116, 139, 0.2);
@@ -1003,6 +1013,26 @@ body.admin-bar .site-header {
     place-items: center;
     font-size: 1.4rem;
     font-weight: 900;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.footer-logo.has-image {
+    width: auto;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.footer-logo-image {
+    display: block;
+    width: auto;
+    height: 56px;
+    max-width: 220px;
+    object-fit: contain;
 }
 
 .footer-brand h2 {
@@ -1246,11 +1276,15 @@ body.admin-bar .about-page-nav {
 
 .about-groups-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 1rem;
+    align-items: stretch;
 }
 
 .about-group-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border-radius: 30px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
@@ -1276,6 +1310,9 @@ body.admin-bar .about-page-nav {
 }
 
 .about-group-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
     padding: 1rem;
 }
 
@@ -1295,7 +1332,7 @@ body.admin-bar .about-page-nav {
 }
 
 .about-group-link {
-    margin-top: 0.85rem;
+    margin-top: auto;
     display: inline-flex;
     color: #00529b;
     font-size: 0.74rem;
@@ -1499,13 +1536,17 @@ body.admin-bar .about-page-nav {
 .events-grid {
     display: grid;
     gap: 1rem;
+    align-items: stretch;
 }
 
 .groups-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
 .group-grid-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border: 1px solid #e2e8f0;
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -1527,10 +1568,11 @@ body.admin-bar .about-page-nav {
 }
 
 .facts-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
 .facts-grid article {
+    height: 100%;
     border: 1px solid #e2e8f0;
     border-radius: 20px;
     padding: 1rem;
@@ -1702,10 +1744,11 @@ body.admin-bar .about-page-nav {
 }
 
 .steps-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
 .steps-grid article {
+    height: 100%;
     border-radius: 22px;
     border: 1px solid #e2e8f0;
     padding: 1rem;
@@ -1735,17 +1778,33 @@ body.admin-bar .about-page-nav {
 }
 
 .archive-grid,
-.events-grid,
+.events-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
 .gallery-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .archive-card,
 .event-list-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border: 1px solid #e2e8f0;
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: #fff;
+}
+
+.event-list-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.event-list-content .event-more {
+    margin-top: auto;
 }
 
 .archive-thumb,
@@ -2346,12 +2405,14 @@ body.admin-bar .membership-nav {
 
 .membership-why-steps {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
     margin-top: 2rem;
+    align-items: stretch;
 }
 
 .why-step-card {
+    height: 100%;
     border-radius: 24px;
     padding: 1.5rem;
     color: #fff;
@@ -2981,6 +3042,99 @@ body.admin-bar .membership-nav {
     margin-inline: auto;
 }
 
+.elementor .odt-el-section.odt-el-banner-section > .elementor-container {
+    width: 100%;
+    max-width: none;
+}
+
+.elementor .odt-el-banner-image .elementor-widget-container,
+.elementor .odt-el-banner-image .elementor-image {
+    line-height: 0;
+}
+
+.elementor .odt-el-banner-image img {
+    display: block;
+    width: 100%;
+    height: clamp(240px, 36vw, 560px);
+    object-fit: cover;
+    object-position: center center;
+}
+
+@media (max-width: 767px) {
+    .elementor .odt-el-banner-image img {
+        height: clamp(190px, 56vw, 280px);
+    }
+}
+
+.elementor .odt-el-solidarity-hero.odt-el-banner-section {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.elementor .odt-el-about-hero.odt-el-banner-section {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.elementor .odt-el-membership-hero.odt-el-banner-section {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.elementor .odt-el-solidarity-hero {
+    border: 0 !important;
+}
+
+.elementor .odt-el-about-hero {
+    border: 0 !important;
+}
+
+.elementor .odt-el-membership-hero {
+    border: 0 !important;
+}
+
+.elementor .odt-el-solidarity-hero.odt-el-banner-section > .elementor-container,
+.elementor .odt-el-solidarity-hero.odt-el-banner-section > .elementor-container > .elementor-column,
+.elementor .odt-el-solidarity-hero.odt-el-banner-section > .elementor-container > .elementor-column > .elementor-element-populated {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.elementor .odt-el-about-hero.odt-el-banner-section > .elementor-container,
+.elementor .odt-el-about-hero.odt-el-banner-section > .elementor-container > .elementor-column,
+.elementor .odt-el-about-hero.odt-el-banner-section > .elementor-container > .elementor-column > .elementor-element-populated {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.elementor .odt-el-membership-hero.odt-el-banner-section > .elementor-container,
+.elementor .odt-el-membership-hero.odt-el-banner-section > .elementor-container > .elementor-column,
+.elementor .odt-el-membership-hero.odt-el-banner-section > .elementor-container > .elementor-column > .elementor-element-populated {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.elementor .odt-el-section.odt-el-solidarity-hero > .elementor-container {
+    width: 100%;
+    max-width: none;
+}
+
+.elementor .odt-el-section.odt-el-about-hero > .elementor-container {
+    width: 100%;
+    max-width: none;
+}
+
+.elementor .odt-el-section.odt-el-membership-hero > .elementor-container {
+    width: 100%;
+    max-width: none;
+}
+
 .elementor .odt-el-title .elementor-heading-title {
     font-weight: 800;
     letter-spacing: -0.03em;
@@ -3159,8 +3313,33 @@ body.admin-bar .membership-nav {
     padding-bottom: 0.65rem;
 }
 
+/* Dinamik kart satirlari: son satirda kart sayisi azalsa da kart olcusu sabit kalsin. */
+.elementor .odt-el-event-card-row:not(.odt-el-home-events-row) > .elementor-container,
+.elementor .odt-el-group-card-row:not(.odt-el-home-groups-row) > .elementor-container {
+    align-items: stretch;
+}
+
+.elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
+.elementor .odt-el-group-card-row:not(.odt-el-home-groups-row) .elementor-column {
+    width: 33.3333% !important;
+}
+
+.elementor .odt-el-card-row .elementor-column > .elementor-element-populated {
+    min-height: 100%;
+    display: flex;
+}
+
+.elementor .odt-el-card-row .odt-el-card .elementor-widget-container {
+    width: 100%;
+    display: flex;
+    height: 100%;
+}
+
 .elementor .odt-el-card .elementor-image-box-wrapper {
     background: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 14px 32px rgba(12, 22, 51, 0.13);
@@ -3192,6 +3371,16 @@ body.admin-bar .membership-nav {
 .elementor .odt-el-card .elementor-image-box-description {
     color: #334155;
     font-size: 0.98rem;
+}
+
+.elementor .odt-el-card .elementor-image-box-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.elementor .odt-el-card .elementor-image-box-description {
+    margin-top: 0.55rem;
 }
 
 .elementor .odt-el-event-card .elementor-image-box-wrapper {
@@ -3382,9 +3571,14 @@ body.admin-bar .membership-nav {
     color: #fff;
 }
 
-.elementor .odt-el-contact-main .odt-el-map iframe {
+.elementor .odt-el-contact-main .odt-el-map iframe,
+.elementor .odt-el-contact-main .odt-el-map-shortcode iframe,
+.elementor .odt-el-contact-main .odt-el-map-shortcode .contact-map-wrap iframe {
     border-radius: 30px;
     box-shadow: 0 20px 38px rgba(12, 22, 51, 0.2);
+    min-height: 360px;
+    width: 100%;
+    border: 0;
 }
 
 .elementor .odt-el-contact-main .elementor-column:first-child > .elementor-element-populated,
@@ -3518,7 +3712,7 @@ body.admin-bar .membership-nav {
 }
 
 .site-header .desktop-menu .sub-menu {
-    top: calc(100% + 10px);
+    top: 100%;
     border-radius: 16px;
     box-shadow: 0 20px 36px -24px rgba(15, 23, 42, 0.54);
 }
@@ -3805,10 +3999,6 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor .odt-el-about-panel-calisma-gruplarimiz .elementor-column > .elementor-element-populated {
     border-left: 10px solid #00529b;
-}
-
-.elementor .odt-el-about-panel-sen-de-katil .elementor-column > .elementor-element-populated {
-    border-left: 10px solid #f97316;
 }
 
 .elementor .odt-el-about-panel-tarihce .elementor-column > .elementor-element-populated {
@@ -4159,6 +4349,11 @@ body.admin-bar .elementor .odt-el-about-nav {
     .elementor .odt-el-home-groups-row > .elementor-container {
         width: calc(100% - 1.3rem);
     }
+
+    .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
+    .elementor .odt-el-group-card-row:not(.odt-el-home-groups-row) .elementor-column {
+        width: 50% !important;
+    }
 }
 
 @media (max-width: 767px) {
@@ -4178,6 +4373,11 @@ body.admin-bar .elementor .odt-el-about-nav {
 
     .elementor .odt-el-home-ctas .odt-el-btn-ghost .elementor-button {
         width: 100%;
+    }
+
+    .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
+    .elementor .odt-el-group-card-row:not(.odt-el-home-groups-row) .elementor-column {
+        width: 100% !important;
     }
 }
 
@@ -4482,20 +4682,7 @@ body.admin-bar .elementor .odt-el-about-nav {
 }
 
 .elementor .odt-el-about-groups-intro {
-    border-bottom: 0;
-    padding-top: 1.1rem;
-    padding-bottom: 0.4rem;
-}
-
-.elementor .odt-el-about-groups-intro .odt-el-title .elementor-heading-title {
-    font-size: clamp(2.2rem, 4.8vw, 4.6rem);
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
-}
-
-.elementor .odt-el-about-groups-intro .odt-el-subtitle p {
-    margin-inline: auto;
-    max-width: 74ch;
+    display: none !important;
 }
 
 .elementor .odt-el-about-groups-row > .elementor-container {
@@ -4588,6 +4775,399 @@ body.admin-bar .elementor .odt-el-about-nav {
     max-width: 100% !important;
 }
 
+/* Iteration 16: Trello scope alignment */
+.about-management-card {
+    text-decoration: none;
+}
+
+.about-pag-btn {
+    position: relative;
+    overflow: hidden;
+    animation: odt-pulse-lift 3.6s ease-in-out infinite;
+}
+
+.about-pag-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.34) 45%, transparent 100%);
+    transform: translateX(-120%);
+    transition: transform 0.5s ease;
+}
+
+.about-pag-btn:hover::after {
+    transform: translateX(120%);
+}
+
+@keyframes odt-pulse-lift {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+.newsletter-section {
+    background: linear-gradient(135deg, #0b1736 0%, #123064 100%);
+    color: #fff;
+    padding: 3.2rem 0;
+}
+
+.newsletter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1.4rem;
+    align-items: center;
+}
+
+.newsletter-copy h2 {
+    margin: 0.35rem 0 0.7rem;
+    font-size: clamp(1.9rem, 4.2vw, 3rem);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.newsletter-copy p {
+    margin: 0;
+    color: #dbeafe;
+}
+
+.newsletter-form {
+    background: #fff;
+    border-radius: 18px;
+    padding: 1.1rem;
+    color: #0f172a;
+    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.2);
+}
+
+.membership-benefits-3p1 {
+    margin-top: 1.2rem;
+}
+
+.membership-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+}
+
+.membership-benefit-card,
+.membership-benefit-plus {
+    border: 1px solid #dbe4f3;
+    border-radius: 16px;
+    background: #fff;
+    padding: 1rem;
+}
+
+.membership-benefit-card h3,
+.membership-benefit-plus h3 {
+    margin-top: 0;
+}
+
+.membership-benefit-plus {
+    margin-top: 0.85rem;
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.solidarity-intro {
+    padding: 2rem 0;
+    background: #fff;
+}
+
+.solidarity-intro h2 {
+    margin: 0;
+    font-size: clamp(1.6rem, 4.2vw, 2.4rem);
+}
+
+.solidarity-intro .solidarity-richtext {
+    margin: 0.8rem 0 1.1rem;
+}
+
+.events-flip-block {
+    padding: 2.5rem 0 0.8rem;
+    background: #f8fafc;
+}
+
+.events-flip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.95rem;
+}
+
+.events-flip-card {
+    perspective: 1200px;
+    min-height: 300px;
+}
+
+.events-flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.events-flip-card:hover .events-flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.events-flip-front,
+.events-flip-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    padding: 1.2rem;
+    backface-visibility: hidden;
+}
+
+.events-flip-front {
+    display: flex;
+    align-items: flex-end;
+    background: linear-gradient(135deg, #123064 0%, #1f4f96 100%);
+    color: #fff;
+}
+
+.events-flip-front h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.events-flip-back {
+    transform: rotateY(180deg);
+    background: #fff;
+    border: 1px solid #dbe4f3;
+    color: #334155;
+}
+
+.events-gallery-caption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    z-index: 3;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(2, 6, 23, 0.55);
+}
+
+.events-gallery-caption strong {
+    font-size: 1.02rem;
+}
+
+.events-gallery-caption span {
+    font-size: 0.86rem;
+    opacity: 0.95;
+}
+
+.events-social-feed {
+    padding: 0.5rem 0 3.2rem;
+    background: #f8fafc;
+}
+
+.events-social-feed h2 {
+    margin: 0 0 0.7rem;
+}
+
+.elementor-page .elementor .odt-el-home-newsletter {
+    background: linear-gradient(135deg, #0b1736 0%, #123064 100%);
+}
+
+.elementor-page .elementor .odt-el-home-newsletter .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-el-home-newsletter .odt-el-subtitle,
+.elementor-page .elementor .odt-el-home-newsletter .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor-page .elementor .odt-el-home-newsletter .odt-el-home-newsletter-form .elementor-widget-container {
+    background: #fff;
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+.elementor-page .elementor .odt-el-home-closing .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-el-home-closing .odt-el-subtitle,
+.elementor-page .elementor .odt-el-home-closing .odt-el-subtitle p {
+    color: #fff;
+}
+
+.elementor-page .elementor .odt-el-events-flip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.95rem;
+}
+
+.elementor-page .elementor .odt-el-events-flip-card {
+    perspective: 1200px;
+    min-height: 290px;
+}
+
+.elementor-page .elementor .odt-el-events-flip-card-inner {
+    position: relative;
+    min-height: 290px;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.elementor-page .elementor .odt-el-events-flip-card:hover .odt-el-events-flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.elementor-page .elementor .odt-el-events-flip-card-front,
+.elementor-page .elementor .odt-el-events-flip-card-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    padding: 1.1rem;
+    backface-visibility: hidden;
+}
+
+.elementor-page .elementor .odt-el-events-flip-card-front {
+    background: linear-gradient(135deg, #123064 0%, #1f4f96 100%);
+    color: #fff;
+    display: flex;
+    align-items: flex-end;
+}
+
+.elementor-page .elementor .odt-el-events-flip-card-back {
+    transform: rotateY(180deg);
+    background: #fff;
+    border: 1px solid #dbe4f3;
+}
+
+.elementor-page .elementor .odt-el-events-flip-title .elementor-heading-title {
+    display: block;
+    border-radius: 14px 14px 0 0;
+    padding: 0.9rem 1rem;
+    background: linear-gradient(135deg, #123064 0%, #1f4f96 100%);
+    color: #fff;
+    font-size: 1.05rem;
+}
+
+.elementor-page .elementor .odt-el-events-flip-copy .elementor-widget-container {
+    border: 1px solid #dbe4f3;
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+    background: #fff;
+    padding: 0.95rem 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.elementor-page .elementor .odt-el-events-flip-copy p {
+    margin: 0;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-item {
+    margin: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dbe4f3;
+    background: #fff;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-item img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-item figcaption {
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-card .elementor-image-box-wrapper {
+    border: 1px solid #dbe4f3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-card .elementor-image-box-img img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.elementor-page .elementor .odt-el-events-gallery-card .elementor-image-box-content {
+    padding: 0.8rem;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-3p1 .odt-el-membership-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-3p1 article {
+    border: 1px solid #dbe4f3;
+    border-radius: 16px;
+    background: #fff;
+    padding: 1rem;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-3p1 .odt-el-membership-benefit-plus {
+    margin-top: 0.8rem;
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-heading .elementor-heading-title {
+    font-size: 1.22rem;
+    margin-bottom: 0.35rem;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-item .elementor-widget-container {
+    border: 1px solid #dbe4f3;
+    border-radius: 14px;
+    background: #fff;
+    padding: 0.8rem 0.95rem;
+    margin-bottom: 0.65rem;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-item-4 .elementor-widget-container {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.elementor-page .elementor .odt-el-membership-benefits-item p {
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+    .newsletter-grid,
+    .events-flip-grid,
+    .elementor-page .elementor .odt-el-events-flip-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .membership-benefits-grid,
+    .elementor-page .elementor .odt-el-membership-benefits-3p1 .odt-el-membership-benefits-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .newsletter-grid,
+    .events-flip-grid,
+    .elementor-page .elementor .odt-el-events-flip-grid,
+    .elementor-page .elementor .odt-el-events-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .elementor .odt-el-about-history-card .elementor-image-box-img img {
     width: 100%;
     height: clamp(220px, 22vw, 300px);
@@ -4635,14 +5215,33 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor .odt-el-about-management-row {
     border-top: 0;
     border-bottom: 0;
+    /* Varsayilan vurgu rengi; Elementor'da section border rengi degistirilirse devralinir. */
+    border-left: 8px solid #1d4e9e;
+    /* Kutu arkaplani ayri kalsin; kenarlik rengi tek basina degissin. */
+    background: transparent !important;
+}
+
+.elementor .odt-el-about-management-row-blue {
+    border-left-color: #1d4e9e;
+}
+
+.elementor .odt-el-about-management-row-red {
+    border-left-color: #e31e24;
+}
+
+.elementor .odt-el-about-management-row-dark {
+    border-left-color: #0f172a;
 }
 
 .elementor .odt-el-about-management-row > .elementor-container {
     width: min(var(--max-width), calc(100% - 2rem));
     margin-inline: auto;
     border: 1px solid #e6edf8;
+    border-left-width: inherit;
+    border-left-style: inherit;
+    border-left-color: inherit;
     border-radius: 30px;
-    background: #fff;
+    background: #fff !important;
     box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
 }
 
@@ -4672,18 +5271,6 @@ body.admin-bar .elementor .odt-el-about-nav {
     min-height: 46px;
     font-size: 0.72rem;
     padding-inline: 1.2rem;
-}
-
-.elementor .odt-el-about-management-row-blue > .elementor-container {
-    border-left: 8px solid #1d4e9e;
-}
-
-.elementor .odt-el-about-management-row-red > .elementor-container {
-    border-left: 8px solid #e31e24;
-}
-
-.elementor .odt-el-about-management-row-dark > .elementor-container {
-    border-left: 8px solid #0f172a;
 }
 
 @media (max-width: 1024px) {
@@ -5138,6 +5725,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     text-transform: uppercase;
     padding: 0.8rem 1.35rem;
     transition: all 0.2s ease;
+    animation: odt-pulse-lift 3.6s ease-in-out infinite;
 }
 
 .elementor .odt-el-about-pagination .odt-el-about-pag-btn-prev .elementor-button {
@@ -5351,6 +5939,18 @@ body.admin-bar .elementor .odt-el-about-nav {
     --odt-membership-accent: #0f172a;
 }
 
+.elementor-page .elementor .odt-el-section.odt-el-membership-nasil-uye-olabilirsiniz {
+    --odt-membership-accent: #00529b;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-yeni-mezunlar-icin-uyelik {
+    --odt-membership-accent: #0f766e;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-uyelik-sss {
+    --odt-membership-accent: #334155;
+}
+
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel > .elementor-container {
     width: min(1120px, calc(100% - 2.2rem));
     align-items: stretch;
@@ -5380,6 +5980,14 @@ body.admin-bar .elementor .odt-el-about-nav {
     font-size: clamp(1rem, 1.55vw, 1.16rem);
     line-height: 1.65;
     color: #334155;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-membership-form {
+    margin: 1rem 0 0.2rem;
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid #d9e5f6;
+    background: #f8fbff;
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel .odt-el-btn .elementor-button {
@@ -5507,6 +6115,40 @@ body.admin-bar .elementor .odt-el-about-nav {
     border-color: #153f8a;
 }
 
+/* Iteration 15: Events page enrichment (categories + social feed) */
+.elementor-page .elementor .odt-el-section.odt-el-events-categories-grid > .elementor-container {
+    align-items: stretch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-events-categories-grid .elementor-column > .elementor-element-populated {
+    border: 1px solid #e5ecf7;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 12px 28px rgba(10, 18, 44, 0.08);
+    height: 100%;
+    padding: 1.2rem;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-events-categories-grid .odt-el-events-category-title .elementor-heading-title {
+    font-size: clamp(1.1rem, 1.9vw, 1.4rem);
+    line-height: 1.25;
+    margin-bottom: 0.45rem;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-events-categories-grid .odt-el-events-category-text p {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #334155;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-events-social-feed-section .odt-el-events-social-feed {
+    margin-top: 0.6rem;
+    padding: clamp(0.8rem, 1.8vw, 1.4rem);
+    border-radius: 20px;
+    border: 1px solid #d9e6f7;
+    background: #f8fbff;
+}
+
 @media (max-width: 1024px) {
     .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column > .elementor-element-populated {
         min-height: 0;
@@ -5519,4 +6161,269 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor-page .elementor .odt-el-about-history-card .elementor-image-box-wrapper .elementor-image-box-img {
     width: 100% !important;
     max-width: 100% !important;
+}
+
+/* Iteration 16: Solidarity full-bleed editable strips */
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout {
+    --odt-solidarity-bg: #0f5aa2;
+    --odt-solidarity-fg: #f8fafc;
+    --odt-solidarity-icon-bg: rgba(255, 255, 255, 0.14);
+    --odt-solidarity-icon-fg: currentColor;
+    --odt-solidarity-btn-bg: #f8fafc;
+    --odt-solidarity-btn-fg: #0f172a;
+    --odt-solidarity-btn-border: transparent;
+    margin: 0 !important;
+    border: 0 !important;
+    background: var(--odt-solidarity-bg);
+    color: var(--odt-solidarity-fg);
+    padding-top: clamp(2.4rem, 5.2vw, 4.8rem);
+    padding-bottom: clamp(2.4rem, 5.2vw, 4.8rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout > .elementor-container {
+    width: 100% !important;
+    max-width: none !important;
+    padding-inline: clamp(1rem, 5vw, 7rem);
+    align-items: center;
+    column-gap: clamp(1rem, 2.6vw, 2.5rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column {
+    display: flex;
+    align-items: stretch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column > .elementor-element-populated {
+    width: 100%;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-solidarity-icon-col > .elementor-element-populated {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-solidarity-emoji .elementor-heading-title {
+    width: clamp(118px, 12vw, 170px);
+    height: clamp(118px, 12vw, 170px);
+    margin: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 24px;
+    background: var(--odt-solidarity-icon-bg);
+    color: var(--odt-solidarity-icon-fg);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);
+    font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+    line-height: 1;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column:last-child > .elementor-element-populated {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: clamp(0.6rem, 1.2vw, 1rem);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-richtext,
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-richtext p {
+    color: currentColor;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-title .elementor-heading-title {
+    font-size: clamp(2.2rem, 5vw, 4.2rem);
+    line-height: 1.04;
+    text-transform: uppercase;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-richtext p {
+    font-size: clamp(1.04rem, 1.9vw, 1.95rem);
+    line-height: 1.38;
+    max-width: 36ch;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-btn .elementor-button {
+    min-height: 58px;
+    padding: 0.9rem 2rem;
+    border-radius: 999px;
+    background: var(--odt-solidarity-btn-bg);
+    color: var(--odt-solidarity-btn-fg);
+    border: 1px solid var(--odt-solidarity-btn-border);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 10px 22px rgba(10, 18, 44, 0.16);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-btn .elementor-button:hover {
+    transform: translateY(-1px);
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-1 {
+    --odt-solidarity-bg: #0f5aa2;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-2 {
+    --odt-solidarity-bg: #eff1f5;
+    --odt-solidarity-fg: #0f172a;
+    --odt-solidarity-icon-bg: #f7f7f8;
+    --odt-solidarity-icon-fg: #e31e24;
+    --odt-solidarity-btn-bg: #0f1f48;
+    --odt-solidarity-btn-fg: #f8fafc;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-3 {
+    --odt-solidarity-bg: #ff6e17;
+    --odt-solidarity-fg: #f8fafc;
+    --odt-solidarity-icon-bg: rgba(255, 255, 255, 0.18);
+    --odt-solidarity-btn-bg: #f8fafc;
+    --odt-solidarity-btn-fg: #0f172a;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-4 {
+    --odt-solidarity-bg: #e31e24;
+    --odt-solidarity-fg: #f8fafc;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-5 {
+    --odt-solidarity-bg: #101b3a;
+    --odt-solidarity-fg: #f8fafc;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-6 {
+    --odt-solidarity-bg: #0b1327;
+    --odt-solidarity-fg: #f8fafc;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-7 {
+    --odt-solidarity-bg: #f7f1df;
+    --odt-solidarity-fg: #0f172a;
+    --odt-solidarity-icon-bg: rgba(15, 23, 42, 0.06);
+    --odt-solidarity-icon-fg: #0f172a;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-8 {
+    --odt-solidarity-bg: #ffffff;
+    --odt-solidarity-fg: #0f172a;
+    --odt-solidarity-icon-bg: rgba(15, 23, 42, 0.06);
+    --odt-solidarity-icon-fg: #0f172a;
+}
+
+@media (max-width: 1024px) {
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout > .elementor-container {
+        padding-inline: clamp(1rem, 4vw, 2rem);
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-solidarity-icon-col > .elementor-element-populated {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout {
+        padding-top: 1.9rem;
+        padding-bottom: 2.1rem;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-solidarity-emoji .elementor-heading-title {
+        width: 96px;
+        height: 96px;
+        border-radius: 20px;
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-title .elementor-heading-title {
+        font-size: clamp(1.7rem, 9vw, 2.4rem);
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-richtext p {
+        font-size: 1.05rem;
+        max-width: none;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-btn .elementor-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Iteration 17: Dayanisma auto-strip for classless new sections */
+body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) {
+    background: #0f5aa2;
+    color: #f8fafc;
+    margin: 0;
+    border: 0;
+    padding-top: clamp(2.4rem, 5.2vw, 4.8rem);
+    padding-bottom: clamp(2.4rem, 5.2vw, 4.8rem);
+}
+
+body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) > .elementor-container {
+    width: 100%;
+    max-width: none;
+    padding-inline: clamp(1rem, 5vw, 7rem);
+    align-items: center;
+    column-gap: clamp(1rem, 2.6vw, 2.5rem);
+}
+
+body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) .elementor-column {
+    display: flex;
+    align-items: stretch;
+}
+
+body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) .elementor-column > .elementor-element-populated {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+@media (max-width: 1024px) {
+    body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) > .elementor-container {
+        padding-inline: clamp(1rem, 4vw, 2rem);
+    }
+
+    body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) .elementor-column {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 767px) {
+    body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity-hero):not(.odt-el-solidarity-final-cta):not(.odt-el-banner-section):not(.odt-el-solidarity-panel-layout):not(.odt-no-auto-strip) {
+        padding-top: 1.9rem;
+        padding-bottom: 2.1rem;
+    }
+}
+
+/* Iteration 18: Membership hero as editable image banner */
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero.odt-el-banner-section {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero.odt-el-banner-section > .elementor-container {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero.odt-el-banner-section > .elementor-container > .elementor-column > .elementor-element-populated {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
 }

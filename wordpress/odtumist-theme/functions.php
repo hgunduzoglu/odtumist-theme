@@ -39,6 +39,38 @@ function odtumist_elementor_is_active()
     return class_exists('\\Elementor\\Plugin');
 }
 
+function odtumist_force_elementor_compat_defaults()
+{
+    // Geçmişte aktif edilmiş olabilecek template kilidini her zaman kapalı tut.
+    if ((bool) get_option('odtumist_lock_templates', false)) {
+        update_option('odtumist_lock_templates', false);
+    }
+
+    if (!odtumist_elementor_is_active()) {
+        return;
+    }
+
+    $supported_types = array('page', 'post', 'event', 'team');
+
+    // Elementor > Ayarlar > İçerik Tipleri seçiminin eksik kalması durumunu otomatik düzelt.
+    $cpt_support = get_option('elementor_cpt_support', array());
+    if (!is_array($cpt_support)) {
+        $cpt_support = array();
+    }
+
+    $updated_cpt_support = array_values(array_unique(array_merge($cpt_support, $supported_types)));
+    if ($updated_cpt_support !== $cpt_support) {
+        update_option('elementor_cpt_support', $updated_cpt_support, false);
+    }
+
+    foreach ($supported_types as $post_type) {
+        if (post_type_exists($post_type)) {
+            add_post_type_support($post_type, 'elementor');
+        }
+    }
+}
+add_action('init', 'odtumist_force_elementor_compat_defaults', 5);
+
 function odtumist_is_built_with_elementor($post_id = 0)
 {
     $post_id = (int) ($post_id ?: get_the_ID());
@@ -59,11 +91,50 @@ function odtumist_is_built_with_elementor($post_id = 0)
     return get_post_meta($post_id, '_elementor_edit_mode', true) === 'builder';
 }
 
+function odtumist_is_elementor_preview_request($post_id = 0)
+{
+    if (!odtumist_elementor_is_active()) {
+        return false;
+    }
+
+    $post_id = (int) $post_id;
+    $preview_id = isset($_GET['elementor-preview']) ? (int) $_GET['elementor-preview'] : 0;
+    if ($preview_id > 0) {
+        if ($post_id <= 0 || $preview_id === $post_id) {
+            return true;
+        }
+    }
+
+    if (method_exists('\\Elementor\\Plugin', 'instance')) {
+        $plugin_instance = \Elementor\Plugin::instance();
+
+        if ($plugin_instance && isset($plugin_instance->preview) && method_exists($plugin_instance->preview, 'is_preview_mode')) {
+            if ((bool) $plugin_instance->preview->is_preview_mode()) {
+                return true;
+            }
+        }
+
+        if ($plugin_instance && isset($plugin_instance->editor) && method_exists($plugin_instance->editor, 'is_edit_mode')) {
+            if ((bool) $plugin_instance->editor->is_edit_mode()) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 function odtumist_should_render_with_elementor($post_id = 0)
 {
     $post_id = (int) ($post_id ?: get_the_ID());
     if ($post_id <= 0) {
         return false;
+    }
+
+    // Elementor editor iframe isteğinde, custom layout fallback'i yerine
+    // her zaman Elementor render hattını kullan.
+    if (odtumist_is_elementor_preview_request($post_id)) {
+        return true;
     }
 
     if (odtumist_templates_are_locked() && odtumist_is_locked_template_page($post_id)) {
@@ -127,7 +198,6 @@ function odtumist_get_locked_template_page_slugs()
         // Hakkimizda alt sayfalari
         'neler-yapiyoruz',
         'calisma-gruplarimiz',
-        'sen-de-katil',
         'tarihce',
         'yonetim',
         // Uyelik alt sayfalari
@@ -135,27 +205,37 @@ function odtumist_get_locked_template_page_slugs()
         'bilgi-guncelleme',
         'aidat-odeme',
         'uyelik-avantajlari',
+        'nasil-uye-olabilirsiniz',
+        'yeni-mezunlar-icin-uyelik',
+        'uyelik-sss',
         // Dayanisma alt sayfalari
+        'sen-de-katil',
         'networking',
         'burs',
         'maraton',
         'mentorluk',
         'bursiyerler',
+        'gonulluluk',
+        'genclik-iletisim',
+        'bagiscilar-paydaslar',
         'gonulluler',
         'bagiscilar',
         'paydaslar',
+        // Kurumsal / sabit sayfalar
+        'bagis-yapin',
+        'yonetim-organlari',
+        'profesyonel-ekip',
+        'eski-baskanlar',
+        'tuzuk',
+        'yonetmelikler',
+        'faaliyet-raporlari',
     );
 }
 
 function odtumist_templates_are_locked()
 {
-    $is_locked = (bool) get_option('odtumist_lock_templates', false);
-
-    /**
-     * Kilit davranisini merkezi olarak ac/kapat.
-     * Varsayilan: false (Elementor duzenleme serbest).
-     */
-    return (bool) apply_filters('odtumist_templates_are_locked', $is_locked);
+    // Bu projede varsayılan davranış her zaman Elementor düzenleme serbestliği.
+    return (bool) apply_filters('odtumist_templates_are_locked', false);
 }
 
 function odtumist_get_cf7_form_choices()
@@ -237,8 +317,19 @@ function odtumist_is_locked_template_page($post_id = 0)
 
 function odtumist_filter_elementor_editability_for_locked_pages($can_edit, $post_id)
 {
-    if (odtumist_templates_are_locked() && odtumist_is_locked_template_page((int) $post_id)) {
-        return false;
+    if (!odtumist_elementor_is_active()) {
+        return $can_edit;
+    }
+
+    $post_id = (int) $post_id;
+    if ($post_id <= 0) {
+        return $can_edit;
+    }
+
+    $post_type = get_post_type($post_id);
+    if (in_array($post_type, array('page', 'post', 'event', 'team'), true)) {
+        // Kullanıcı bu tipte bir içeriği düzenleyebiliyorsa Elementor butonu mutlaka aktif olsun.
+        return true;
     }
 
     return $can_edit;
@@ -286,7 +377,7 @@ function odtumist_fallback_register_cpts()
                 'singular_name' => __('Etkinlik', 'odtumist'),
             ),
             'public'       => true,
-            'has_archive'  => true,
+            'has_archive'  => false,
             'show_in_rest' => true,
             'supports'     => array('title', 'editor', 'excerpt', 'thumbnail'),
             'rewrite'      => array('slug' => 'etkinlik'),
@@ -331,6 +422,75 @@ function odtumist_fallback_register_cpts()
 }
 add_action('init', 'odtumist_fallback_register_cpts', 20);
 
+function odtumist_redirect_event_archive_to_page()
+{
+    if (!is_post_type_archive('event')) {
+        return;
+    }
+
+    $events_page = odtumist_get_page_by_slug(array('etkinlikler', 'events'));
+    if (!($events_page instanceof WP_Post)) {
+        return;
+    }
+
+    $target = get_permalink($events_page);
+    if (!is_string($target) || $target === '') {
+        return;
+    }
+
+    wp_safe_redirect($target, 301);
+    exit;
+}
+add_action('template_redirect', 'odtumist_redirect_event_archive_to_page', 1);
+
+function odtumist_redirect_legacy_about_child_slugs()
+{
+    if (!is_page() || is_admin()) {
+        return;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if ($post_id <= 0) {
+        return;
+    }
+
+    $slug = sanitize_title((string) get_post_field('post_name', $post_id));
+    $anchor_map = array(
+        'neler-yapiyoruz' => 'neler-yapiyoruz',
+        'calisma-gruplari' => 'calisma-gruplarimiz',
+        'calisma-gruplarimiz' => 'calisma-gruplarimiz',
+        'tarihce' => 'tarihce',
+        'yonetim' => 'yonetim',
+    );
+    if (empty($anchor_map[$slug])) {
+        return;
+    }
+
+    $parent_id = (int) get_post_field('post_parent', $post_id);
+    if ($parent_id <= 0) {
+        $about_root = odtumist_get_page_by_slug(array('hakkimizda', 'about'));
+        if (!($about_root instanceof WP_Post) || (int) $about_root->ID === $post_id) {
+            return;
+        }
+        $parent_id = (int) $about_root->ID;
+    } else {
+        $parent_slug = sanitize_title((string) get_post_field('post_name', $parent_id));
+        if (!in_array($parent_slug, array('hakkimizda', 'about'), true)) {
+            return;
+        }
+    }
+
+    $parent_url = get_permalink($parent_id);
+    if (!is_string($parent_url) || $parent_url === '') {
+        return;
+    }
+
+    $target_url = $parent_url . '#' . sanitize_title((string) $anchor_map[$slug]);
+    wp_safe_redirect($target_url, 301);
+    exit;
+}
+add_action('template_redirect', 'odtumist_redirect_legacy_about_child_slugs', 2);
+
 function odtumist_get_page_by_slug($slugs)
 {
     foreach ($slugs as $slug) {
@@ -342,6 +502,56 @@ function odtumist_get_page_by_slug($slugs)
 
     return null;
 }
+
+function odtumist_get_runtime_page_id()
+{
+    $post_id = (int) get_queried_object_id();
+    if ($post_id > 0) {
+        return $post_id;
+    }
+
+    if (isset($_GET['elementor-preview'])) {
+        $preview_id = (int) $_GET['elementor-preview'];
+        if ($preview_id > 0) {
+            return $preview_id;
+        }
+    }
+
+    return 0;
+}
+
+function odtumist_is_solidarity_root_page($post_id = 0)
+{
+    $post_id = (int) $post_id;
+    if ($post_id <= 0) {
+        $post_id = odtumist_get_runtime_page_id();
+    }
+    if ($post_id <= 0) {
+        return false;
+    }
+
+    $post = get_post($post_id);
+    if (!($post instanceof WP_Post) || $post->post_type !== 'page') {
+        return false;
+    }
+
+    $slug = sanitize_title((string) $post->post_name);
+    return in_array($slug, array('dayanisma', 'solidarity'), true);
+}
+
+function odtumist_add_context_body_classes($classes)
+{
+    if (!is_array($classes)) {
+        $classes = array();
+    }
+
+    if (!is_admin() && odtumist_is_solidarity_root_page()) {
+        $classes[] = 'odt-page-dayanisma';
+    }
+
+    return array_values(array_unique($classes));
+}
+add_filter('body_class', 'odtumist_add_context_body_classes');
 
 function odtumist_extract_content_sections($content)
 {
@@ -695,22 +905,90 @@ function odtumist_get_home_closing_content()
     );
 }
 
+function odtumist_get_brand_name()
+{
+    $brand_name = trim((string) get_theme_mod('odtumist_brand_name', ''));
+    if ($brand_name !== '') {
+        return $brand_name;
+    }
+
+    $site_name = trim((string) get_bloginfo('name'));
+    if ($site_name === '') {
+        return 'ODTÜMİST';
+    }
+
+    if (strcasecmp($site_name, 'ODTUMIST') === 0) {
+        return 'ODTÜMİST';
+    }
+
+    return $site_name;
+}
+
 function odtumist_get_contact_content()
 {
     return array(
-        'address'   => get_theme_mod('odtumist_contact_address', __('Levazım Mah. Koru Sok. Beşiktaş / İstanbul (ODTÜPARK)', 'odtumist')),
-        'phone'     => get_theme_mod('odtumist_contact_phone', '+90 (212) 281 40 47'),
+        'address'   => get_theme_mod('odtumist_contact_address', __("Cumhuriyet Cad. Cumhuriyet Apt. No: 17\nKat: 2 D: 5 Taksim, Beyoğlu, İstanbul", 'odtumist')),
+        'phone'     => get_theme_mod('odtumist_contact_phone', "0546 522 96 11\n0533 206 23 01\n0546 522 96 41"),
         'email'     => get_theme_mod('odtumist_contact_email', 'dernek@odtumist.org'),
-        'map_url'   => get_theme_mod('odtumist_contact_map_url', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.38870198594!2d29.02340337656644!3d41.06047247134375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab660f7e4f35b%3A0x868b20463c630807!2zT0RUw5xNwLBTVCBWacWfbmVsaWsgVGVzaXNsZXJp!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str'),
+        'map_url'   => get_theme_mod('odtumist_contact_map_url', 'https://www.google.com/maps?q=Cumhuriyet+Cad.+Cumhuriyet+Apt.+No:+17,+Beyoglu,+Istanbul&output=embed'),
         'hero_image' => get_theme_mod('odtumist_contact_hero_image', 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=2000'),
-        'hero_text'  => get_theme_mod('odtumist_contact_hero_text', __('İstanbuldaki ODTÜ ruhunun buluşma noktasına ulaşmak için bize yazabilir, arayabilir veya ziyaret edebilirsin.', 'odtumist')),
+        'hero_text'  => get_theme_mod('odtumist_contact_hero_text', __('İstanbul ODTÜ Mezunları Derneği ile iletişimde kalmak için bize yazabilir, arayabilir veya dernek merkezimizi ziyaret edebilirsin.', 'odtumist')),
     );
+}
+
+function odtumist_get_contact_phone_lines($raw_phone)
+{
+    $raw_phone = is_string($raw_phone) ? $raw_phone : '';
+    $parts = preg_split('/[\r\n,;]+/', $raw_phone);
+    if (!is_array($parts)) {
+        $parts = array();
+    }
+
+    $phones = array();
+    foreach ($parts as $part) {
+        $phone = trim((string) $part);
+        if ($phone !== '') {
+            $phones[] = $phone;
+        }
+    }
+
+    if (empty($phones) && trim($raw_phone) !== '') {
+        $phones[] = trim($raw_phone);
+    }
+
+    return $phones;
+}
+
+function odtumist_get_footer_logo_image_url()
+{
+    $custom_url = trim((string) get_theme_mod('odtumist_footer_logo_image', ''));
+    if ($custom_url !== '') {
+        return esc_url_raw($custom_url);
+    }
+
+    $custom_logo_id = (int) get_theme_mod('custom_logo');
+    if ($custom_logo_id > 0) {
+        $logo_url = wp_get_attachment_image_url($custom_logo_id, 'full');
+        if (is_string($logo_url) && trim($logo_url) !== '') {
+            return esc_url_raw($logo_url);
+        }
+    }
+
+    return '';
 }
 
 function odtumist_get_footer_content()
 {
     return array(
+        'logo_text'    => get_theme_mod('odtumist_footer_logo_text', 'O'),
+        'logo_image'   => odtumist_get_footer_logo_image_url(),
+        'subtitle'     => get_theme_mod('odtumist_org_name', __('İstanbul ODTÜ Mezunları Derneği', 'odtumist')),
         'description' => get_theme_mod('odtumist_footer_description', __('ODTÜMİST; İstanbul\'daki ODTÜ mezunlarını dayanışma, burs, mentorluk ve ortak projelerde bir araya getiren mezunlar topluluğudur.', 'odtumist')),
+        'quick_title'  => get_theme_mod('odtumist_footer_quick_title', __('Hızlı Erişim', 'odtumist')),
+        'corp_title'   => get_theme_mod('odtumist_footer_corporate_title', __('Kurumsal', 'odtumist')),
+        'info_title'   => get_theme_mod('odtumist_footer_info_title', __('Bilgi Merkezi', 'odtumist')),
+        'contact_title' => get_theme_mod('odtumist_footer_contact_title', __('İletişim', 'odtumist')),
+        'copyright'    => get_theme_mod('odtumist_footer_copyright_text', __('Tüm hakları saklıdır.', 'odtumist')),
     );
 }
 
@@ -754,27 +1032,26 @@ function odtumist_render_fallback_menu($args)
     $membership_url = $membership_page ? get_permalink($membership_page) : home_url('/uyelik/');
     $solidarity_url = $solidarity_page ? get_permalink($solidarity_page) : home_url('/dayanisma/');
     $contact_url    = $contact_page ? get_permalink($contact_page) : home_url('/iletisim/');
+    $resolve_child_url = static function ($slug, $fallback_url) {
+        $child_page = get_page_by_path((string) $slug);
+        if ($child_page instanceof WP_Post) {
+            return get_permalink($child_page);
+        }
+
+        return $fallback_url;
+    };
 
     if ('primary-menu' === $theme_location) {
-        $resolve_child_url = static function ($slug, $fallback_url) {
-            $child_page = get_page_by_path((string) $slug);
-            if ($child_page instanceof WP_Post) {
-                return get_permalink($child_page);
-            }
-
-            return $fallback_url;
-        };
-
         $items = array(
             array(
                 'title' => 'HAKKIMIZDA',
                 'url'   => $about_url,
                 'children' => array(
-                    array('title' => 'Neler Yapıyoruz?', 'url' => $resolve_child_url('neler-yapiyoruz', $about_url . '#neler-yapiyoruz')),
-                    array('title' => 'Çalışma Gruplarımız', 'url' => $resolve_child_url('calisma-gruplarimiz', $about_url . '#calisma-gruplarimiz')),
-                    array('title' => 'Sen de katıl Hocam!', 'url' => $resolve_child_url('sen-de-katil', $about_url . '#sen-de-katil')),
-                    array('title' => 'Tarihçe', 'url' => $resolve_child_url('tarihce', $about_url . '#tarihce')),
-                    array('title' => 'Yönetim', 'url' => $resolve_child_url('yonetim', $about_url . '#yonetim')),
+                    array('title' => 'Neler Yapıyoruz?', 'url' => $about_url . '#neler-yapiyoruz'),
+                    array('title' => 'Çalışma Gruplarımız', 'url' => $about_url . '#calisma-gruplarimiz'),
+                    array('title' => 'Tarihçe', 'url' => $about_url . '#tarihce'),
+                    array('title' => 'Yönetim', 'url' => $about_url . '#yonetim'),
+                    array('title' => 'Ekip', 'url' => $resolve_child_url('profesyonel-ekip', home_url('/profesyonel-ekip/'))),
                 ),
             ),
             array(
@@ -786,24 +1063,27 @@ function odtumist_render_fallback_menu($args)
                 'title' => 'ÜYELİK',
                 'url'   => $membership_url,
                 'children' => array(
-                    array('title' => 'Neden Üye Olmalıyım?', 'url' => $resolve_child_url('neden-uye-olmaliyim', $membership_url . '#neden-uye-olmaliyim')),
-                    array('title' => 'Bilgi Güncelleme', 'url' => $resolve_child_url('bilgi-guncelleme', $membership_url . '#bilgi-guncelleme')),
-                    array('title' => 'Aidat Ödeme', 'url' => $resolve_child_url('aidat-odeme', $membership_url . '#aidat-odeme')),
-                    array('title' => 'Üyelik Avantajları', 'url' => $resolve_child_url('uyelik-avantajlari', $membership_url . '#uyelik-avantajlari')),
+                    array('title' => 'Neden Üye Olmalıyım?', 'url' => $membership_url . '#neden-uye-olmaliyim'),
+                    array('title' => 'Bilgi Güncelleme', 'url' => $membership_url . '#bilgi-guncelleme'),
+                    array('title' => 'Aidat Ödeme', 'url' => $membership_url . '#aidat-odeme'),
+                    array('title' => 'Üyelik Avantajları', 'url' => $membership_url . '#uyelik-avantajlari'),
+                    array('title' => 'Nasıl Üye Olabilirsiniz?', 'url' => $membership_url . '#nasil-uye-olabilirsiniz'),
+                    array('title' => 'Yeni Mezunlar İçin Üyelik', 'url' => $membership_url . '#yeni-mezunlar-icin-uyelik'),
+                    array('title' => 'Üyelik SSS', 'url' => $membership_url . '#uyelik-sss'),
                 ),
             ),
             array(
                 'title' => 'DAYANIŞMA',
                 'url'   => $solidarity_url,
                 'children' => array(
-                    array('title' => 'Networking', 'url' => $resolve_child_url('networking', $solidarity_url . '#networking')),
-                    array('title' => 'Burs', 'url' => $resolve_child_url('burs', $solidarity_url . '#burs')),
-                    array('title' => 'Maraton', 'url' => $resolve_child_url('maraton', $solidarity_url . '#maraton')),
-                    array('title' => 'Mentorluk', 'url' => $resolve_child_url('mentorluk', $solidarity_url . '#mentorluk')),
-                    array('title' => 'Bursiyerler', 'url' => $resolve_child_url('bursiyerler', $solidarity_url . '#bursiyerler')),
-                    array('title' => 'Gönüllüler', 'url' => $resolve_child_url('gonulluler', $solidarity_url . '#gonulluler')),
-                    array('title' => 'Bağışçılar', 'url' => $resolve_child_url('bagiscilar', $solidarity_url . '#bagiscilar')),
-                    array('title' => 'Paydaşlarımız', 'url' => $resolve_child_url('paydaslar', $solidarity_url . '#paydaslar')),
+                    array('title' => 'Burs', 'url' => $solidarity_url . '#burs'),
+                    array('title' => 'Spor & Maraton', 'url' => $solidarity_url . '#maraton'),
+                    array('title' => 'Mentorluk', 'url' => $solidarity_url . '#mentorluk'),
+                    array('title' => 'Gönüllüler', 'url' => $solidarity_url . '#gonulluluk'),
+                    array('title' => 'Gençlik & İletişim', 'url' => $solidarity_url . '#genclik-iletisim'),
+                    array('title' => 'Bağışçılar / Paydaşlar', 'url' => $solidarity_url . '#bagiscilar-paydaslar'),
+                    array('title' => 'Bursiyerler', 'url' => $solidarity_url . '#bursiyerler'),
+                    array('title' => 'Networking', 'url' => $solidarity_url . '#networking'),
                 ),
             ),
             array(
@@ -853,9 +1133,8 @@ function odtumist_render_fallback_menu($args)
     if ('footer-corporate-menu' === $theme_location) {
         $items = array(
             array('title' => 'Bir Bakışta ODTÜMİST', 'url' => $about_url . '#neler-yapiyoruz'),
-            array('title' => 'Paydaşlarımız', 'url' => $solidarity_url . '#paydaslar'),
-            array('title' => 'Tarihçe', 'url' => $about_url . '#tarihce'),
-            array('title' => 'Yönetim', 'url' => $about_url . '#yonetim'),
+            array('title' => 'Yönetim Kurulu', 'url' => $resolve_child_url('yonetim-organlari', home_url('/yonetim-organlari/'))),
+            array('title' => 'Profesyonel Ekip', 'url' => $resolve_child_url('profesyonel-ekip', home_url('/profesyonel-ekip/'))),
         );
 
         echo '<ul class="' . esc_attr($menu_class) . '">';
@@ -868,10 +1147,10 @@ function odtumist_render_fallback_menu($args)
 
     if ('footer-info-menu' === $theme_location) {
         $items = array(
-            array('title' => 'Raporlar', 'url' => home_url('/haberler/')),
-            array('title' => 'KVKK', 'url' => home_url('/iletisim/')),
-            array('title' => 'Üyelik Şartları', 'url' => $membership_url . '#neden-uye-olmaliyim'),
-            array('title' => 'Sıkça Sorulan Sorular', 'url' => $membership_url),
+            array('title' => 'Yönetim', 'url' => $resolve_child_url('yonetim-organlari', home_url('/yonetim-organlari/'))),
+            array('title' => 'Tüzük', 'url' => $resolve_child_url('tuzuk', home_url('/tuzuk/'))),
+            array('title' => 'Yönetmelikler', 'url' => $resolve_child_url('yonetmelikler', home_url('/yonetmelikler/'))),
+            array('title' => 'Faaliyet Raporları', 'url' => $resolve_child_url('faaliyet-raporlari', home_url('/faaliyet-raporlari/'))),
         );
 
         echo '<ul class="' . esc_attr($menu_class) . '">';
@@ -898,7 +1177,6 @@ function odtumist_get_page_layout_slug($slug)
         'about'      => 'about-layout',
         'neler-yapiyoruz' => 'about-layout',
         'calisma-gruplarimiz' => 'about-layout',
-        'sen-de-katil' => 'about-layout',
         'tarihce' => 'about-layout',
         'yonetim' => 'about-layout',
         'etkinlikler' => 'events-layout',
@@ -909,13 +1187,20 @@ function odtumist_get_page_layout_slug($slug)
         'bilgi-guncelleme' => 'membership-layout',
         'aidat-odeme' => 'membership-layout',
         'uyelik-avantajlari' => 'membership-layout',
+        'nasil-uye-olabilirsiniz' => 'membership-layout',
+        'yeni-mezunlar-icin-uyelik' => 'membership-layout',
+        'uyelik-sss' => 'membership-layout',
         'dayanisma'   => 'solidarity-layout',
         'solidarity'  => 'solidarity-layout',
+        'sen-de-katil' => 'solidarity-layout',
         'networking'  => 'solidarity-layout',
         'burs'        => 'solidarity-layout',
         'maraton'     => 'solidarity-layout',
         'mentorluk'   => 'solidarity-layout',
         'bursiyerler' => 'solidarity-layout',
+        'gonulluluk'  => 'solidarity-layout',
+        'genclik-iletisim' => 'solidarity-layout',
+        'bagiscilar-paydaslar' => 'solidarity-layout',
         'gonulluler'  => 'solidarity-layout',
         'bagiscilar'  => 'solidarity-layout',
         'paydaslar'   => 'solidarity-layout',
@@ -928,6 +1213,86 @@ function odtumist_get_page_layout_slug($slug)
 
 function odtumist_customize_register($wp_customize)
 {
+    $wp_customize->add_section('odtumist_branding_section', array(
+        'title'    => __('ODTÜMİST Kimlik (Header/Footer)', 'odtumist'),
+        'priority' => 39,
+    ));
+
+    $branding_fields = array(
+        'odtumist_brand_name' => array(
+            'label' => 'Marka Adı (Header/Genel)',
+            'default' => 'ODTÜMİST',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_org_name' => array(
+            'label' => 'Dernek Adı (Footer Alt Başlık)',
+            'default' => 'İstanbul ODTÜ Mezunları Derneği',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_logo_text' => array(
+            'label' => 'Footer Logo Harfi',
+            'default' => 'O',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_quick_title' => array(
+            'label' => 'Footer Kolon 1 Başlık',
+            'default' => 'Hızlı Erişim',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_corporate_title' => array(
+            'label' => 'Footer Kolon 2 Başlık',
+            'default' => 'Kurumsal',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_info_title' => array(
+            'label' => 'Footer Kolon 3 Başlık',
+            'default' => 'Bilgi Merkezi',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_contact_title' => array(
+            'label' => 'Footer İletişim Başlığı',
+            'default' => 'İletişim',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+        'odtumist_footer_copyright_text' => array(
+            'label' => 'Footer Copyright Metni',
+            'default' => 'Tüm hakları saklıdır.',
+            'type' => 'text',
+            'sanitize' => 'sanitize_text_field',
+        ),
+    );
+
+    foreach ($branding_fields as $setting => $field) {
+        $wp_customize->add_setting($setting, array(
+            'default'           => $field['default'],
+            'sanitize_callback' => $field['sanitize'],
+        ));
+
+        $wp_customize->add_control($setting, array(
+            'label'   => __($field['label'], 'odtumist'),
+            'section' => 'odtumist_branding_section',
+            'type'    => $field['type'],
+        ));
+    }
+
+    $wp_customize->add_setting('odtumist_footer_logo_image', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'odtumist_footer_logo_image', array(
+        'label'    => __('Footer Logo Görseli', 'odtumist'),
+        'section'  => 'odtumist_branding_section',
+        'settings' => 'odtumist_footer_logo_image',
+    )));
+
     $wp_customize->add_section('odtumist_social_section', array(
         'title'    => __('ODTÜMİST Sosyal ve Buton Linkleri', 'odtumist'),
         'priority' => 40,
@@ -1106,11 +1471,11 @@ function odtumist_customize_register($wp_customize)
     ));
 
     $contact_fields = array(
-        'odtumist_contact_address' => array('label' => 'Adres', 'default' => __('Levazım Mah. Koru Sok. Beşiktaş / İstanbul (ODTÜPARK)', 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
-        'odtumist_contact_phone'   => array('label' => 'Telefon', 'default' => '+90 (212) 281 40 47', 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
+        'odtumist_contact_address' => array('label' => 'Adres', 'default' => __("Cumhuriyet Cad. Cumhuriyet Apt. No: 17\nKat: 2 D: 5 Taksim, Beyoğlu, İstanbul", 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
+        'odtumist_contact_phone'   => array('label' => 'Telefon', 'default' => "0546 522 96 11\n0533 206 23 01\n0546 522 96 41", 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
         'odtumist_contact_email'   => array('label' => 'E-posta', 'default' => 'dernek@odtumist.org', 'type' => 'email', 'sanitize' => 'sanitize_email'),
-        'odtumist_contact_map_url' => array('label' => 'Google Maps Embed URL', 'default' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.38870198594!2d29.02340337656644!3d41.06047247134375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab660f7e4f35b%3A0x868b20463c630807!2zT0RUw5xNwLBTVCBWacWfbmVsaWsgVGVzaXNsZXJp!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str', 'type' => 'url', 'sanitize' => 'esc_url_raw'),
-        'odtumist_contact_hero_text' => array('label' => 'İletişim Hero Açıklama', 'default' => __('İstanbuldaki ODTÜ ruhunun buluşma noktasına ulaşmak için bize yazabilir, arayabilir veya ziyaret edebilirsin.', 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
+        'odtumist_contact_map_url' => array('label' => 'Google Maps Embed URL', 'default' => 'https://www.google.com/maps?q=Cumhuriyet+Cad.+Cumhuriyet+Apt.+No:+17,+Beyoglu,+Istanbul&output=embed', 'type' => 'url', 'sanitize' => 'esc_url_raw'),
+        'odtumist_contact_hero_text' => array('label' => 'İletişim Hero Açıklama', 'default' => __('İstanbul ODTÜ Mezunları Derneği ile iletişimde kalmak için bize yazabilir, arayabilir veya dernek merkezimizi ziyaret edebilirsin.', 'odtumist'), 'type' => 'textarea', 'sanitize' => 'sanitize_textarea_field'),
         'odtumist_contact_form_title' => array('label' => 'İletişim Form Alanı Başlığı', 'default' => __('Sizi Dinlemeye Hazırız', 'odtumist'), 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
         'odtumist_contact_form_desc'  => array('label' => 'İletişim Form Alanı Açıklaması', 'default' => __('Bize her konuda yazabilirsiniz Hocam.', 'odtumist'), 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
         'odtumist_contact_form_shortcode' => array('label' => 'Gelişmiş: Manuel Form Shortcode', 'default' => '[contact-form-7 id="123" title="İletişim Formu"]', 'type' => 'text', 'sanitize' => 'sanitize_text_field'),
@@ -1227,14 +1592,14 @@ function odtumist_get_contact_departments()
 function odtumist_get_solidarity_section_defaults()
 {
     $defaults = array(
-        array('id' => 'networking',   'title' => 'Networking',          'icon' => '&#127760;', 'tone' => 'tone-blue',   'btn' => 'Ağa Katıl'),
-        array('id' => 'burs',         'title' => 'Burs Programları',    'icon' => '&#127891;', 'tone' => 'tone-light',  'btn' => 'Keşfet'),
-        array('id' => 'maraton',      'title' => 'Maraton &amp; Spor',  'icon' => '&#127942;', 'tone' => 'tone-orange', 'btn' => 'Destekle'),
-        array('id' => 'mentorluk',    'title' => 'Mentorluk',           'icon' => '&#9749;',   'tone' => 'tone-red',    'btn' => 'Katıl'),
-        array('id' => 'bursiyerler',  'title' => 'Bursiyer İlişkileri', 'icon' => '&#128101;', 'tone' => 'tone-light',  'btn' => 'Mezun-Öğrenci Dayanışması'),
-        array('id' => 'gonulluler',   'title' => 'Gönüllülerimiz',     'icon' => '&#10084;',  'tone' => 'tone-dark',   'btn' => 'Harekete Geç'),
-        array('id' => 'bagiscilar',   'title' => 'Bağışçılarımız',     'icon' => '&#129309;', 'tone' => 'tone-cream',  'btn' => 'İncele'),
-        array('id' => 'paydaslar',    'title' => 'Paydaşlarımız',      'icon' => '&#127970;', 'tone' => '',            'btn' => 'Keşfet'),
+        array('id' => 'burs',         'title' => 'Burs',                   'icon' => '&#127891;', 'tone' => 'tone-light',  'btn' => 'Keşfet'),
+        array('id' => 'maraton',      'title' => 'Spor &amp; Maraton',     'icon' => '&#127942;', 'tone' => 'tone-orange', 'btn' => 'Destekle'),
+        array('id' => 'mentorluk',    'title' => 'Mentorluk',              'icon' => '&#9749;',   'tone' => 'tone-red',    'btn' => 'Katıl'),
+        array('id' => 'gonulluluk',   'title' => 'Gönüllüler',             'icon' => '&#10084;',  'tone' => 'tone-dark',   'btn' => 'Harekete Geç'),
+        array('id' => 'genclik-iletisim', 'title' => 'Gençlik &amp; İletişim', 'icon' => '&#128227;', 'tone' => 'tone-cream',  'btn' => 'Katıl'),
+        array('id' => 'bagiscilar-paydaslar', 'title' => 'Bağışçılar / Paydaşlar', 'icon' => '&#129309;', 'tone' => '', 'btn' => 'İncele'),
+        array('id' => 'bursiyerler',  'title' => 'Bursiyerler',            'icon' => '&#128101;', 'tone' => 'tone-light',  'btn' => 'Mezun-Öğrenci Dayanışması'),
+        array('id' => 'networking',   'title' => 'Networking',             'icon' => '&#127760;', 'tone' => 'tone-blue',   'btn' => 'Ağa Katıl'),
     );
     foreach ($defaults as $i => &$section) {
         $n = $i + 1;
@@ -1253,8 +1618,11 @@ function odtumist_get_membership_tab_defaults()
     $defaults = array(
         array('id' => 'neden-uye-olmaliyim', 'label' => 'Neden Üye Olmalıyım?'),
         array('id' => 'uyelik-avantajlari',  'label' => 'Üyelik Avantajları'),
-        array('id' => 'bilgi-guncelleme',     'label' => 'Bilgi Güncelleme'),
-        array('id' => 'aidat-odeme',          'label' => 'Aidat Ödeme'),
+        array('id' => 'bilgi-guncelleme',    'label' => 'Bilgi Güncelleme'),
+        array('id' => 'aidat-odeme',         'label' => 'Aidat Ödeme'),
+        array('id' => 'nasil-uye-olabilirsiniz', 'label' => 'Nasıl Üye Olabilirsiniz?'),
+        array('id' => 'yeni-mezunlar-icin-uyelik', 'label' => 'Yeni Mezunlar İçin Üyelik'),
+        array('id' => 'uyelik-sss',          'label' => 'Üyelik SSS'),
     );
     foreach ($defaults as $i => &$tab) {
         $n = $i + 1;
@@ -1269,23 +1637,65 @@ function odtumist_get_membership_tab_defaults()
    ────────────────────────────────────────────── */
 function odtumist_get_events_gallery()
 {
+    $gallery_items = odtumist_get_events_gallery_items();
     $gallery = array();
-    $defaults = array(
-        'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1475721027187-4024733923f7?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800',
-    );
-    for ($i = 0; $i < 6; $i++) {
-        $n = $i + 1;
-        $url = get_theme_mod("odtumist_gallery_{$n}", $defaults[$i]);
-        if (!empty($url)) {
-            $gallery[] = $url;
+    foreach ($gallery_items as $item) {
+        if (!empty($item['image'])) {
+            $gallery[] = (string) $item['image'];
         }
     }
     return $gallery;
+}
+
+function odtumist_get_events_gallery_items()
+{
+    $items = array();
+    $defaults = array(
+        array(
+            'image' => 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=800',
+            'title' => 'Mezunlar Günü',
+            'desc'  => 'Geleneksel buluşmadan bir kare',
+        ),
+        array(
+            'image' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+            'title' => 'Bahar Şenliği',
+            'desc'  => 'Sosyal buluşma ve dayanışma',
+        ),
+        array(
+            'image' => 'https://images.unsplash.com/photo-1475721027187-4024733923f7?auto=format&fit=crop&q=80&w=800',
+            'title' => 'Panel / Seminer',
+            'desc'  => 'Konuşmacı buluşmalarından kesitler',
+        ),
+        array(
+            'image' => 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800',
+            'title' => 'Kültür Etkinliği',
+            'desc'  => 'Gezi ve sosyal etkinlik anları',
+        ),
+        array(
+            'image' => 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=800',
+            'title' => 'Genç Mezun Etkinliği',
+            'desc'  => 'Yeni mezunlarla ağ kurma buluşması',
+        ),
+        array(
+            'image' => 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800',
+            'title' => 'ODTÜMİST Topluluğu',
+            'desc'  => 'Etkinliklerden kareler',
+        ),
+    );
+    for ($i = 0; $i < 6; $i++) {
+        $n = $i + 1;
+        $url = get_theme_mod("odtumist_gallery_{$n}", $defaults[$i]['image']);
+        $title = get_theme_mod("odtumist_gallery_{$n}_title", $defaults[$i]['title']);
+        $desc = get_theme_mod("odtumist_gallery_{$n}_desc", $defaults[$i]['desc']);
+        if (!empty($url)) {
+            $items[] = array(
+                'image' => $url,
+                'title' => $title,
+                'desc'  => $desc,
+            );
+        }
+    }
+    return $items;
 }
 
 /* ──────────────────────────────────────────────
@@ -1379,14 +1789,14 @@ function odtumist_customize_register_extra($wp_customize)
     ));
 
     $sol_defaults = array(
-        1 => array('title' => 'Networking',          'btn' => 'Ağa Katıl'),
-        2 => array('title' => 'Burs Programları',    'btn' => 'Keşfet'),
-        3 => array('title' => 'Maraton &amp; Spor',  'btn' => 'Destekle'),
-        4 => array('title' => 'Mentorluk',           'btn' => 'Katıl'),
-        5 => array('title' => 'Bursiyer İlişkileri', 'btn' => 'Mezun-Öğrenci Dayanışması'),
-        6 => array('title' => 'Gönüllülerimiz',     'btn' => 'Harekete Geç'),
-        7 => array('title' => 'Bağışçılarımız',     'btn' => 'İncele'),
-        8 => array('title' => 'Paydaşlarımız',      'btn' => 'Keşfet'),
+        1 => array('title' => 'Burs',                    'btn' => 'Keşfet'),
+        2 => array('title' => 'Spor &amp; Maraton',      'btn' => 'Destekle'),
+        3 => array('title' => 'Mentorluk',               'btn' => 'Katıl'),
+        4 => array('title' => 'Gönüllüler',              'btn' => 'Harekete Geç'),
+        5 => array('title' => 'Gençlik &amp; İletişim',  'btn' => 'Katıl'),
+        6 => array('title' => 'Bağışçılar / Paydaşlar',  'btn' => 'İncele'),
+        7 => array('title' => 'Bursiyerler',             'btn' => 'Mezun-Öğrenci Dayanışması'),
+        8 => array('title' => 'Networking',              'btn' => 'Ağa Katıl'),
     );
 
     for ($i = 1; $i <= 8; $i++) {
@@ -1422,9 +1832,12 @@ function odtumist_customize_register_extra($wp_customize)
         2 => 'Üyelik Avantajları',
         3 => 'Bilgi Güncelleme',
         4 => 'Aidat Ödeme',
+        5 => 'Nasıl Üye Olabilirsiniz?',
+        6 => 'Yeni Mezunlar İçin Üyelik',
+        7 => 'Üyelik SSS',
     );
 
-    for ($i = 1; $i <= 4; $i++) {
+    for ($i = 1; $i <= 7; $i++) {
         $wp_customize->add_setting("odtumist_memtab_{$i}_label", array(
             'default'           => $memtab_defaults[$i],
             'sanitize_callback' => 'sanitize_text_field',
@@ -1465,12 +1878,11 @@ function odtumist_customize_register_extra($wp_customize)
     $about_tab_defaults = array(
         1 => 'Neler Yapıyoruz?',
         2 => 'Çalışma Gruplarımız',
-        3 => 'Sen de Katıl Hocam!',
-        4 => 'Tarihçe',
-        5 => 'Yönetim',
+        3 => 'Tarihçe',
+        4 => 'Yönetim',
     );
 
-    for ($i = 1; $i <= 5; $i++) {
+    for ($i = 1; $i <= 4; $i++) {
         $wp_customize->add_setting("odtumist_abouttab_{$i}_label", array(
             'default'           => $about_tab_defaults[$i],
             'sanitize_callback' => 'sanitize_text_field',
@@ -1523,9 +1935,9 @@ function odtumist_customize_register_extra($wp_customize)
     $mgmt_defaults = array(
         1 => array('title' => 'Dernek Yönetim Organları', 'desc' => 'Yönetim Kurulu, Denetleme Kurulu, Disiplin Kurulu ve Danışma Kurulu üyelerimizin biyografileri.'),
         2 => array('title' => 'Çalışma Gruplarımız', 'desc' => 'Derneğimizi yaşatan çalışma gruplarımızın katkılarıyla büyümeye devam ediyoruz.'),
-        3 => array('title' => 'Geçmiş Yönetimler', 'desc' => '1986\'dan bugüne derneğimize emek vermiş tüm kurullarımız ve yöneticilerimiz.'),
-        4 => array('title' => 'Dernek Tüzüğü ve Yönetmelikler', 'desc' => 'Şeffaf yönetişim ilkelerimiz, tüzüğümüz ve çalışma yönetmeliklerimiz.'),
-        5 => array('title' => 'Faaliyet Raporları', 'desc' => 'Yıllık çalışma raporlarımız, mali tablolarımız ve kurumsal başarı hikayelerimiz.'),
+        3 => array('title' => 'Dernek Tüzüğü ve Yönetmelikler', 'desc' => 'Şeffaf yönetişim ilkelerimiz, tüzüğümüz ve çalışma yönetmeliklerimiz.'),
+        4 => array('title' => 'Faaliyet Raporları', 'desc' => 'Yıllık çalışma raporlarımız, mali tablolarımız ve kurumsal başarı hikayelerimiz.'),
+        5 => array('title' => 'Eski Başkanlar', 'desc' => '1986\'dan bugüne derneğimize emek vermiş tüm kurullarımız ve yöneticilerimiz.'),
     );
 
     for ($i = 1; $i <= 5; $i++) {
@@ -1557,25 +1969,43 @@ function odtumist_customize_register_extra($wp_customize)
     ));
 
     $gallery_defaults = array(
-        'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1475721027187-4024733923f7?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800',
+        array('image' => 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=800', 'title' => 'Mezunlar Günü', 'desc' => 'Geleneksel buluşmadan bir kare'),
+        array('image' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800', 'title' => 'Bahar Şenliği', 'desc' => 'Sosyal buluşma ve dayanışma'),
+        array('image' => 'https://images.unsplash.com/photo-1475721027187-4024733923f7?auto=format&fit=crop&q=80&w=800', 'title' => 'Panel / Seminer', 'desc' => 'Konuşmacı buluşmalarından kesitler'),
+        array('image' => 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800', 'title' => 'Kültür Etkinliği', 'desc' => 'Gezi ve sosyal etkinlik anları'),
+        array('image' => 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=800', 'title' => 'Genç Mezun Etkinliği', 'desc' => 'Yeni mezunlarla ağ kurma buluşması'),
+        array('image' => 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800', 'title' => 'ODTÜMİST Topluluğu', 'desc' => 'Etkinliklerden kareler'),
     );
 
     for ($i = 1; $i <= 6; $i++) {
         $wp_customize->add_setting("odtumist_gallery_{$i}", array(
-            'default'           => $gallery_defaults[$i - 1],
+            'default'           => $gallery_defaults[$i - 1]['image'],
             'sanitize_callback' => 'esc_url_raw',
         ));
         $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "odtumist_gallery_{$i}", array(
             'label'   => sprintf(__('Galeri Görseli %d', 'odtumist'), $i),
             'section' => 'odtumist_gallery_section',
         )));
+
+        $wp_customize->add_setting("odtumist_gallery_{$i}_title", array(
+            'default'           => $gallery_defaults[$i - 1]['title'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control("odtumist_gallery_{$i}_title", array(
+            'label'   => sprintf(__('Galeri %d Etkinlik Adı', 'odtumist'), $i),
+            'section' => 'odtumist_gallery_section',
+            'type'    => 'text',
+        ));
+
+        $wp_customize->add_setting("odtumist_gallery_{$i}_desc", array(
+            'default'           => $gallery_defaults[$i - 1]['desc'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control("odtumist_gallery_{$i}_desc", array(
+            'label'   => sprintf(__('Galeri %d Açıklama', 'odtumist'), $i),
+            'section' => 'odtumist_gallery_section',
+            'type'    => 'text',
+        ));
     }
 }
 add_action('customize_register', 'odtumist_customize_register_extra');
-
-require_once get_template_directory() . '/inc/starter-importer.php';

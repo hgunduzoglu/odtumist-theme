@@ -5,6 +5,7 @@ if (!defined('ABSPATH')) {
 
 $social      = odtumist_get_social_links();
 $contact     = odtumist_get_contact_content();
+$phones      = odtumist_get_contact_phone_lines($contact['phone']);
 $departments = odtumist_get_contact_departments();
 $form_title  = get_theme_mod('odtumist_contact_form_title', __('Sizi Dinlemeye Hazırız', 'odtumist'));
 $form_desc   = get_theme_mod('odtumist_contact_form_desc', __('Bize her konuda yazabilirsiniz Hocam.', 'odtumist'));
@@ -46,14 +47,16 @@ $form_shortcode = trim((string) get_theme_mod('odtumist_contact_form_shortcode',
                         <div class="contact-detail-row">
                             <span class="contact-detail-icon">&#128205;</span>
                             <div>
-                                <p class="contact-detail-title"><?php esc_html_e('ODTÜPARK Ulus', 'odtumist'); ?></p>
-                                <p class="contact-detail-text"><?php echo esc_html($contact['address']); ?></p>
+                                <p class="contact-detail-title"><?php esc_html_e('Dernek Merkezi', 'odtumist'); ?></p>
+                                <p class="contact-detail-text"><?php echo nl2br(esc_html($contact['address'])); ?></p>
                             </div>
                         </div>
-                        <div class="contact-detail-row">
-                            <span class="contact-detail-icon">&#128222;</span>
-                            <p class="contact-detail-title"><a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $contact['phone'])); ?>"><?php echo esc_html($contact['phone']); ?></a></p>
-                        </div>
+                        <?php foreach ($phones as $phone) : ?>
+                            <div class="contact-detail-row">
+                                <span class="contact-detail-icon">&#128222;</span>
+                                <p class="contact-detail-title"><a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', (string) $phone)); ?>"><?php echo esc_html($phone); ?></a></p>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                     <div class="contact-card-item contact-card-social">
                         <h3><?php esc_html_e('Sosyal Medya', 'odtumist'); ?></h3>
@@ -83,14 +86,11 @@ $form_shortcode = trim((string) get_theme_mod('odtumist_contact_form_shortcode',
 
         <div class="contact-right">
             <div class="contact-map-header">
-                <h3><?php esc_html_e('Buluşma Noktamız:', 'odtumist'); ?> <span class="text-blue"><?php esc_html_e('Ulus ODTÜPARK', 'odtumist'); ?></span></h3>
+                <h3><?php esc_html_e('Buluşma Noktamız:', 'odtumist'); ?> <span class="text-blue"><?php esc_html_e('ODTÜMİST Dernek Merkezi', 'odtumist'); ?></span></h3>
                 <div class="contact-map-divider"></div>
             </div>
             <div class="contact-map-wrap">
                 <iframe src="<?php echo esc_url($contact['map_url']); ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="<?php esc_attr_e('ODTÜMİST Lokasyon', 'odtumist'); ?>"></iframe>
-            </div>
-            <div class="contact-map-cta">
-                <a class="btn btn-dark" href="https://maps.app.goo.gl/QGGZtNl7QrMxFSI6L" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Yol Almaya Başla', 'odtumist'); ?></a>
             </div>
         </div>
     </div>

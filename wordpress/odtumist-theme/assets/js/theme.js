@@ -209,14 +209,13 @@
     var anchorToTab = {
       'neler-yapiyoruz': 'doing',
       'calisma-gruplarimiz': 'groups',
-      'sen-de-katil': 'join',
+      'calisma-gruplari': 'groups',
       'tarihce': 'history',
       'yonetim': 'management'
     };
     var tabToAnchor = {
       doing: 'neler-yapiyoruz',
       groups: 'calisma-gruplarimiz',
-      join: 'sen-de-katil',
       history: 'tarihce',
       management: 'yonetim'
     };
@@ -242,11 +241,6 @@
         '.elementor .odt-el-about-groups-intro',
         '.elementor .odt-el-about-groups-row',
         '.elementor .odt-el-about-pagination-groups'
-      ]),
-      join: collectSections([
-        '.elementor .odt-el-about-panel-sen-de-katil',
-        '.elementor .odt-el-about-join-actions',
-        '.elementor .odt-el-about-pagination-join'
       ]),
       history: collectSections([
         '.elementor .odt-el-about-panel-tarihce',
@@ -442,6 +436,47 @@
     window.scrollTo({ top: targetTop, behavior: 'smooth' });
   }
 
+  function initChildSlugSectionFocus() {
+    // Hash varsa kullanıcının explicit hedefini bozmayalım.
+    if ((window.location.hash || '').trim() !== '') return;
+
+    var slug = window.location.pathname.replace(/\/+$/, '').split('/').pop();
+    if (!slug) return;
+
+    // Child URL'lerde parent sayfanın ilgili bölümüne otomatik odaklan.
+    var slugToAnchor = {
+      'neden-uye-olmaliyim': 'neden-uye-olmaliyim',
+      'bilgi-guncelleme': 'bilgi-guncelleme',
+      'aidat-odeme': 'aidat-odeme',
+      'uyelik-avantajlari': 'uyelik-avantajlari',
+      'nasil-uye-olabilirsiniz': 'nasil-uye-olabilirsiniz',
+      'yeni-mezunlar-icin-uyelik': 'yeni-mezunlar-icin-uyelik',
+      'uyelik-sss': 'uyelik-sss',
+      'sen-de-katil': 'sen-de-katil',
+      'burs': 'burs',
+      'maraton': 'maraton',
+      'mentorluk': 'mentorluk',
+      'gonulluluk': 'gonulluluk',
+      'gonulluler': 'gonulluluk',
+      'genclik-iletisim': 'genclik-iletisim',
+      'bagiscilar-paydaslar': 'bagiscilar-paydaslar',
+      'bagiscilar': 'bagiscilar-paydaslar',
+      'paydaslar': 'bagiscilar-paydaslar',
+      'bursiyerler': 'bursiyerler',
+      'networking': 'networking'
+    };
+
+    if (!slugToAnchor[slug]) return;
+
+    var anchor = slugToAnchor[slug];
+    var target = document.getElementById(anchor);
+    if (!target) return;
+
+    var headerOffset = 110;
+    var targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+  }
+
   function initAboutPagination() {
     document.addEventListener('click', function (e) {
       var btn = e.target.closest('.about-pag-btn[data-about-tab]');
@@ -471,5 +506,6 @@
     initMembershipTabs();
     initAboutPagination();
     initSolidarityInitialAnchor();
+    initChildSlugSectionFocus();
   });
 })();

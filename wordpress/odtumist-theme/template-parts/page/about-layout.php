@@ -16,13 +16,14 @@ $sections    = odtumist_extract_content_sections($raw_content);
 
 $doing_section      = odtumist_pick_content_section($sections, array('neler-yapiyoruz'));
 $groups_section     = odtumist_pick_content_section($sections, array('calisma-gruplarimiz', 'calisma-gruplarimiz-2'));
-$join_section       = odtumist_pick_content_section($sections, array('sen-de-katil', 'sen-de-katil-hocam'));
 $history_section    = odtumist_pick_content_section($sections, array('tarihce'));
 $management_section = odtumist_pick_content_section($sections, array('yonetim'));
 
 $groups_query = odtumist_get_working_groups(-1);
-$ctas         = odtumist_get_primary_cta_links();
-$contact_page = odtumist_get_page_by_slug(array('iletisim', 'contact'));
+$management_org_page = odtumist_get_page_by_slug(array('yonetim-organlari'));
+$bylaw_page          = odtumist_get_page_by_slug(array('tuzuk'));
+$report_page         = odtumist_get_page_by_slug(array('faaliyet-raporlari'));
+$former_presidents_page = odtumist_get_page_by_slug(array('eski-baskanlar', 'baskanlar'));
 
 $about_intro = (string) get_post_field('post_excerpt', $content_source_id);
 $about_intro = trim($about_intro) !== ''
@@ -32,7 +33,7 @@ $about_intro = trim($about_intro) !== ''
 $about_initial_tab_map = array(
     'neler-yapiyoruz'      => 'doing',
     'calisma-gruplarimiz'  => 'groups',
-    'sen-de-katil'         => 'join',
+    'calisma-gruplari'     => 'groups',
     'tarihce'              => 'history',
     'yonetim'              => 'management',
 );
@@ -56,16 +57,14 @@ for ($hf_i = 1; $hf_i <= 4; $hf_i++) {
 $about_tab_defaults = array(
     1 => 'Neler Yapıyoruz?',
     2 => 'Çalışma Gruplarımız',
-    3 => 'Sen de Katıl Hocam!',
-    4 => 'Tarihçe',
-    5 => 'Yönetim',
+    3 => 'Tarihçe',
+    4 => 'Yönetim',
 );
 $about_tabs = array(
     array('id' => 'doing',      'label' => get_theme_mod('odtumist_abouttab_1_label', $about_tab_defaults[1]), 'icon' => '&#10024;'),
     array('id' => 'groups',     'label' => get_theme_mod('odtumist_abouttab_2_label', $about_tab_defaults[2]), 'icon' => '&#127919;'),
-    array('id' => 'join',       'label' => get_theme_mod('odtumist_abouttab_3_label', $about_tab_defaults[3]), 'icon' => '&#128101;'),
-    array('id' => 'history',    'label' => get_theme_mod('odtumist_abouttab_4_label', $about_tab_defaults[4]), 'icon' => '&#128336;'),
-    array('id' => 'management', 'label' => get_theme_mod('odtumist_abouttab_5_label', $about_tab_defaults[5]), 'icon' => '&#8505;'),
+    array('id' => 'history',    'label' => get_theme_mod('odtumist_abouttab_3_label', $about_tab_defaults[3]), 'icon' => '&#128336;'),
+    array('id' => 'management', 'label' => get_theme_mod('odtumist_abouttab_4_label', $about_tab_defaults[4]), 'icon' => '&#8505;'),
 );
 ?>
 
@@ -154,31 +153,6 @@ $about_tabs = array(
             <?php odtumist_render_about_pagination($about_tabs, 'groups'); ?>
         </article>
 
-        <!-- Sen de Katıl -->
-        <article class="about-tab-panel<?php echo $initial_tab === 'join' ? ' is-active' : ''; ?>" data-about-panel="join" data-about-anchors="sen-de-katil">
-            <section id="sen-de-katil">
-                <h2 class="about-panel-title"><?php esc_html_e('ODTÜ Ruhunu Birlikte Yaşatalım', 'odtumist'); ?></h2>
-
-                <div class="about-join-grid">
-                    <a class="about-join-card" href="<?php echo esc_url($ctas['membership']); ?>" target="_blank" rel="noopener noreferrer">
-                        <span class="about-join-icon">&#128100;</span>
-                        <span class="about-join-title"><?php esc_html_e('Üye Ol', 'odtumist'); ?></span>
-                    </a>
-                    <a class="about-join-card about-join-card-red" href="<?php echo esc_url($contact_page ? get_permalink($contact_page) : home_url('/iletisim/')); ?>">
-                        <span class="about-join-icon">&#10084;</span>
-                        <span class="about-join-title"><?php esc_html_e('Gönüllü Ol', 'odtumist'); ?></span>
-                    </a>
-                </div>
-
-                <?php if (!empty($join_section['body'])) : ?>
-                    <div class="about-richtext">
-                        <?php echo wp_kses_post($join_section['body']); ?>
-                    </div>
-                <?php endif; ?>
-            </section>
-            <?php odtumist_render_about_pagination($about_tabs, 'join'); ?>
-        </article>
-
         <!-- Tarihçe -->
         <article class="about-tab-panel<?php echo $initial_tab === 'history' ? ' is-active' : ''; ?>" data-about-panel="history" data-about-anchors="tarihce">
             <section id="tarihce">
@@ -230,30 +204,38 @@ $about_tabs = array(
                     $mgmt_card_defaults = array(
                         1 => array('title' => 'Dernek Yönetim Organları', 'desc' => 'Yönetim Kurulu, Denetleme Kurulu, Disiplin Kurulu ve Danışma Kurulu üyelerimizin biyografileri.'),
                         2 => array('title' => 'Çalışma Gruplarımız', 'desc' => 'Derneğimizi yaşatan çalışma gruplarımızın katkılarıyla büyümeye devam ediyoruz.'),
-                        3 => array('title' => 'Geçmiş Yönetimler', 'desc' => '1986\'dan bugüne derneğimize emek vermiş tüm kurullarımız ve yöneticilerimiz.'),
-                        4 => array('title' => 'Dernek Tüzüğü ve Yönetmelikler', 'desc' => 'Şeffaf yönetişim ilkelerimiz, tüzüğümüz ve çalışma yönetmeliklerimiz.'),
-                        5 => array('title' => 'Faaliyet Raporları', 'desc' => 'Yıllık çalışma raporlarımız, mali tablolarımız ve kurumsal başarı hikayelerimiz.'),
+                        3 => array('title' => 'Dernek Tüzüğü ve Yönetmelikler', 'desc' => 'Şeffaf yönetişim ilkelerimiz, tüzüğümüz ve çalışma yönetmeliklerimiz.'),
+                        4 => array('title' => 'Faaliyet Raporları', 'desc' => 'Yıllık çalışma raporlarımız, mali tablolarımız ve kurumsal başarı hikayelerimiz.'),
+                        5 => array('title' => 'Eski Başkanlar', 'desc' => '1986\'dan bugüne derneğimize emek vermiş tüm kurullarımız ve yöneticilerimiz.'),
                     );
-                    $mgmt_icons   = array('&#128737;', '&#127919;', '&#128336;', '&#128196;', '&#128188;');
-                    $mgmt_accents = array('blue', 'red', 'dark', 'blue', 'red');
+                    $mgmt_icons   = array('&#128737;', '&#127919;', '&#128196;', '&#128188;', '&#128336;');
+                    $mgmt_accents = array('blue', 'red', 'blue', 'red', 'dark');
+                    $mgmt_urls = array(
+                        1 => $management_org_page ? get_permalink($management_org_page) : home_url('/yonetim-organlari/'),
+                        2 => $about_root_page ? get_permalink($about_root_page) . '#calisma-gruplarimiz' : home_url('/hakkimizda/#calisma-gruplarimiz'),
+                        3 => $bylaw_page ? get_permalink($bylaw_page) : home_url('/tuzuk/'),
+                        4 => $report_page ? get_permalink($report_page) : home_url('/faaliyet-raporlari/'),
+                        5 => $former_presidents_page ? get_permalink($former_presidents_page) : home_url('/eski-baskanlar/'),
+                    );
                     $mgmt_cards = array();
                     for ($mc = 1; $mc <= 5; $mc++) {
                         $mgmt_cards[] = array(
                             'icon'   => $mgmt_icons[$mc - 1],
                             'title'  => get_theme_mod("odtumist_mgmt_{$mc}_title", $mgmt_card_defaults[$mc]['title']),
                             'desc'   => get_theme_mod("odtumist_mgmt_{$mc}_desc", $mgmt_card_defaults[$mc]['desc']),
+                            'url'    => $mgmt_urls[$mc],
                             'accent' => $mgmt_accents[$mc - 1],
                         );
                     }
                     foreach ($mgmt_cards as $card) : ?>
-                        <article class="about-management-card about-mgmt-<?php echo esc_attr($card['accent']); ?>">
+                        <a class="about-management-card about-mgmt-<?php echo esc_attr($card['accent']); ?>" href="<?php echo esc_url($card['url']); ?>">
                             <span class="about-mgmt-icon"><?php echo $card['icon']; ?></span>
                             <div class="about-mgmt-content">
                                 <h3><?php echo esc_html($card['title']); ?></h3>
                                 <p><?php echo esc_html($card['desc']); ?></p>
                             </div>
                             <span class="about-mgmt-arrow">&rsaquo;</span>
-                        </article>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             </section>

@@ -17,6 +17,7 @@ if (!defined('ABSPATH')) {
     <?php
     $social_links = odtumist_get_social_links();
     $cta_links    = odtumist_get_primary_cta_links();
+    $brand_name   = odtumist_get_brand_name();
     $cta_labels   = array(
         'donation'   => get_theme_mod('odtumist_header_donation_label', __('Bağış Yap', 'odtumist')),
         'membership' => get_theme_mod('odtumist_header_membership_label', __('Üye Ol', 'odtumist')),
@@ -28,7 +29,7 @@ if (!defined('ABSPATH')) {
                 <div class="site-brand site-brand-logo"><?php the_custom_logo(); ?></div>
             <?php else : ?>
                 <a class="site-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="<?php esc_attr_e('Anasayfa', 'odtumist'); ?>">
-                    <span class="site-brand-title"><?php echo esc_html(get_bloginfo('name')); ?></span>
+                    <span class="site-brand-title"><?php echo esc_html($brand_name); ?></span>
                 </a>
             <?php endif; ?>
 

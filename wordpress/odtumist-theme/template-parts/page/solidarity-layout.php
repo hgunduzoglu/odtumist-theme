@@ -14,19 +14,24 @@ $content_source_id  = $is_solidarity_root ? $current_page_id : ($solidarity_root
 
 $raw_content   = (string) get_post_field('post_content', $content_source_id);
 $sections_map  = odtumist_extract_content_sections($raw_content);
+$join_section  = odtumist_pick_content_section($sections_map, array('sen-de-katil', 'sen-de-katil-hocam'));
 $sol_defaults  = odtumist_get_solidarity_section_defaults();
 $hero_title    = $content_source_id > 0 ? get_the_title($content_source_id) : get_the_title();
 $hero_excerpt  = (string) get_post_field('post_excerpt', $content_source_id);
 
 $solidarity_initial_anchor_map = array(
-    'networking' => 'networking',
+    'sen-de-katil' => 'sen-de-katil',
     'burs' => 'burs',
     'maraton' => 'maraton',
     'mentorluk' => 'mentorluk',
+    'gonulluluk' => 'gonulluluk',
+    'genclik-iletisim' => 'genclik-iletisim',
+    'bagiscilar-paydaslar' => 'bagiscilar-paydaslar',
     'bursiyerler' => 'bursiyerler',
-    'gonulluler' => 'gonulluler',
-    'bagiscilar' => 'bagiscilar',
-    'paydaslar' => 'paydaslar',
+    'networking' => 'networking',
+    'gonulluler' => 'gonulluluk',
+    'bagiscilar' => 'bagiscilar-paydaslar',
+    'paydaslar' => 'bagiscilar-paydaslar',
 );
 $initial_anchor = isset($solidarity_initial_anchor_map[$current_slug]) ? $solidarity_initial_anchor_map[$current_slug] : '';
 ?>
@@ -48,6 +53,16 @@ $initial_anchor = isset($solidarity_initial_anchor_map[$current_slug]) ? $solida
         </p>
     </div>
 </section>
+
+<?php if (!empty($join_section['body'])) : ?>
+<section class="solidarity-intro" id="sen-de-katil">
+    <div class="site-container">
+        <h2><?php esc_html_e('Sen de Katıl Hocam!', 'odtumist'); ?></h2>
+        <div class="solidarity-richtext"><?php echo wp_kses_post($join_section['body']); ?></div>
+        <a class="btn btn-solid" href="<?php echo esc_url($contact_page ? get_permalink($contact_page) : home_url('/iletisim')); ?>"><?php esc_html_e('Dayanışmaya Katıl', 'odtumist'); ?></a>
+    </div>
+</section>
+<?php endif; ?>
 
 <section class="solidarity-sections" data-solidarity-initial="<?php echo esc_attr($initial_anchor); ?>">
     <?php foreach ($sol_defaults as $section) :

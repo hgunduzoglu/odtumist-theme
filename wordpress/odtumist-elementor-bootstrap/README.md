@@ -6,9 +6,10 @@ Bu eklenti, ODTUMIST kurulumunu tek ekrandan otomatiklestirir.
 
 - Sayfalari olusturur: `anasayfa`, `hakkimizda`, `etkinlikler`, `uyelik`, `dayanisma`, `iletisim`, `haberler`
 - Alt sayfalari olusturur:
-  - `hakkimizda` altinda: `neler-yapiyoruz`, `calisma-gruplarimiz`, `sen-de-katil`, `tarihce`, `yonetim`
-  - `uyelik` altinda: `neden-uye-olmaliyim`, `bilgi-guncelleme`, `aidat-odeme`, `uyelik-avantajlari`
-  - `dayanisma` altinda: `networking`, `burs`, `maraton`, `mentorluk`, `bursiyerler`, `gonulluler`, `bagiscilar`, `paydaslar`
+  - `hakkimizda` altinda: `neler-yapiyoruz`, `calisma-gruplarimiz`, `tarihce`, `yonetim`
+  - kurumsal/yonetim: `yonetim-organlari`, `profesyonel-ekip`, `tuzuk`, `yonetmelikler`, `faaliyet-raporlari`, `eski-baskanlar`
+  - `uyelik` altinda: `neden-uye-olmaliyim`, `bilgi-guncelleme`, `aidat-odeme`, `uyelik-avantajlari`, `nasil-uye-olabilirsiniz`, `yeni-mezunlar-icin-uyelik`, `uyelik-sss`
+  - `dayanisma` altinda: `burs`, `maraton`, `mentorluk`, `gonulluluk`, `genclik-iletisim`, `bagiscilar-paydaslar`, `bursiyerler`, `networking`, `sen-de-katil`
 - CPT/taksonomi kurar:
   - `event` + `event-category`
   - `team` + `team-category`
@@ -27,7 +28,7 @@ Bu eklenti, ODTUMIST kurulumunu tek ekrandan otomatiklestirir.
 
 - Varsayilan mod: **mevcut icerikleri ezmez**
 - "Zorla Yeniden Tohumla" acik ise sayfa/CPT/Elementor icerikleri tekrar yazilir
-- Menuler sadece bossa otomatik kurulur; istersen checkbox ile yeniden kurabilirsin
+- Menuler bossa otomatik kurulur; ayrica gerekli itemler eksikse kendini otomatik iyilestirir
 - "Tam Elementor Modu" aciksa slider, kartlar, bloklar Elementor icerisinde tek tek tasinabilir/duzenlenebilir olur
 
 ## Kullanim

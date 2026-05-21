@@ -23,6 +23,9 @@ $membership_initial_tab_map = array(
     'uyelik-avantajlari'  => 'uyelik-avantajlari',
     'bilgi-guncelleme'    => 'bilgi-guncelleme',
     'aidat-odeme'         => 'aidat-odeme',
+    'nasil-uye-olabilirsiniz' => 'nasil-uye-olabilirsiniz',
+    'yeni-mezunlar-icin-uyelik' => 'yeni-mezunlar-icin-uyelik',
+    'uyelik-sss' => 'uyelik-sss',
 );
 $initial_tab = isset($membership_initial_tab_map[$current_slug]) ? $membership_initial_tab_map[$current_slug] : 'neden-uye-olmaliyim';
 ?>
@@ -115,6 +118,27 @@ $initial_tab = isset($membership_initial_tab_map[$current_slug]) ? $membership_i
                 <div class="membership-richtext prose-block"><?php echo wp_kses_post($benefits_section['body']); ?></div>
             <?php endif; ?>
 
+            <div class="membership-benefits-3p1">
+                <div class="membership-benefits-grid">
+                    <article class="membership-benefit-card">
+                        <h3><?php esc_html_e('Dayanışma', 'odtumist'); ?></h3>
+                        <p><?php esc_html_e('Mezunlar, öğrenciler ve gönüllüler arasında güçlü bir dayanışma ağına katılırsın.', 'odtumist'); ?></p>
+                    </article>
+                    <article class="membership-benefit-card">
+                        <h3><?php esc_html_e('Etkinlikler', 'odtumist'); ?></h3>
+                        <p><?php esc_html_e('Panel, seminer, kültür gezisi ve sosyal buluşmalara öncelikli erişim sağlarsın.', 'odtumist'); ?></p>
+                    </article>
+                    <article class="membership-benefit-card">
+                        <h3><?php esc_html_e('Geri Verme', 'odtumist'); ?></h3>
+                        <p><?php esc_html_e('Burs, mentorluk ve gönüllülük kanallarıyla öğrencilere dokunursun.', 'odtumist'); ?></p>
+                    </article>
+                </div>
+                <article class="membership-benefit-plus">
+                    <h3><?php esc_html_e('+1 İndirimler', 'odtumist'); ?></h3>
+                    <p><?php esc_html_e('Üyelere özel kurum anlaşmaları ve dönemsel avantajlardan yararlanırsın.', 'odtumist'); ?></p>
+                </article>
+            </div>
+
             <div class="membership-final-cta cta-orange-block">
                 <h3><?php esc_html_e('Hadi Şimdi Bu Çatıda Buluşalım', 'odtumist'); ?></h3>
                 <p><?php esc_html_e('ODTÜ\'lülerle birlikte olma, birlikte üretme: İletişim ve Networking İmkanları!', 'odtumist'); ?></p>
@@ -133,6 +157,10 @@ $initial_tab = isset($membership_initial_tab_map[$current_slug]) ? $membership_i
             <?php if (!empty($update_section['body'])) : ?>
                 <div class="membership-richtext prose-block"><?php echo wp_kses_post($update_section['body']); ?></div>
             <?php endif; ?>
+
+            <div class="membership-richtext prose-block" style="margin-top:1rem;">
+                <?php echo do_shortcode('[odtumist_contact_form provider="wpforms"]'); ?>
+            </div>
         </article>
 
         <!-- Aidat Ödeme -->
@@ -148,7 +176,58 @@ $initial_tab = isset($membership_initial_tab_map[$current_slug]) ? $membership_i
             <?php endif; ?>
 
             <div style="text-align:center; margin-top:2rem;">
-                <a class="btn btn-solid" href="https://fonzip.com/odtumist/login" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Fonzip\'e Giriş Yap', 'odtumist'); ?></a>
+                <a class="btn btn-solid" href="https://fonzip.com/odtumist/odeme" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Aidat Ödeme Sayfasına Git', 'odtumist'); ?></a>
+            </div>
+        </article>
+
+        <!-- Nasıl Üye Olabilirsiniz -->
+        <article class="membership-panel<?php echo $initial_tab === 'nasil-uye-olabilirsiniz' ? ' is-active' : ''; ?>" data-membership-panel="nasil-uye-olabilirsiniz" data-membership-anchors="nasil-uye-olabilirsiniz">
+            <?php $howto_section = odtumist_pick_content_section($sections, array('nasil-uye-olabilirsiniz')); ?>
+            <div class="membership-why-header">
+                <h2><?php esc_html_e('Nasıl Üye Olabilirsiniz?', 'odtumist'); ?></h2>
+                <p class="membership-subtitle"><?php esc_html_e('Başvuru adımlarını takip ederek kısa sürede ODTÜMİST ağına katılabilirsiniz.', 'odtumist'); ?></p>
+            </div>
+
+            <?php if (!empty($howto_section['body'])) : ?>
+                <div class="membership-richtext prose-block"><?php echo wp_kses_post($howto_section['body']); ?></div>
+            <?php endif; ?>
+
+            <div style="margin-top:1.5rem;">
+                <a class="btn btn-solid" href="<?php echo esc_url($ctas['membership']); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Üyelik Başvurusuna Git', 'odtumist'); ?></a>
+            </div>
+        </article>
+
+        <!-- Yeni Mezunlar İçin Üyelik -->
+        <article class="membership-panel<?php echo $initial_tab === 'yeni-mezunlar-icin-uyelik' ? ' is-active' : ''; ?>" data-membership-panel="yeni-mezunlar-icin-uyelik" data-membership-anchors="yeni-mezunlar-icin-uyelik">
+            <?php $newgrad_section = odtumist_pick_content_section($sections, array('yeni-mezunlar-icin-uyelik')); ?>
+            <div class="membership-why-header">
+                <h2><?php esc_html_e('Yeni Mezunlar İçin Üyelik', 'odtumist'); ?></h2>
+                <p class="membership-subtitle"><?php esc_html_e('Yeni mezunlara özel etkinlik, mentorluk ve dayanışma fırsatlarını bu bölümden takip edebilirsiniz.', 'odtumist'); ?></p>
+            </div>
+
+            <?php if (!empty($newgrad_section['body'])) : ?>
+                <div class="membership-richtext prose-block"><?php echo wp_kses_post($newgrad_section['body']); ?></div>
+            <?php endif; ?>
+
+            <div style="margin-top:1.5rem;">
+                <a class="btn btn-solid" href="<?php echo esc_url($ctas['membership']); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Yeni Mezun Başvurusu', 'odtumist'); ?></a>
+            </div>
+        </article>
+
+        <!-- Üyelik SSS -->
+        <article class="membership-panel<?php echo $initial_tab === 'uyelik-sss' ? ' is-active' : ''; ?>" data-membership-panel="uyelik-sss" data-membership-anchors="uyelik-sss">
+            <?php $faq_section = odtumist_pick_content_section($sections, array('uyelik-sss')); ?>
+            <div class="membership-why-header">
+                <h2><?php esc_html_e('Üyelik SSS', 'odtumist'); ?></h2>
+                <p class="membership-subtitle"><?php esc_html_e('Sık sorulan sorulara ek olarak farklı bir konuda desteğe ihtiyaç duyarsanız bize ulaşabilirsiniz.', 'odtumist'); ?></p>
+            </div>
+
+            <?php if (!empty($faq_section['body'])) : ?>
+                <div class="membership-richtext prose-block"><?php echo wp_kses_post($faq_section['body']); ?></div>
+            <?php endif; ?>
+
+            <div style="margin-top:1.5rem;">
+                <a class="btn btn-solid" href="<?php echo esc_url(home_url('/iletisim/')); ?>"><?php esc_html_e('İletişime Geç', 'odtumist'); ?></a>
             </div>
         </article>
 

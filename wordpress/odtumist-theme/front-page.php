@@ -16,6 +16,7 @@ $render_with_elementor = $front_page_id > 0 && odtumist_should_render_with_eleme
         <?php get_template_part('template-parts/sections/events'); ?>
         <?php get_template_part('template-parts/sections/membership-ctas'); ?>
         <?php get_template_part('template-parts/sections/working-groups'); ?>
+        <?php get_template_part('template-parts/sections/newsletter'); ?>
         <?php get_template_part('template-parts/sections/group-photo'); ?>
 
         <?php if ('page' === get_option('show_on_front') && have_posts()) : ?>
