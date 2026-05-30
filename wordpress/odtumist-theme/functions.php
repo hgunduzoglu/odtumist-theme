@@ -404,7 +404,7 @@ function odtumist_fallback_register_cpts()
             'public'       => true,
             'has_archive'  => true,
             'show_in_rest' => true,
-            'supports'     => array('title', 'editor', 'excerpt', 'thumbnail'),
+            'supports'     => array('title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'),
             'rewrite'      => array('slug' => 'calisma-gruplari'),
             'menu_icon'    => 'dashicons-groups',
         ));
@@ -421,6 +421,122 @@ function odtumist_fallback_register_cpts()
     }
 }
 add_action('init', 'odtumist_fallback_register_cpts', 20);
+
+function odtumist_register_bridge_shortcodes()
+{
+    add_shortcode('odtumist_featured_image', 'odtumist_shortcode_featured_image');
+    add_shortcode('odtumist_team_featured_image', 'odtumist_shortcode_featured_image');
+}
+add_action('init', 'odtumist_register_bridge_shortcodes', 30);
+
+function odtumist_shortcode_featured_image($atts = array(), $content = null, $shortcode_tag = 'odtumist_featured_image')
+{
+    $atts = shortcode_atts(array(
+        'id' => 0,
+        'size' => 'large',
+        'class' => '',
+        'width' => '100%',
+        'height' => '',
+        'fit' => 'cover',
+        'position' => 'center center',
+        'radius' => '',
+        'loading' => 'eager',
+        'decoding' => 'async',
+        'link' => '0',
+    ), $atts, $shortcode_tag);
+
+    $post_id = (int) $atts['id'];
+    if ($post_id <= 0) {
+        $post_id = (int) get_the_ID();
+    }
+    if ($post_id <= 0) {
+        $post_id = (int) get_queried_object_id();
+    }
+    if ($post_id <= 0) {
+        return '';
+    }
+
+    $size = sanitize_key((string) $atts['size']);
+    $allowed_sizes = array_map('strval', get_intermediate_image_sizes());
+    $allowed_sizes[] = 'full';
+    $allowed_sizes[] = 'post-thumbnail';
+    $allowed_sizes = array_values(array_unique($allowed_sizes));
+    if ($size === '' || !in_array($size, $allowed_sizes, true)) {
+        $size = 'large';
+    }
+
+    $class_tokens = array('odt-shortcode-featured-image');
+    if ($shortcode_tag === 'odtumist_team_featured_image') {
+        $class_tokens[] = 'odt-shortcode-team-featured-image';
+    }
+    $raw_class = preg_split('/\s+/', trim((string) $atts['class']));
+    if (is_array($raw_class)) {
+        foreach ($raw_class as $class_name) {
+            $sanitized = sanitize_html_class((string) $class_name);
+            if ($sanitized !== '') {
+                $class_tokens[] = $sanitized;
+            }
+        }
+    }
+    $class_tokens = array_values(array_unique($class_tokens));
+
+    $styles = array();
+    $fit = sanitize_key((string) $atts['fit']);
+    if (in_array($fit, array('cover', 'contain', 'fill', 'none', 'scale-down'), true)) {
+        $styles[] = 'object-fit:' . $fit;
+    }
+
+    $position = trim((string) $atts['position']);
+    if ($position !== '' && preg_match('/^[a-zA-Z0-9.%\-\s]+$/', $position)) {
+        $styles[] = 'object-position:' . preg_replace('/\s+/', ' ', $position);
+    }
+
+    $width = trim((string) $atts['width']);
+    if ($width !== '' && preg_match('/^-?(?:\d+(?:\.\d+)?)(?:px|%|em|rem|vh|vw|vmin|vmax|ch)$/', $width)) {
+        $styles[] = 'width:' . $width;
+    }
+
+    $height = trim((string) $atts['height']);
+    if ($height !== '' && preg_match('/^-?(?:\d+(?:\.\d+)?)(?:px|%|em|rem|vh|vw|vmin|vmax|ch)$/', $height)) {
+        $styles[] = 'height:' . $height;
+    }
+
+    $radius = trim((string) $atts['radius']);
+    if ($radius !== '' && preg_match('/^-?(?:\d+(?:\.\d+)?)(?:px|%|em|rem|vh|vw|vmin|vmax|ch)$/', $radius)) {
+        $styles[] = 'border-radius:' . $radius;
+        $styles[] = 'overflow:hidden';
+    }
+
+    $img_attrs = array(
+        'class' => implode(' ', $class_tokens),
+        'loading' => ($atts['loading'] === 'lazy' ? 'lazy' : 'eager'),
+        'decoding' => ($atts['decoding'] === 'sync' ? 'sync' : 'async'),
+    );
+    if (!empty($styles)) {
+        $img_attrs['style'] = implode(';', $styles) . ';';
+    }
+
+    $thumb_id = get_post_thumbnail_id($post_id);
+    if (!$thumb_id) {
+        return '';
+    }
+
+    $html = wp_get_attachment_image((int) $thumb_id, $size, false, $img_attrs);
+    if (!is_string($html) || trim($html) === '') {
+        return '';
+    }
+
+    $link = isset($atts['link']) ? strtolower(trim((string) $atts['link'])) : '0';
+    $should_link = in_array($link, array('1', 'true', 'yes'), true);
+    if ($should_link) {
+        $permalink = get_permalink($post_id);
+        if (is_string($permalink) && $permalink !== '') {
+            return '<a class="odt-shortcode-featured-image-link" href="' . esc_url($permalink) . '">' . $html . '</a>';
+        }
+    }
+
+    return $html;
+}
 
 function odtumist_redirect_event_archive_to_page()
 {
@@ -774,8 +890,11 @@ function odtumist_get_working_groups($limit = 9)
         'post_type'      => 'team',
         'post_status'    => 'publish',
         'posts_per_page' => $limit,
-        'orderby'        => 'modified',
-        'order'          => 'DESC',
+        'orderby'        => array(
+            'menu_order' => 'ASC',
+            'modified'   => 'DESC',
+            'ID'         => 'DESC',
+        ),
     ));
 
     if (!$query->have_posts()) {
@@ -961,20 +1080,70 @@ function odtumist_get_contact_phone_lines($raw_phone)
 
 function odtumist_get_footer_logo_image_url()
 {
+    $preferred_sizes = array('thumbnail', 'medium', 'full');
+
     $custom_url = trim((string) get_theme_mod('odtumist_footer_logo_image', ''));
     if ($custom_url !== '') {
+        $custom_id = odtumist_resolve_attachment_id_from_url($custom_url);
+        if ($custom_id > 0) {
+            foreach ($preferred_sizes as $size_name) {
+                $sized_url = wp_get_attachment_image_url($custom_id, $size_name);
+                if (is_string($sized_url) && trim($sized_url) !== '') {
+                    return esc_url_raw($sized_url);
+                }
+            }
+        }
+
         return esc_url_raw($custom_url);
     }
 
     $custom_logo_id = (int) get_theme_mod('custom_logo');
     if ($custom_logo_id > 0) {
-        $logo_url = wp_get_attachment_image_url($custom_logo_id, 'full');
-        if (is_string($logo_url) && trim($logo_url) !== '') {
-            return esc_url_raw($logo_url);
+        foreach ($preferred_sizes as $size_name) {
+            $logo_url = wp_get_attachment_image_url($custom_logo_id, $size_name);
+            if (is_string($logo_url) && trim($logo_url) !== '') {
+                return esc_url_raw($logo_url);
+            }
         }
     }
 
+    $site_icon_id = (int) get_option('site_icon');
+    if ($site_icon_id > 0) {
+        foreach ($preferred_sizes as $size_name) {
+            $icon_url = wp_get_attachment_image_url($site_icon_id, $size_name);
+            if (is_string($icon_url) && trim($icon_url) !== '') {
+                return esc_url_raw($icon_url);
+            }
+        }
+    }
+
+    $site_icon_url = get_site_icon_url(96, '');
+    if (is_string($site_icon_url) && trim($site_icon_url) !== '') {
+        return esc_url_raw($site_icon_url);
+    }
+
     return '';
+}
+
+function odtumist_resolve_attachment_id_from_url($url)
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return 0;
+    }
+
+    $attachment_id = (int) attachment_url_to_postid($url);
+    if ($attachment_id > 0) {
+        return $attachment_id;
+    }
+
+    // Boyut suffix'li URL gelirse (or. image-150x150.jpg) orijinali de dene.
+    $normalized_url = preg_replace('/-\d+x\d+(?=\.[a-zA-Z0-9]+(?:\?.*)?$)/', '', $url);
+    if (!is_string($normalized_url) || $normalized_url === $url) {
+        return 0;
+    }
+
+    return (int) attachment_url_to_postid($normalized_url);
 }
 
 function odtumist_get_footer_content()

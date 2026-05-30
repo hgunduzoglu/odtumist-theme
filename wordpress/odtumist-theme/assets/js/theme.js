@@ -101,6 +101,69 @@
     });
   }
 
+  function initElementorHomeRowArrows() {
+    var tracks = Array.prototype.slice.call(
+      document.querySelectorAll(
+        '.elementor .odt-el-home-events-row > .elementor-container, .elementor .odt-el-home-groups-row > .elementor-container'
+      )
+    );
+    if (!tracks.length) return;
+
+    tracks.forEach(function (track) {
+      if (track.getAttribute('data-odt-arrows-ready') === '1') return;
+
+      var section = track.closest('.elementor-section');
+      if (!section) return;
+
+      section.classList.add('odt-el-scrollable-row-host');
+
+      var prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'odt-el-scroll-arrow odt-el-scroll-arrow-prev';
+      prev.setAttribute('aria-label', 'Önceki kartlar');
+      prev.innerHTML = '&#8249;';
+
+      var next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'odt-el-scroll-arrow odt-el-scroll-arrow-next';
+      next.setAttribute('aria-label', 'Sonraki kartlar');
+      next.innerHTML = '&#8250;';
+
+      section.appendChild(prev);
+      section.appendChild(next);
+
+      function stepSize() {
+        return Math.max(280, track.clientWidth * 0.86);
+      }
+
+      function syncArrows() {
+        var maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+        var noOverflow = maxScroll <= 10;
+        var isStart = track.scrollLeft <= 4;
+        var isEnd = track.scrollLeft >= maxScroll - 4;
+
+        section.classList.toggle('odt-el-scroll-arrows-hidden', noOverflow);
+        prev.disabled = noOverflow || isStart;
+        next.disabled = noOverflow || isEnd;
+      }
+
+      prev.addEventListener('click', function () {
+        track.scrollBy({ left: -stepSize(), behavior: 'smooth' });
+      });
+
+      next.addEventListener('click', function () {
+        track.scrollBy({ left: stepSize(), behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', syncArrows, { passive: true });
+      window.addEventListener('resize', syncArrows);
+
+      window.requestAnimationFrame(syncArrows);
+      window.setTimeout(syncArrows, 180);
+      track.setAttribute('data-odt-arrows-ready', '1');
+    });
+  }
+
   function initEventFilter() {
     var filterRoot = document.querySelector('[data-events-filter]');
     if (!filterRoot) return;
@@ -501,6 +564,7 @@
     initMobileMenu();
     initHeroSlider();
     initCarousels();
+    initElementorHomeRowArrows();
     initEventFilter();
     initAboutTabs();
     initMembershipTabs();

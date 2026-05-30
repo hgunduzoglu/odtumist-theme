@@ -1018,21 +1018,21 @@ body.admin-bar .site-header {
 }
 
 .footer-logo.has-image {
-    width: auto;
-    height: auto;
+    width: 52px;
+    height: 52px;
     background: transparent;
-    border-radius: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
 }
 
 .footer-logo-image {
     display: block;
-    width: auto;
-    height: 56px;
-    max-width: 220px;
-    object-fit: contain;
+    width: 52px;
+    height: 52px;
+    max-width: 52px;
+    object-fit: cover;
+    border-radius: 999px;
 }
 
 .footer-brand h2 {
@@ -4112,6 +4112,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     background: #fff;
     padding-top: 0.45rem !important;
     padding-bottom: 0.45rem !important;
+    position: relative;
 }
 
 .elementor .odt-el-home-events-row > .elementor-container {
@@ -4217,6 +4218,7 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor .odt-el-home-groups-row {
     padding-top: 0.4rem !important;
     padding-bottom: 0.8rem !important;
+    position: relative;
 }
 
 .elementor .odt-el-home-groups-row > .elementor-container {
@@ -4234,6 +4236,53 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor .odt-el-home-groups-row > .elementor-container::-webkit-scrollbar {
     display: none;
+}
+
+.elementor .odt-el-scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: 0;
+    display: grid;
+    place-items: center;
+    font-size: 1.85rem;
+    line-height: 1;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.24);
+    z-index: 20;
+    cursor: pointer;
+    transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.elementor .odt-el-scroll-arrow:hover {
+    transform: translateY(-50%) scale(1.03);
+    background: #fff;
+    box-shadow: 0 14px 26px rgba(15, 23, 42, 0.3);
+}
+
+.elementor .odt-el-scroll-arrow:disabled,
+.elementor .odt-el-scroll-arrow.is-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.elementor .odt-el-scroll-arrow-prev {
+    left: 0.55rem;
+}
+
+.elementor .odt-el-scroll-arrow-next {
+    right: 0.55rem;
+}
+
+.elementor .odt-el-scroll-arrows-hidden .odt-el-scroll-arrow {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .elementor .odt-el-home-groups-row .elementor-column {
@@ -4373,6 +4422,10 @@ body.admin-bar .elementor .odt-el-about-nav {
 
     .elementor .odt-el-home-ctas .odt-el-btn-ghost .elementor-button {
         width: 100%;
+    }
+
+    .elementor .odt-el-scroll-arrow {
+        display: none;
     }
 
     .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
@@ -6230,6 +6283,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     justify-content: center;
     align-items: flex-start;
     gap: clamp(0.6rem, 1.2vw, 1rem);
+    padding-right: clamp(1rem, 3.2vw, 4rem) !important;
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-title .elementor-heading-title,
@@ -6247,7 +6301,7 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-richtext p {
     font-size: clamp(1.04rem, 1.9vw, 1.95rem);
     line-height: 1.38;
-    max-width: 36ch;
+    max-width: min(72ch, 100%);
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-btn .elementor-button {
@@ -6327,6 +6381,10 @@ body.admin-bar .elementor .odt-el-about-nav {
 
     .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .odt-el-solidarity-icon-col > .elementor-element-populated {
         justify-content: flex-start;
+    }
+
+    .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout .elementor-column:last-child > .elementor-element-populated {
+        padding-right: 0 !important;
     }
 }
 

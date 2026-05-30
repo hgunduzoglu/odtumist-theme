@@ -77,7 +77,7 @@ final class ODTUMIST_Elementor_Bootstrap
                 'show_in_rest' => true,
                 'has_archive'  => true,
                 'rewrite'      => array('slug' => 'calisma-gruplari'),
-                'supports'     => array('title', 'editor', 'excerpt', 'thumbnail'),
+                'supports'     => array('title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'),
                 'menu_icon'    => 'dashicons-groups',
             ));
         }
@@ -4130,7 +4130,13 @@ final class ODTUMIST_Elementor_Bootstrap
         $sections = array();
         $cards    = array();
 
-        $query_orderby = ($post_type === 'team') ? 'modified' : 'date';
+        $query_orderby = ($post_type === 'team')
+            ? array(
+                'menu_order' => 'ASC',
+                'modified'   => 'DESC',
+                'ID'         => 'DESC',
+            )
+            : 'date';
 
         $posts_per_page = (int) $limit;
         if ($posts_per_page === 0) {
@@ -4143,13 +4149,17 @@ final class ODTUMIST_Elementor_Bootstrap
             $posts_per_page = 100;
         }
 
-        $query = new WP_Query(array(
+        $query_args = array(
             'post_type' => $post_type,
             'post_status' => 'publish',
             'posts_per_page' => $posts_per_page,
             'orderby' => $query_orderby,
-            'order' => 'DESC',
-        ));
+        );
+        if ($post_type !== 'team') {
+            $query_args['order'] = 'DESC';
+        }
+
+        $query = new WP_Query($query_args);
 
         if ($query->have_posts()) {
             while ($query->have_posts()) {
@@ -4715,8 +4725,11 @@ final class ODTUMIST_Elementor_Bootstrap
             'post_type'      => 'team',
             'post_status'    => 'publish',
             'posts_per_page' => $limit,
-            'orderby'        => 'modified',
-            'order'          => 'DESC',
+            'orderby'        => array(
+                'menu_order' => 'ASC',
+                'modified'   => 'DESC',
+                'ID'         => 'DESC',
+            ),
         ));
 
         if (!$query->have_posts()) {
