@@ -1816,6 +1816,15 @@ body.admin-bar .about-page-nav {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
+.events-page-grid .events-grid {
+    grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+    gap: 1.35rem;
+}
+
+.events-page-grid .site-container {
+    width: min(1500px, calc(100% - 1.5rem));
+}
+
 .gallery-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
@@ -1835,6 +1844,54 @@ body.admin-bar .about-page-nav {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+}
+
+.events-page-grid .event-list-card {
+    min-height: clamp(760px, 80vh, 980px);
+    border-radius: 24px;
+    box-shadow: 0 14px 34px rgba(12, 22, 51, 0.14);
+}
+
+.events-page-grid .event-list-thumb {
+    aspect-ratio: 4 / 5 !important;
+    min-height: clamp(330px, 46vh, 520px);
+    background: #eef3fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.events-page-grid .event-list-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain !important;
+    object-position: center;
+    padding: 0.45rem;
+}
+
+.events-page-grid .event-list-content {
+    padding: 1.2rem 1.05rem 1.2rem;
+}
+
+.events-page-grid .event-list-content h2 {
+    min-height: 2.7em;
+}
+
+.events-page-grid .event-list-content > p:not(.event-meta) {
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.events-page-grid .event-list-content .event-meta {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 1439px) {
+    .events-page-grid .events-grid {
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    }
 }
 
 .event-list-content .event-more {
@@ -4154,6 +4211,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     margin-inline: auto;
     display: flex;
     flex-wrap: nowrap;
+    align-items: stretch;
     gap: 1.2rem;
     overflow-x: auto;
     overflow-y: hidden;
@@ -4170,21 +4228,38 @@ body.admin-bar .elementor .odt-el-about-nav {
     min-width: min(350px, 86vw);
     max-width: min(350px, 86vw);
     flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
     scroll-snap-align: start;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-wrapper {
+.elementor .odt-el-home-events-row .elementor-column > .elementor-element-populated {
+    width: 100%;
+    display: flex;
+}
+
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-wrapper {
     border-radius: 22px;
     border: 1px solid #e7edf8;
     box-shadow: 0 10px 26px rgba(12, 22, 51, 0.12);
     background: #fff;
+    height: clamp(640px, 70vh, 760px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-img {
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
     position: relative;
+    height: clamp(320px, 38vh, 430px);
+    overflow: hidden;
+    background: #eef2f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-img::before {
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img::before {
     content: "ETKİNLİK";
     position: absolute;
     top: 12px;
@@ -4197,29 +4272,39 @@ body.admin-bar .elementor .odt-el-about-nav {
     font-size: 0.61rem;
     font-weight: 900;
     letter-spacing: 0.09em;
+    pointer-events: none;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-img img {
-    aspect-ratio: 1 / 1;
-    height: auto;
-    min-height: 270px;
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 0.6rem;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-content {
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-content {
     padding: 1rem 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-title {
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-title {
     font-size: 1.05rem;
     line-height: 1.25;
     min-height: 2.7em;
     text-transform: none;
 }
 
-.elementor .odt-el-event-card .elementor-image-box-description {
+.elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-description {
     font-size: 0.86rem;
     line-height: 1.5;
     color: #475569;
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .elementor .odt-el-home-groups-intro,
@@ -4260,6 +4345,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     margin-inline: auto;
     display: flex;
     flex-wrap: nowrap;
+    align-items: stretch;
     gap: 1.2rem;
     overflow-x: auto;
     overflow-y: hidden;
@@ -4323,46 +4409,74 @@ body.admin-bar .elementor .odt-el-about-nav {
     min-width: min(310px, 86vw);
     max-width: min(310px, 86vw);
     flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
     scroll-snap-align: start;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-wrapper {
+.elementor .odt-el-home-groups-row .elementor-column > .elementor-element-populated {
+    width: 100%;
+    display: flex;
+}
+
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-wrapper {
     border-radius: 34px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow: 0 18px 34px rgba(2, 6, 23, 0.45);
     overflow: hidden;
+    height: clamp(620px, 68vh, 740px);
+    display: flex;
+    flex-direction: column;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-img {
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
     position: relative;
+    height: clamp(300px, 36vh, 390px);
+    overflow: hidden;
+    background: linear-gradient(180deg, #1f4f96 0%, #123266 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-img::after {
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0) 35%, rgba(2, 6, 23, 0.65) 100%);
+    background: none;
     pointer-events: none;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-img img {
-    height: 300px;
-    object-fit: cover;
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 0.75rem 0.85rem 0.25rem;
+    display: block;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-content {
-    padding: 1.2rem 1rem 1.1rem;
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-content {
+    padding: 1.3rem 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-title {
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-title {
     font-size: 1.22rem;
     text-transform: uppercase;
     color: #0f172a;
+    min-height: 2.3em;
 }
 
-.elementor .odt-el-group-card .elementor-image-box-description {
+.elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-description {
     font-size: 0.9rem;
     color: #475569;
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .elementor .odt-el-home-ctas {
@@ -4433,6 +4547,22 @@ body.admin-bar .elementor .odt-el-about-nav {
         width: calc(100% - 1.3rem);
     }
 
+    .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-wrapper {
+        height: clamp(580px, 72vh, 700px);
+    }
+
+    .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
+        height: clamp(270px, 36vh, 360px);
+    }
+
+    .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-wrapper {
+        height: clamp(560px, 72vh, 680px);
+    }
+
+    .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
+        height: clamp(250px, 34vh, 330px);
+    }
+
     .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
     .elementor .odt-el-group-card-row:not(.odt-el-home-groups-row) .elementor-column {
         width: 50% !important;
@@ -4460,6 +4590,24 @@ body.admin-bar .elementor .odt-el-about-nav {
 
     .elementor .odt-el-scroll-arrow {
         display: none;
+    }
+
+    .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-wrapper {
+        height: auto;
+        min-height: 540px;
+    }
+
+    .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
+        height: clamp(240px, 38vh, 320px);
+    }
+
+    .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-wrapper {
+        height: auto;
+        min-height: 520px;
+    }
+
+    .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
+        height: clamp(230px, 36vh, 300px);
     }
 
     .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
@@ -5418,10 +5566,15 @@ body.admin-bar .elementor .odt-el-about-nav {
     height: 100%;
 }
 
+.elementor .odt-el-about-groups-dynamic .about-group-media {
+    aspect-ratio: 16 / 10;
+}
+
 .elementor .odt-el-about-groups-dynamic .about-group-media img {
     width: 100%;
-    aspect-ratio: 16 / 10;
+    height: 100%;
     object-fit: cover;
+    object-position: top center;
 }
 
 .team-single-hero {

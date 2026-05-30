@@ -5,6 +5,15 @@ if (!defined('ABSPATH')) {
 
 $events_query = odtumist_get_featured_events(24);
 $gallery_items = function_exists('odtumist_get_events_gallery_items') ? odtumist_get_events_gallery_items() : array();
+$event_filter_terms = get_terms(array(
+    'taxonomy'   => 'event-category',
+    'hide_empty' => true,
+    'orderby'    => 'name',
+    'order'      => 'ASC',
+));
+if (!is_array($event_filter_terms) || is_wp_error($event_filter_terms)) {
+    $event_filter_terms = array();
+}
 ?>
 <section class="page-hero page-hero-light">
     <div class="site-container">
@@ -66,6 +75,17 @@ $gallery_items = function_exists('odtumist_get_events_gallery_items') ? odtumist
                 <h2><?php esc_html_e('Yaklaşan Etkinlikler', 'odtumist'); ?></h2>
             </div>
         </div>
+        <?php if (count($event_filter_terms) > 1) : ?>
+            <div class="event-filters" data-events-filter="events-page">
+                <button class="is-active" type="button" data-event-filter="all"><?php esc_html_e('Tümü', 'odtumist'); ?></button>
+                <?php foreach ($event_filter_terms as $filter_term) : ?>
+                    <?php if (!($filter_term instanceof WP_Term)) {
+                        continue;
+                    } ?>
+                    <button type="button" data-event-filter="<?php echo esc_attr(sanitize_title((string) $filter_term->slug)); ?>"><?php echo esc_html((string) $filter_term->name); ?></button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         <div class="events-grid">
             <?php if ($events_query->have_posts()) : ?>
                 <?php while ($events_query->have_posts()) : $events_query->the_post(); ?>
@@ -74,8 +94,24 @@ $gallery_items = function_exists('odtumist_get_events_gallery_items') ? odtumist
                     $terms        = get_the_terms($post_id, 'event-category');
                     $primary_term = (is_array($terms) && !empty($terms)) ? $terms[0] : null;
                     $cat_name     = $primary_term ? $primary_term->name : __('Etkinlik', 'odtumist');
+                    $term_slugs   = array();
+                    if (is_array($terms) && !is_wp_error($terms)) {
+                        foreach ($terms as $term_item) {
+                            if (!($term_item instanceof WP_Term)) {
+                                continue;
+                            }
+                            $term_slug = sanitize_title((string) $term_item->slug);
+                            if ($term_slug !== '') {
+                                $term_slugs[] = $term_slug;
+                            }
+                        }
+                    }
+                    $term_slugs = array_values(array_unique($term_slugs));
+                    if (empty($term_slugs)) {
+                        $term_slugs[] = 'diger';
+                    }
                     ?>
-                    <article class="event-list-card">
+                    <article class="event-list-card" data-event-category="<?php echo esc_attr(implode(' ', $term_slugs)); ?>">
                         <a href="<?php the_permalink(); ?>" class="event-list-thumb">
                             <?php if (has_post_thumbnail()) : ?>
                                 <?php the_post_thumbnail('large', array('loading' => 'lazy')); ?>

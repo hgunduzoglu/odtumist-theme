@@ -379,7 +379,7 @@ function odtumist_fallback_register_cpts()
             'public'       => true,
             'has_archive'  => false,
             'show_in_rest' => true,
-            'supports'     => array('title', 'editor', 'excerpt', 'thumbnail'),
+            'supports'     => array('title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'),
             'rewrite'      => array('slug' => 'etkinlik'),
             'menu_icon'    => 'dashicons-calendar-alt',
         ));
@@ -841,24 +841,15 @@ function odtumist_get_event_location($post_id)
 
 function odtumist_get_featured_events($limit = 8)
 {
-    $meta_query = array();
-
-    $now = odtumist_wp_date('Y-m-d H:i:s');
-    $meta_query[] = array(
-        'key'     => 'solicitor_event_start_dt',
-        'value'   => $now,
-        'compare' => '>=',
-        'type'    => 'DATETIME',
-    );
-
     $query = new WP_Query(array(
         'post_type'      => 'event',
         'post_status'    => 'publish',
         'posts_per_page' => $limit,
-        'meta_key'       => 'solicitor_event_start_dt',
-        'orderby'        => 'meta_value',
-        'order'          => 'ASC',
-        'meta_query'     => $meta_query,
+        'orderby'        => array(
+            'menu_order' => 'ASC',
+            'modified'   => 'DESC',
+            'ID'         => 'DESC',
+        ),
     ));
 
     if (!$query->have_posts()) {

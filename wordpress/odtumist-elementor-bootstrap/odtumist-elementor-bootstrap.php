@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ODTÜMİST Elementor Bootstrap
  * Description: Elementor Pro odaklı ODTÜMİST kurulumu için sayfa, menü, CPT ve temel içerikleri tek tıkla oluşturur/günceller.
- * Version: 1.2.7
+ * Version: 1.3.0
  * Author: Hüsamettin Gündüzoğlu
  */
 
@@ -16,6 +16,7 @@ final class ODTUMIST_Elementor_Bootstrap
     const SOCIAL_FEED_OPTION = 'odtumist_social_feed_shortcode';
     const SOCIAL_FEED_DEFAULT = '[instagram-feed feed="1"]';
     const CARD_SOURCE_SNAPSHOT_META = '_odtumist_card_source_snapshot';
+    const EVENTS_PAGE_MANUAL_MODE_META = '_odtumist_events_page_manual_mode';
     private static $is_bootstrap_running = false;
     private static $is_card_source_sync_running = false;
     private static $pre_update_card_snapshots = array();
@@ -29,6 +30,9 @@ final class ODTUMIST_Elementor_Bootstrap
         add_action('save_post_event', array(__CLASS__, 'handle_event_post_saved'), 25, 3);
         add_action('save_post_team', array(__CLASS__, 'handle_team_post_saved'), 25, 3);
         add_action('set_object_terms', array(__CLASS__, 'handle_team_term_relationships_updated'), 25, 6);
+        add_action('created_event-category', array(__CLASS__, 'handle_event_category_terms_changed'), 25, 2);
+        add_action('edited_event-category', array(__CLASS__, 'handle_event_category_terms_changed'), 25, 2);
+        add_action('delete_event-category', array(__CLASS__, 'handle_event_category_terms_deleted'), 25, 4);
         add_action('created_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
         add_action('edited_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
         add_action('delete_team-category', array(__CLASS__, 'handle_team_category_terms_deleted'), 25, 4);
@@ -56,7 +60,7 @@ final class ODTUMIST_Elementor_Bootstrap
                 // /etkinlikler/ slug'i Elementor sayfasi icin ayrilsin.
                 'has_archive'  => false,
                 'rewrite'      => array('slug' => 'etkinlik'),
-                'supports'     => array('title', 'editor', 'excerpt', 'thumbnail'),
+                'supports'     => array('title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'),
                 'menu_icon'    => 'dashicons-calendar-alt',
             ));
         }
@@ -311,7 +315,8 @@ final class ODTUMIST_Elementor_Bootstrap
 
     public static function handle_team_term_relationships_updated($object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids)
     {
-        if ((string) $taxonomy !== 'team-category') {
+        $taxonomy = (string) $taxonomy;
+        if (!in_array($taxonomy, array('team-category', 'event-category'), true)) {
             return;
         }
 
@@ -321,7 +326,13 @@ final class ODTUMIST_Elementor_Bootstrap
         }
 
         $post = get_post($object_id);
-        if (!($post instanceof WP_Post) || $post->post_type !== 'team') {
+        if (!($post instanceof WP_Post)) {
+            return;
+        }
+        if ($taxonomy === 'team-category' && $post->post_type !== 'team') {
+            return;
+        }
+        if ($taxonomy === 'event-category' && $post->post_type !== 'event') {
             return;
         }
 
@@ -329,7 +340,17 @@ final class ODTUMIST_Elementor_Bootstrap
             return;
         }
 
-        self::auto_sync_card_sections('team');
+        self::auto_sync_card_sections($taxonomy === 'team-category' ? 'team' : 'event');
+    }
+
+    public static function handle_event_category_terms_changed($term_id, $tt_id)
+    {
+        self::trigger_event_filter_and_cards_resync();
+    }
+
+    public static function handle_event_category_terms_deleted($term, $tt_id, $deleted_term, $object_ids)
+    {
+        self::trigger_event_filter_and_cards_resync();
     }
 
     public static function handle_team_category_terms_changed($term_id, $tt_id)
@@ -353,6 +374,19 @@ final class ODTUMIST_Elementor_Bootstrap
         }
 
         self::auto_sync_card_sections('team');
+    }
+
+    private static function trigger_event_filter_and_cards_resync()
+    {
+        if (self::$is_bootstrap_running || self::$is_card_source_sync_running) {
+            return;
+        }
+
+        if (!class_exists('Elementor\\Plugin')) {
+            return;
+        }
+
+        self::auto_sync_card_sections('event');
     }
 
     public static function capture_page_card_snapshot_before_save($post_id, $data)
@@ -394,8 +428,84 @@ final class ODTUMIST_Elementor_Bootstrap
             return;
         }
 
-        self::sync_removed_cards_to_source_posts($post_id, $slug);
+        $events_manual_mode = false;
+        if ($slug === 'etkinlikler') {
+            $events_manual_mode = self::maybe_toggle_events_page_manual_mode((int) $post_id);
+        }
+
+        if ($slug === 'etkinlikler' && $events_manual_mode) {
+            unset(self::$pre_update_card_snapshots[(int) $post_id]);
+            $snapshot = self::collect_dynamic_card_source_ids_for_page((int) $post_id);
+            update_post_meta((int) $post_id, self::CARD_SOURCE_SNAPSHOT_META, $snapshot);
+        } else {
+            self::sync_removed_cards_to_source_posts($post_id, $slug);
+        }
+
         self::auto_sync_card_sections('both');
+    }
+
+    private static function maybe_toggle_events_page_manual_mode($page_id)
+    {
+        $page_id = (int) $page_id;
+        if ($page_id <= 0) {
+            return false;
+        }
+
+        $document = self::get_elementor_document($page_id);
+        if (empty($document) || !is_array($document)) {
+            return self::is_events_page_manual_mode_enabled($page_id);
+        }
+
+        $has_auto_rows = self::document_has_section_css_class($document, 'odt-el-events-page-row');
+        if ($has_auto_rows) {
+            if (self::is_events_page_manual_mode_enabled($page_id)) {
+                delete_post_meta($page_id, self::EVENTS_PAGE_MANUAL_MODE_META);
+            }
+            return false;
+        }
+
+        update_post_meta($page_id, self::EVENTS_PAGE_MANUAL_MODE_META, '1');
+        return true;
+    }
+
+    private static function is_events_page_manual_mode_enabled($page_id)
+    {
+        $page_id = (int) $page_id;
+        if ($page_id <= 0) {
+            return false;
+        }
+
+        return ((string) get_post_meta($page_id, self::EVENTS_PAGE_MANUAL_MODE_META, true) === '1');
+    }
+
+    private static function document_has_section_css_class($nodes, $target_class)
+    {
+        if (!is_array($nodes)) {
+            return false;
+        }
+
+        $target_class = sanitize_html_class((string) $target_class);
+        if ($target_class === '') {
+            return false;
+        }
+
+        foreach ($nodes as $node) {
+            if (!is_array($node)) {
+                continue;
+            }
+
+            if (self::section_has_css_class($node, $target_class)) {
+                return true;
+            }
+
+            if (!empty($node['elements']) && is_array($node['elements'])) {
+                if (self::document_has_section_css_class($node['elements'], $target_class)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static function handle_content_type_post_saved($post_id, $post, $expected_post_type)
@@ -2314,11 +2424,7 @@ final class ODTUMIST_Elementor_Bootstrap
         $about_targets = array_values(array_unique(array_filter($about_targets)));
 
         if (!empty($about_targets)) {
-            $about_sections = self::build_card_sections_for_post_type('team', -1, $fallback, false, false, 'odt-el-about-groups-row');
-            $about_filter_section = self::build_team_filter_section_for_elementor();
-            if (is_array($about_filter_section) && !empty($about_filter_section)) {
-                array_unshift($about_sections, $about_filter_section);
-            }
+            $about_sections = self::build_about_groups_dynamic_sections_for_elementor();
             if (!empty($about_sections)) {
                 $synced_count = 0;
                 $copy_migrated_count = 0;
@@ -2350,6 +2456,36 @@ final class ODTUMIST_Elementor_Bootstrap
                 }
             }
         }
+    }
+
+    private static function build_about_groups_dynamic_sections_for_elementor()
+    {
+        return array(
+            self::build_section_with_columns(
+                array(
+                    array(
+                        'size' => 100,
+                        'widgets' => array(
+                            self::build_widget('shortcode', array(
+                                'shortcode' => '[odtumist_working_groups_grid limit="all"]',
+                                '_css_classes' => 'odt-el-about-groups-shortcode',
+                            )),
+                        ),
+                    ),
+                ),
+                array(
+                    '_css_classes' => 'odt-el odt-el-section odt-el-about-groups-row odt-el-about-groups-dynamic',
+                    'padding' => array(
+                        'unit' => 'px',
+                        'top' => '8',
+                        'right' => '0',
+                        'bottom' => '8',
+                        'left' => '0',
+                        'isLinked' => false,
+                    ),
+                )
+            ),
+        );
     }
 
     private static function sync_event_cards_into_elementor_pages($page_ids, &$report)
@@ -2384,12 +2520,13 @@ final class ODTUMIST_Elementor_Bootstrap
         }
 
         if (!empty($page_ids['etkinlikler'])) {
-            // Etkinlikler sayfasi: daha genis liste.
-            $events_sections = self::build_card_sections_for_post_type('event', 12, $fallback, true, false, 'odt-el-events-page-row');
+            $events_page_id = (int) $page_ids['etkinlikler'];
+            // Etkinlikler sayfasi: kategori filtresi + kart gridi dinamik shortcode ile her zaman event kaynaklarindan beslensin.
+            $events_sections = self::build_events_dynamic_sections_for_elementor();
             if (!empty($events_sections)) {
                 $events_synced = self::sync_elementor_section_rows(
-                    (int) $page_ids['etkinlikler'],
-                    array('odt-el-events-page-row'),
+                    $events_page_id,
+                    array('odt-el-events-page-row', 'odt-el-events-page-dynamic'),
                     'odt-el-events-hero',
                     $events_sections
                 );
@@ -2398,6 +2535,36 @@ final class ODTUMIST_Elementor_Bootstrap
                 }
             }
         }
+    }
+
+    private static function build_events_dynamic_sections_for_elementor()
+    {
+        return array(
+            self::build_section_with_columns(
+                array(
+                    array(
+                        'size' => 100,
+                        'widgets' => array(
+                            self::build_widget('shortcode', array(
+                                'shortcode' => '[odtumist_events_grid limit="all" show_filter="1"]',
+                                '_css_classes' => 'odt-el-events-page-grid-shortcode',
+                            )),
+                        ),
+                    ),
+                ),
+                array(
+                    '_css_classes' => 'odt-el odt-el-section odt-el-events-page-row odt-el-events-page-dynamic',
+                    'padding' => array(
+                        'unit' => 'px',
+                        'top' => '10',
+                        'right' => '0',
+                        'bottom' => '10',
+                        'left' => '0',
+                        'isLinked' => false,
+                    ),
+                )
+            ),
+        );
     }
 
     private static function sync_elementor_section_rows($page_id, $remove_classes, $insert_after_class, $new_sections)
@@ -3427,14 +3594,7 @@ final class ODTUMIST_Elementor_Bootstrap
             ),
             array('_css_classes' => 'odt-el odt-el-section odt-el-events-upcoming-intro')
         );
-        $events_doc = array_merge($events_doc, self::build_card_sections_for_post_type(
-            'event',
-            12,
-            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=900',
-            true,
-            false,
-            'odt-el-events-page-row'
-        ));
+        $events_doc = array_merge($events_doc, self::build_events_dynamic_sections_for_elementor());
         $events_doc[] = self::build_section_with_columns(
             array(
                 array(
@@ -4184,7 +4344,7 @@ final class ODTUMIST_Elementor_Bootstrap
         $sections = array();
         $cards    = array();
 
-        $query_orderby = ($post_type === 'team')
+        $query_orderby = (in_array($post_type, array('team', 'event'), true))
             ? array(
                 'menu_order' => 'ASC',
                 'modified'   => 'DESC',
@@ -4209,7 +4369,7 @@ final class ODTUMIST_Elementor_Bootstrap
             'posts_per_page' => $posts_per_page,
             'orderby' => $query_orderby,
         );
-        if ($post_type !== 'team') {
+        if (!in_array($post_type, array('team', 'event'), true)) {
             $query_args['order'] = 'DESC';
         }
 
@@ -4230,14 +4390,15 @@ final class ODTUMIST_Elementor_Bootstrap
                 }
 
                 $category_slugs = array();
-                if ($post_type === 'team') {
-                    $team_terms = get_the_terms($post_id, 'team-category');
-                    if (is_array($team_terms) && !is_wp_error($team_terms)) {
-                        foreach ($team_terms as $team_term) {
-                            if (!($team_term instanceof WP_Term)) {
+                if (in_array($post_type, array('team', 'event'), true)) {
+                    $taxonomy = $post_type === 'team' ? 'team-category' : 'event-category';
+                    $object_terms = get_the_terms($post_id, $taxonomy);
+                    if (is_array($object_terms) && !is_wp_error($object_terms)) {
+                        foreach ($object_terms as $object_term) {
+                            if (!($object_term instanceof WP_Term)) {
                                 continue;
                             }
-                            $slug = sanitize_title((string) $team_term->slug);
+                            $slug = sanitize_title((string) $object_term->slug);
                             if ($slug !== '') {
                                 $category_slugs[] = $slug;
                             }
@@ -4277,13 +4438,14 @@ final class ODTUMIST_Elementor_Bootstrap
                 $card_css_classes = array('odt-el-card', $card_type_class);
                 $column_css_classes = array('odt-el-card-col', $card_type_class . '-col');
 
-                if ($post_type === 'team' && !empty($card['category_slugs']) && is_array($card['category_slugs'])) {
+                if (in_array($post_type, array('team', 'event'), true) && !empty($card['category_slugs']) && is_array($card['category_slugs'])) {
                     foreach ($card['category_slugs'] as $term_slug) {
                         $term_slug = sanitize_title((string) $term_slug);
                         if ($term_slug === '') {
                             continue;
                         }
-                        $term_class = 'odt-team-cat-' . sanitize_html_class($term_slug);
+                        $class_prefix = $post_type === 'team' ? 'odt-team-cat-' : 'odt-event-cat-';
+                        $term_class = $class_prefix . sanitize_html_class($term_slug);
                         $card_css_classes[] = $term_class;
                         $column_css_classes[] = $term_class;
                     }
@@ -4757,34 +4919,92 @@ final class ODTUMIST_Elementor_Bootstrap
     public static function shortcode_events_grid($atts)
     {
         $atts = shortcode_atts(array(
-            'limit' => 6,
+            'limit' => 12,
+            'show_filter' => '0',
         ), $atts, 'odtumist_events_grid');
 
-        $limit = max(1, min(24, absint($atts['limit'])));
+        $raw_limit = trim((string) $atts['limit']);
+        if ($raw_limit === '' || $raw_limit === '0') {
+            $raw_limit = '12';
+        }
+
+        if (in_array(strtolower($raw_limit), array('all', '-1'), true)) {
+            $limit = -1;
+        } else {
+            $limit = max(1, min(200, absint($raw_limit)));
+        }
+
+        $show_filter = in_array(strtolower(trim((string) $atts['show_filter'])), array('1', 'true', 'yes', 'on'), true);
+
         $query = new WP_Query(array(
             'post_type'      => 'event',
             'post_status'    => 'publish',
             'posts_per_page' => $limit,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
+            'orderby'        => array(
+                'menu_order' => 'ASC',
+                'modified'   => 'DESC',
+                'ID'         => 'DESC',
+            ),
         ));
 
         if (!$query->have_posts()) {
             return '<p class="empty-state">Henüz yayınlanmış etkinlik bulunmuyor.</p>';
         }
 
+        $filter_terms = get_terms(array(
+            'taxonomy'   => 'event-category',
+            'hide_empty' => true,
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+        ));
+        if (!is_array($filter_terms) || is_wp_error($filter_terms)) {
+            $filter_terms = array();
+        }
+
         ob_start();
         ?>
         <div class="events-page-grid">
-            <div class="site-container events-grid">
+            <div class="site-container">
+                <?php if ($show_filter && count($filter_terms) > 1) : ?>
+                    <div class="event-filters" data-events-filter="events-grid">
+                        <button type="button" class="is-active" data-event-filter="all"><?php esc_html_e('Tümü', 'odtumist-eb'); ?></button>
+                        <?php foreach ($filter_terms as $filter_term) : ?>
+                            <?php if (!($filter_term instanceof WP_Term)) {
+                                continue;
+                            } ?>
+                            <button type="button" data-event-filter="<?php echo esc_attr(sanitize_title((string) $filter_term->slug)); ?>">
+                                <?php echo esc_html((string) $filter_term->name); ?>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="events-grid">
                 <?php while ($query->have_posts()) : $query->the_post(); ?>
                     <?php
                     $post_id      = get_the_ID();
                     $terms        = get_the_terms($post_id, 'event-category');
                     $primary_term = (is_array($terms) && !empty($terms)) ? $terms[0] : null;
                     $cat_name     = $primary_term ? $primary_term->name : 'Etkinlik';
+                    $term_slugs   = array();
+                    if (is_array($terms) && !is_wp_error($terms)) {
+                        foreach ($terms as $term_item) {
+                            if (!($term_item instanceof WP_Term)) {
+                                continue;
+                            }
+                            $slug = sanitize_title((string) $term_item->slug);
+                            if ($slug !== '') {
+                                $term_slugs[] = $slug;
+                            }
+                        }
+                    }
+                    $term_slugs = array_values(array_unique($term_slugs));
+                    if (empty($term_slugs)) {
+                        $term_slugs[] = 'diger';
+                    }
+                    $term_slug_attr = implode(' ', $term_slugs);
                     ?>
-                    <article class="event-list-card">
+                    <article class="event-list-card" data-event-category="<?php echo esc_attr($term_slug_attr); ?>">
                         <a href="<?php the_permalink(); ?>" class="event-list-thumb">
                             <?php if (has_post_thumbnail()) : ?>
                                 <?php the_post_thumbnail('large', array('loading' => 'lazy')); ?>
@@ -4802,6 +5022,7 @@ final class ODTUMIST_Elementor_Bootstrap
                         </div>
                     </article>
                 <?php endwhile; ?>
+                </div>
             </div>
         </div>
         <?php

@@ -165,29 +165,59 @@
   }
 
   function initEventFilter() {
-    var filterRoot = document.querySelector('[data-events-filter]');
-    if (!filterRoot) return;
+    var filterRoots = Array.prototype.slice.call(document.querySelectorAll('[data-events-filter]'));
+    if (!filterRoots.length) return;
 
-    var cards = Array.prototype.slice.call(document.querySelectorAll('.event-card[data-event-category]'));
-    var buttons = Array.prototype.slice.call(filterRoot.querySelectorAll('[data-event-filter]'));
+    function parseCategories(node) {
+      var raw = (node.getAttribute('data-event-category') || '').trim();
+      if (!raw) return [];
 
-    if (!cards.length || !buttons.length) return;
+      return raw.split(/[\s,|]+/).map(function (slug) {
+        return String(slug || '').trim();
+      }).filter(Boolean);
+    }
 
-    buttons.forEach(function (button) {
-      button.addEventListener('click', function () {
-        var selected = button.getAttribute('data-event-filter') || 'all';
+    filterRoots.forEach(function (filterRoot) {
+      if (!filterRoot || filterRoot.getAttribute('data-events-filter-ready') === '1') return;
 
-        buttons.forEach(function (b) {
-          b.classList.remove('is-active');
+      var scope = filterRoot.closest('.events-page-grid, .events-section, .elementor-section');
+      var searchRoot = scope || document;
+      var cards = Array.prototype.slice.call(
+        searchRoot.querySelectorAll('.event-card[data-event-category], .event-list-card[data-event-category]')
+      );
+      var buttons = Array.prototype.slice.call(filterRoot.querySelectorAll('[data-event-filter]'));
+
+      if (!cards.length || !buttons.length) return;
+
+      function setActiveButton(selected) {
+        buttons.forEach(function (btn) {
+          var isActive = (btn.getAttribute('data-event-filter') || 'all') === selected;
+          btn.classList.toggle('is-active', isActive);
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
-        button.classList.add('is-active');
+      }
+
+      function applyFilter(selected) {
+        var filterSlug = String(selected || 'all').trim();
+        setActiveButton(filterSlug);
 
         cards.forEach(function (card) {
-          var category = card.getAttribute('data-event-category');
-          var show = selected === 'all' || category === selected;
+          var cats = parseCategories(card);
+          var show = filterSlug === 'all' || cats.indexOf(filterSlug) !== -1;
           card.style.display = show ? '' : 'none';
         });
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          applyFilter(button.getAttribute('data-event-filter') || 'all');
+        });
       });
+
+      var activeBtn = filterRoot.querySelector('[data-event-filter].is-active');
+      var initial = activeBtn ? activeBtn.getAttribute('data-event-filter') : (buttons[0].getAttribute('data-event-filter') || 'all');
+      applyFilter(initial || 'all');
+      filterRoot.setAttribute('data-events-filter-ready', '1');
     });
   }
 
@@ -227,6 +257,16 @@
     }
 
     function getFilterTargets(root) {
+      var panel = root.closest('[data-about-panel="groups"]');
+      var scope = panel || document;
+      var cards = Array.prototype.slice.call(scope.querySelectorAll('.about-groups-grid .about-group-card'));
+      if (cards.length) {
+        return {
+          mode: 'classic',
+          items: cards
+        };
+      }
+
       var inElementor = !!root.closest('.elementor');
       if (inElementor) {
         var columns = Array.prototype.slice.call(
@@ -240,9 +280,6 @@
         };
       }
 
-      var panel = root.closest('[data-about-panel="groups"]');
-      var scope = panel || document;
-      var cards = Array.prototype.slice.call(scope.querySelectorAll('.about-groups-grid .about-group-card'));
       return {
         mode: 'classic',
         items: cards
