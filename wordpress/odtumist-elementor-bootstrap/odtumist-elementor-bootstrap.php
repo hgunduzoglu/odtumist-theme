@@ -2,8 +2,8 @@
 /**
  * Plugin Name: ODTÜMİST Elementor Bootstrap
  * Description: Elementor Pro odaklı ODTÜMİST kurulumu için sayfa, menü, CPT ve temel içerikleri tek tıkla oluşturur/günceller.
- * Version: 1.2.5
- * Author: ODTÜMİST
+ * Version: 1.2.7
+ * Author: Hüsamettin Gündüzoğlu
  */
 
 if (!defined('ABSPATH')) {
@@ -28,6 +28,10 @@ final class ODTUMIST_Elementor_Bootstrap
         add_action('pre_post_update', array(__CLASS__, 'capture_page_card_snapshot_before_save'), 10, 2);
         add_action('save_post_event', array(__CLASS__, 'handle_event_post_saved'), 25, 3);
         add_action('save_post_team', array(__CLASS__, 'handle_team_post_saved'), 25, 3);
+        add_action('set_object_terms', array(__CLASS__, 'handle_team_term_relationships_updated'), 25, 6);
+        add_action('created_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
+        add_action('edited_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
+        add_action('delete_team-category', array(__CLASS__, 'handle_team_category_terms_deleted'), 25, 4);
         add_action('save_post_page', array(__CLASS__, 'handle_key_page_saved'), 25, 3);
         add_action('transition_post_status', array(__CLASS__, 'handle_content_type_status_transition'), 25, 3);
         add_action('deleted_post', array(__CLASS__, 'handle_content_type_post_deleted'), 25, 2);
@@ -303,6 +307,52 @@ final class ODTUMIST_Elementor_Bootstrap
     public static function handle_team_post_saved($post_id, $post, $update)
     {
         self::handle_content_type_post_saved($post_id, $post, 'team');
+    }
+
+    public static function handle_team_term_relationships_updated($object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids)
+    {
+        if ((string) $taxonomy !== 'team-category') {
+            return;
+        }
+
+        $object_id = (int) $object_id;
+        if ($object_id <= 0) {
+            return;
+        }
+
+        $post = get_post($object_id);
+        if (!($post instanceof WP_Post) || $post->post_type !== 'team') {
+            return;
+        }
+
+        if (!self::can_run_auto_card_sync($object_id, $post)) {
+            return;
+        }
+
+        self::auto_sync_card_sections('team');
+    }
+
+    public static function handle_team_category_terms_changed($term_id, $tt_id)
+    {
+        self::trigger_team_filter_and_cards_resync();
+    }
+
+    public static function handle_team_category_terms_deleted($term, $tt_id, $deleted_term, $object_ids)
+    {
+        self::trigger_team_filter_and_cards_resync();
+    }
+
+    private static function trigger_team_filter_and_cards_resync()
+    {
+        if (self::$is_bootstrap_running || self::$is_card_source_sync_running) {
+            return;
+        }
+
+        if (!class_exists('Elementor\\Plugin')) {
+            return;
+        }
+
+        self::auto_sync_card_sections('team');
     }
 
     public static function capture_page_card_snapshot_before_save($post_id, $data)
@@ -2265,13 +2315,17 @@ final class ODTUMIST_Elementor_Bootstrap
 
         if (!empty($about_targets)) {
             $about_sections = self::build_card_sections_for_post_type('team', -1, $fallback, false, false, 'odt-el-about-groups-row');
+            $about_filter_section = self::build_team_filter_section_for_elementor();
+            if (is_array($about_filter_section) && !empty($about_filter_section)) {
+                array_unshift($about_sections, $about_filter_section);
+            }
             if (!empty($about_sections)) {
                 $synced_count = 0;
                 $copy_migrated_count = 0;
                 foreach ($about_targets as $about_page_id) {
                     $about_synced = self::sync_elementor_section_rows(
                         (int) $about_page_id,
-                        array('odt-el-about-groups-row', 'odt-el-about-groups-dynamic', 'odt-el-about-groups-intro'),
+                        array('odt-el-about-groups-row', 'odt-el-about-groups-dynamic', 'odt-el-about-groups-intro', 'odt-el-about-groups-filter'),
                         'odt-el-about-panel-calisma-gruplarimiz',
                         $about_sections
                     );
@@ -4175,11 +4229,29 @@ final class ODTUMIST_Elementor_Bootstrap
                     $description = self::get_event_datetime($post_id) . ' | ' . self::get_event_location($post_id) . ' | ' . $description;
                 }
 
+                $category_slugs = array();
+                if ($post_type === 'team') {
+                    $team_terms = get_the_terms($post_id, 'team-category');
+                    if (is_array($team_terms) && !is_wp_error($team_terms)) {
+                        foreach ($team_terms as $team_term) {
+                            if (!($team_term instanceof WP_Term)) {
+                                continue;
+                            }
+                            $slug = sanitize_title((string) $team_term->slug);
+                            if ($slug !== '') {
+                                $category_slugs[] = $slug;
+                            }
+                        }
+                    }
+                    $category_slugs = array_values(array_unique($category_slugs));
+                }
+
                 $cards[] = array(
                     'title' => get_the_title(),
                     'description' => $description,
                     'image' => $image,
                     'url' => get_permalink($post_id),
+                    'category_slugs' => $category_slugs,
                 );
             }
             wp_reset_postdata();
@@ -4202,8 +4274,28 @@ final class ODTUMIST_Elementor_Bootstrap
             }
 
             foreach ($row as $card) {
+                $card_css_classes = array('odt-el-card', $card_type_class);
+                $column_css_classes = array('odt-el-card-col', $card_type_class . '-col');
+
+                if ($post_type === 'team' && !empty($card['category_slugs']) && is_array($card['category_slugs'])) {
+                    foreach ($card['category_slugs'] as $term_slug) {
+                        $term_slug = sanitize_title((string) $term_slug);
+                        if ($term_slug === '') {
+                            continue;
+                        }
+                        $term_class = 'odt-team-cat-' . sanitize_html_class($term_slug);
+                        $card_css_classes[] = $term_class;
+                        $column_css_classes[] = $term_class;
+                    }
+                }
+
+                $card_css_classes = implode(' ', array_values(array_unique($card_css_classes)));
+                $column_css_classes = implode(' ', array_values(array_unique($column_css_classes)));
                 $columns[] = array(
                     'size' => $col_size,
+                    'settings' => array(
+                        '_css_classes' => $column_css_classes,
+                    ),
                     'widgets' => array(
                         self::build_widget('image-box', array(
                             'image' => array('url' => (string) $card['image'], 'id' => ''),
@@ -4212,7 +4304,7 @@ final class ODTUMIST_Elementor_Bootstrap
                             'link' => array('url' => (string) $card['url']),
                             'position' => 'top',
                             'align' => 'left',
-                            '_css_classes' => 'odt-el-card ' . $card_type_class,
+                            '_css_classes' => $card_css_classes,
                         )),
                     ),
                 );
@@ -4236,6 +4328,77 @@ final class ODTUMIST_Elementor_Bootstrap
         }
 
         return $sections;
+    }
+
+    private static function get_team_filter_terms()
+    {
+        $terms = get_terms(array(
+            'taxonomy' => 'team-category',
+            'hide_empty' => true,
+            'orderby' => 'name',
+            'order' => 'ASC',
+        ));
+        if (!is_array($terms) || is_wp_error($terms)) {
+            return array();
+        }
+
+        $items = array();
+        foreach ($terms as $term) {
+            if (!($term instanceof WP_Term)) {
+                continue;
+            }
+            $slug = sanitize_title((string) $term->slug);
+            $name = trim((string) $term->name);
+            if ($slug === '' || $name === '') {
+                continue;
+            }
+            $items[] = array(
+                'slug' => $slug,
+                'name' => $name,
+            );
+        }
+
+        return $items;
+    }
+
+    private static function build_team_filter_section_for_elementor()
+    {
+        $terms = self::get_team_filter_terms();
+        if (count($terms) < 2) {
+            return array();
+        }
+
+        $buttons = array();
+        $buttons[] = '<button type="button" class="odt-group-filter is-active" data-group-filter="all">Tümü</button>';
+        foreach ($terms as $term) {
+            $buttons[] = '<button type="button" class="odt-group-filter" data-group-filter="' . esc_attr((string) $term['slug']) . '">' . esc_html((string) $term['name']) . '</button>';
+        }
+
+        $markup = '<div class="odt-group-filters odt-group-filters-elementor" data-working-groups-filter="team">' . implode('', $buttons) . '</div>';
+
+        return self::build_section_with_columns(
+            array(
+                array(
+                    'size' => 100,
+                    'widgets' => array(
+                        self::build_widget('html', array(
+                            'html' => $markup,
+                        )),
+                    ),
+                ),
+            ),
+            array(
+                'padding' => array(
+                    'unit' => 'px',
+                    'top' => '16',
+                    'right' => '0',
+                    'bottom' => '8',
+                    'left' => '0',
+                    'isLinked' => false,
+                ),
+                '_css_classes' => 'odt-el odt-el-section odt-el-about-groups-filter',
+            )
+        );
     }
 
     private static function build_elementor_document($widgets)
@@ -4736,11 +4899,42 @@ final class ODTUMIST_Elementor_Bootstrap
             return '<p class="empty-state">Henüz yayınlanmış çalışma grubu bulunmuyor.</p>';
         }
 
+        $filter_terms = self::get_team_filter_terms();
+
         ob_start();
         ?>
+        <?php if (count($filter_terms) > 1) : ?>
+            <div class="odt-group-filters" data-working-groups-filter="team">
+                <button type="button" class="odt-group-filter is-active" data-group-filter="all"><?php esc_html_e('Tümü', 'odtumist-eb'); ?></button>
+                <?php foreach ($filter_terms as $filter_term) : ?>
+                    <button type="button" class="odt-group-filter" data-group-filter="<?php echo esc_attr((string) $filter_term['slug']); ?>"><?php echo esc_html((string) $filter_term['name']); ?></button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         <div class="about-groups-grid">
             <?php while ($query->have_posts()) : $query->the_post(); ?>
-                <article class="about-group-card">
+                <?php
+                $term_slugs = array();
+                $team_terms = get_the_terms(get_the_ID(), 'team-category');
+                if (is_array($team_terms) && !is_wp_error($team_terms)) {
+                    foreach ($team_terms as $team_term) {
+                        if (!($team_term instanceof WP_Term)) {
+                            continue;
+                        }
+                        $slug = sanitize_title((string) $team_term->slug);
+                        if ($slug !== '') {
+                            $term_slugs[] = $slug;
+                        }
+                    }
+                }
+                $term_slugs = array_values(array_unique($term_slugs));
+                $term_slug_attr = implode(' ', $term_slugs);
+                $term_class_tokens = array();
+                foreach ($term_slugs as $term_slug) {
+                    $term_class_tokens[] = 'odt-team-cat-' . sanitize_html_class((string) $term_slug);
+                }
+                ?>
+                <article class="about-group-card<?php echo !empty($term_class_tokens) ? ' ' . esc_attr(implode(' ', $term_class_tokens)) : ''; ?>" data-group-cats="<?php echo esc_attr($term_slug_attr); ?>">
                     <a class="about-group-media" href="<?php the_permalink(); ?>">
                         <?php if (has_post_thumbnail()) : ?>
                             <?php the_post_thumbnail('full', array('loading' => 'lazy')); ?>

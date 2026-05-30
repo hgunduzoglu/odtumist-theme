@@ -20,6 +20,15 @@ $history_section    = odtumist_pick_content_section($sections, array('tarihce'))
 $management_section = odtumist_pick_content_section($sections, array('yonetim'));
 
 $groups_query = odtumist_get_working_groups(-1);
+$group_filter_terms = get_terms(array(
+    'taxonomy' => 'team-category',
+    'hide_empty' => true,
+    'orderby' => 'name',
+    'order' => 'ASC',
+));
+if (!is_array($group_filter_terms) || is_wp_error($group_filter_terms)) {
+    $group_filter_terms = array();
+}
 $management_org_page = odtumist_get_page_by_slug(array('yonetim-organlari'));
 $bylaw_page          = odtumist_get_page_by_slug(array('tuzuk'));
 $report_page         = odtumist_get_page_by_slug(array('faaliyet-raporlari'));
@@ -125,10 +134,45 @@ $about_tabs = array(
                     </div>
                 <?php endif; ?>
 
+                <?php if (count($group_filter_terms) > 1) : ?>
+                    <div class="odt-group-filters" data-working-groups-filter="team">
+                        <button type="button" class="odt-group-filter is-active" data-group-filter="all"><?php esc_html_e('Tümü', 'odtumist'); ?></button>
+                        <?php foreach ($group_filter_terms as $group_filter_term) : ?>
+                            <?php if (!($group_filter_term instanceof WP_Term)) {
+                                continue;
+                            } ?>
+                            <button type="button" class="odt-group-filter" data-group-filter="<?php echo esc_attr(sanitize_title((string) $group_filter_term->slug)); ?>">
+                                <?php echo esc_html((string) $group_filter_term->name); ?>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="about-groups-grid">
                     <?php if ($groups_query->have_posts()) : ?>
                         <?php while ($groups_query->have_posts()) : $groups_query->the_post(); ?>
-                            <article class="about-group-card">
+                            <?php
+                            $team_terms = get_the_terms(get_the_ID(), 'team-category');
+                            $term_slugs = array();
+                            if (is_array($team_terms) && !is_wp_error($team_terms)) {
+                                foreach ($team_terms as $team_term) {
+                                    if (!($team_term instanceof WP_Term)) {
+                                        continue;
+                                    }
+                                    $slug = sanitize_title((string) $team_term->slug);
+                                    if ($slug !== '') {
+                                        $term_slugs[] = $slug;
+                                    }
+                                }
+                            }
+                            $term_slugs = array_values(array_unique($term_slugs));
+                            $term_class_tokens = array();
+                            foreach ($term_slugs as $term_slug) {
+                                $term_class_tokens[] = 'odt-team-cat-' . sanitize_html_class($term_slug);
+                            }
+                            $term_slug_attr = implode(' ', $term_slugs);
+                            ?>
+                            <article class="about-group-card<?php echo !empty($term_class_tokens) ? ' ' . esc_attr(implode(' ', $term_class_tokens)) : ''; ?>" data-group-cats="<?php echo esc_attr($term_slug_attr); ?>">
                                 <a class="about-group-media" href="<?php the_permalink(); ?>">
                                     <?php if (has_post_thumbnail()) : ?>
                                         <?php the_post_thumbnail('full', array('loading' => 'lazy')); ?>

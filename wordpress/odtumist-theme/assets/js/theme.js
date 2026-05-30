@@ -191,6 +191,143 @@
     });
   }
 
+  function initWorkingGroupFilters() {
+    var filterRoots = Array.prototype.slice.call(document.querySelectorAll('[data-working-groups-filter]'));
+    if (!filterRoots.length) return;
+
+    function unique(values) {
+      var seen = {};
+      return values.filter(function (value) {
+        if (!value || seen[value]) return false;
+        seen[value] = true;
+        return true;
+      });
+    }
+
+    function parseCategorySlugs(node) {
+      if (!node) return [];
+
+      var slugs = [];
+      var dataCats = (node.getAttribute('data-group-cats') || '').trim();
+      if (dataCats) {
+        dataCats.split(/[\s,|]+/).forEach(function (slug) {
+          var clean = String(slug || '').trim();
+          if (clean) slugs.push(clean);
+        });
+      }
+
+      var classTokens = String(node.className || '').split(/\s+/);
+      classTokens.forEach(function (token) {
+        if (token.indexOf('odt-team-cat-') !== 0) return;
+        var slug = token.replace(/^odt-team-cat-/, '').trim();
+        if (slug) slugs.push(slug);
+      });
+
+      return unique(slugs);
+    }
+
+    function getFilterTargets(root) {
+      var inElementor = !!root.closest('.elementor');
+      if (inElementor) {
+        var columns = Array.prototype.slice.call(
+          document.querySelectorAll('.elementor .odt-el-about-groups-row .elementor-column')
+        ).filter(function (column) {
+          return !!column.querySelector('.odt-el-group-card');
+        });
+        return {
+          mode: 'elementor',
+          items: columns
+        };
+      }
+
+      var panel = root.closest('[data-about-panel="groups"]');
+      var scope = panel || document;
+      var cards = Array.prototype.slice.call(scope.querySelectorAll('.about-groups-grid .about-group-card'));
+      return {
+        mode: 'classic',
+        items: cards
+      };
+    }
+
+    function ensureButtons(root, items) {
+      var buttons = Array.prototype.slice.call(root.querySelectorAll('[data-group-filter]'));
+      if (buttons.length) return buttons;
+
+      var slugs = [];
+      items.forEach(function (item) {
+        slugs = slugs.concat(parseCategorySlugs(item));
+      });
+      slugs = unique(slugs);
+      if (!slugs.length) return [];
+
+      var fragment = document.createDocumentFragment();
+
+      var allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = 'odt-group-filter is-active';
+      allBtn.setAttribute('data-group-filter', 'all');
+      allBtn.textContent = 'Tümü';
+      fragment.appendChild(allBtn);
+
+      slugs.forEach(function (slug) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'odt-group-filter';
+        btn.setAttribute('data-group-filter', slug);
+        btn.textContent = slug.replace(/-/g, ' ');
+        fragment.appendChild(btn);
+      });
+
+      root.appendChild(fragment);
+      return Array.prototype.slice.call(root.querySelectorAll('[data-group-filter]'));
+    }
+
+    filterRoots.forEach(function (root) {
+      if (root.getAttribute('data-groups-filter-ready') === '1') return;
+
+      var targets = getFilterTargets(root);
+      if (!targets.items.length) return;
+
+      var buttons = ensureButtons(root, targets.items);
+      if (!buttons.length) return;
+
+      function setActiveButton(activeSlug) {
+        buttons.forEach(function (button) {
+          var isActive = (button.getAttribute('data-group-filter') || 'all') === activeSlug;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+      }
+
+      function applyFilter(selectedSlug) {
+        var normalized = (selectedSlug || 'all').trim();
+        setActiveButton(normalized);
+
+        targets.items.forEach(function (item) {
+          var slugs = parseCategorySlugs(item);
+          var isVisible = normalized === 'all' || slugs.indexOf(normalized) !== -1;
+          if (targets.mode === 'elementor') {
+            item.style.display = isVisible ? '' : 'none';
+          } else {
+            item.style.display = isVisible ? '' : 'none';
+          }
+        });
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var selected = button.getAttribute('data-group-filter') || 'all';
+          applyFilter(selected);
+        });
+      });
+
+      var activeBtn = root.querySelector('[data-group-filter].is-active');
+      var initial = activeBtn ? activeBtn.getAttribute('data-group-filter') : (buttons[0].getAttribute('data-group-filter') || 'all');
+      applyFilter(initial || 'all');
+      root.setAttribute('data-groups-filter-ready', '1');
+    });
+  }
+
   function initAboutTabs() {
     var navRoot = document.querySelector('[data-about-nav]');
 
@@ -301,6 +438,7 @@
       ]),
       groups: collectSections([
         '.elementor .odt-el-about-panel-calisma-gruplarimiz',
+        '.elementor .odt-el-about-groups-filter',
         '.elementor .odt-el-about-groups-intro',
         '.elementor .odt-el-about-groups-row',
         '.elementor .odt-el-about-pagination-groups'
@@ -566,6 +704,7 @@
     initCarousels();
     initElementorHomeRowArrows();
     initEventFilter();
+    initWorkingGroupFilters();
     initAboutTabs();
     initMembershipTabs();
     initAboutPagination();

@@ -1274,6 +1274,40 @@ body.admin-bar .about-page-nav {
     margin-bottom: 1.4rem;
 }
 
+.odt-group-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0 0 1.1rem;
+}
+
+.odt-group-filter {
+    appearance: none;
+    border: 1px solid #c8d6ea;
+    background: #fff;
+    color: #1e293b;
+    border-radius: 999px;
+    min-height: 38px;
+    padding: 0.45rem 0.95rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.odt-group-filter:hover {
+    border-color: #00529b;
+    color: #00529b;
+}
+
+.odt-group-filter.is-active {
+    border-color: #00529b;
+    background: #00529b;
+    color: #fff;
+}
+
 .about-groups-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -4736,6 +4770,15 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor .odt-el-about-groups-intro {
     display: none !important;
+}
+
+.elementor .odt-el-about-groups-filter > .elementor-container {
+    width: min(var(--max-width), calc(100% - 2rem));
+    margin-inline: auto;
+}
+
+.elementor .odt-el-about-groups-filter .odt-group-filters {
+    margin-bottom: 0.65rem;
 }
 
 .elementor .odt-el-about-groups-row > .elementor-container {
