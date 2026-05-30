@@ -168,12 +168,29 @@
     var filterRoots = Array.prototype.slice.call(document.querySelectorAll('[data-events-filter]'));
     if (!filterRoots.length) return;
 
+    function normalizeSlug(value) {
+      var slug = String(value || '').trim().toLowerCase();
+      if (!slug) return '';
+
+      if (typeof slug.normalize === 'function') {
+        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      slug = slug
+        .replace(/[\s_]+/g, '-')
+        .replace(/[^a-z0-9-]+/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      return slug;
+    }
+
     function parseCategories(node) {
       var raw = (node.getAttribute('data-event-category') || '').trim();
       if (!raw) return [];
 
       return raw.split(/[\s,|]+/).map(function (slug) {
-        return String(slug || '').trim();
+        return normalizeSlug(slug);
       }).filter(Boolean);
     }
 
@@ -191,14 +208,15 @@
 
       function setActiveButton(selected) {
         buttons.forEach(function (btn) {
-          var isActive = (btn.getAttribute('data-event-filter') || 'all') === selected;
+          var buttonSlug = normalizeSlug(btn.getAttribute('data-event-filter') || 'all') || 'all';
+          var isActive = buttonSlug === selected;
           btn.classList.toggle('is-active', isActive);
           btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
       }
 
       function applyFilter(selected) {
-        var filterSlug = String(selected || 'all').trim();
+        var filterSlug = normalizeSlug(selected || 'all') || 'all';
         setActiveButton(filterSlug);
 
         cards.forEach(function (card) {

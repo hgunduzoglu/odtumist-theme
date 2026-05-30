@@ -1847,14 +1847,14 @@ body.admin-bar .about-page-nav {
 }
 
 .events-page-grid .event-list-card {
-    min-height: clamp(760px, 80vh, 980px);
+    min-height: clamp(640px, 72vh, 840px);
     border-radius: 24px;
     box-shadow: 0 14px 34px rgba(12, 22, 51, 0.14);
 }
 
 .events-page-grid .event-list-thumb {
     aspect-ratio: 4 / 5 !important;
-    min-height: clamp(330px, 46vh, 520px);
+    min-height: clamp(360px, 44vh, 520px);
     background: #eef3fa;
     display: flex;
     align-items: center;
@@ -1871,6 +1871,7 @@ body.admin-bar .about-page-nav {
 
 .events-page-grid .event-list-content {
     padding: 1.2rem 1.05rem 1.2rem;
+    position: relative;
 }
 
 .events-page-grid .event-list-content h2 {
@@ -1879,13 +1880,28 @@ body.admin-bar .about-page-nav {
 
 .events-page-grid .event-list-content > p:not(.event-meta) {
     display: -webkit-box;
-    -webkit-line-clamp: 7;
+    -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .events-page-grid .event-list-content .event-meta {
     margin-top: 0.5rem;
+}
+
+.events-page-grid .event-list-content .event-badge {
+    position: static;
+    top: auto;
+    left: auto;
+    display: inline-flex;
+    align-self: flex-start;
+    margin: 0 0 0.65rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(227, 30, 36, 0.1);
+    color: #c51920;
+    font-size: 0.68rem;
+    line-height: 1;
 }
 
 @media (max-width: 1439px) {
@@ -4225,8 +4241,8 @@ body.admin-bar .elementor .odt-el-about-nav {
 }
 
 .elementor .odt-el-home-events-row .elementor-column {
-    min-width: min(350px, 86vw);
-    max-width: min(350px, 86vw);
+    min-width: min(390px, 92vw);
+    max-width: min(390px, 92vw);
     flex: 0 0 auto;
     align-self: stretch;
     display: flex;
@@ -4243,7 +4259,7 @@ body.admin-bar .elementor .odt-el-about-nav {
     border: 1px solid #e7edf8;
     box-shadow: 0 10px 26px rgba(12, 22, 51, 0.12);
     background: #fff;
-    height: clamp(640px, 70vh, 760px);
+    height: clamp(700px, 78vh, 860px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -4251,7 +4267,7 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
     position: relative;
-    height: clamp(320px, 38vh, 430px);
+    height: clamp(440px, 54vh, 600px);
     overflow: hidden;
     background: #eef2f8;
     display: flex;
@@ -4260,19 +4276,8 @@ body.admin-bar .elementor .odt-el-about-nav {
 }
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img::before {
-    content: "ETKİNLİK";
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 2;
-    padding: 0.28rem 0.65rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.92);
-    color: #e31e24;
-    font-size: 0.61rem;
-    font-weight: 900;
-    letter-spacing: 0.09em;
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
 }
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img img {
@@ -4280,29 +4285,29 @@ body.admin-bar .elementor .odt-el-about-nav {
     height: 100%;
     object-fit: contain;
     object-position: center;
-    padding: 0.6rem;
+    padding: 0.2rem;
 }
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-content {
-    padding: 1rem 1rem 1.1rem;
+    padding: 0.95rem 0.9rem 0.95rem;
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
 }
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-title {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     line-height: 1.25;
-    min-height: 2.7em;
+    min-height: 2.45em;
     text-transform: none;
 }
 
 .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-description {
-    font-size: 0.86rem;
+    font-size: 0.95rem;
     line-height: 1.5;
     color: #475569;
     display: -webkit-box;
-    -webkit-line-clamp: 8;
+    -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -4406,8 +4411,8 @@ body.admin-bar .elementor .odt-el-about-nav {
 }
 
 .elementor .odt-el-home-groups-row .elementor-column {
-    min-width: min(310px, 86vw);
-    max-width: min(310px, 86vw);
+    min-width: min(390px, 92vw);
+    max-width: min(390px, 92vw);
     flex: 0 0 auto;
     align-self: stretch;
     display: flex;
@@ -4424,14 +4429,14 @@ body.admin-bar .elementor .odt-el-about-nav {
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow: 0 18px 34px rgba(2, 6, 23, 0.45);
     overflow: hidden;
-    height: clamp(620px, 68vh, 740px);
+    height: clamp(620px, 74vh, 780px);
     display: flex;
     flex-direction: column;
 }
 
 .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
     position: relative;
-    height: clamp(300px, 36vh, 390px);
+    height: clamp(300px, 40vh, 420px);
     overflow: hidden;
     background: linear-gradient(180deg, #1f4f96 0%, #123266 100%);
     display: flex;
@@ -4450,31 +4455,31 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
-    padding: 0.75rem 0.85rem 0.25rem;
+    padding: 0;
     display: block;
 }
 
 .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-content {
-    padding: 1.3rem 1rem 1.15rem;
+    padding: 1rem 0.95rem 1rem;
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
 }
 
 .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-title {
-    font-size: 1.22rem;
+    font-size: 1.3rem;
     text-transform: uppercase;
     color: #0f172a;
-    min-height: 2.3em;
+    min-height: 2.1em;
 }
 
 .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-description {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #475569;
     display: -webkit-box;
-    -webkit-line-clamp: 8;
+    -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -4548,19 +4553,19 @@ body.admin-bar .elementor .odt-el-about-nav {
     }
 
     .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-wrapper {
-        height: clamp(580px, 72vh, 700px);
+        height: clamp(640px, 76vh, 780px);
     }
 
     .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
-        height: clamp(270px, 36vh, 360px);
+        height: clamp(380px, 48vh, 500px);
     }
 
     .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-wrapper {
-        height: clamp(560px, 72vh, 680px);
+        height: clamp(590px, 74vh, 740px);
     }
 
     .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
-        height: clamp(250px, 34vh, 330px);
+        height: clamp(280px, 38vh, 390px);
     }
 
     .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
@@ -4594,20 +4599,20 @@ body.admin-bar .elementor .odt-el-about-nav {
 
     .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-wrapper {
         height: auto;
-        min-height: 540px;
+        min-height: 640px;
     }
 
     .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img {
-        height: clamp(240px, 38vh, 320px);
+        height: clamp(340px, 48vh, 460px);
     }
 
     .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-wrapper {
         height: auto;
-        min-height: 520px;
+        min-height: 600px;
     }
 
     .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img {
-        height: clamp(230px, 36vh, 300px);
+        height: clamp(260px, 40vh, 360px);
     }
 
     .elementor .odt-el-event-card-row:not(.odt-el-home-events-row) .elementor-column,
@@ -6410,6 +6415,34 @@ body.admin-bar .elementor .odt-el-about-nav {
 .elementor-page .elementor .odt-el-about-history-card .elementor-image-box-wrapper .elementor-image-box-img {
     width: 100% !important;
     max-width: 100% !important;
+}
+
+/* Elementor page-level widget css can force image box width to 30%; hard-override for home dynamic cards. */
+.elementor-page .elementor .odt-el-home-events-row .odt-el-event-card.elementor-position-top .elementor-image-box-wrapper .elementor-image-box-img,
+.elementor-page .elementor .odt-el-home-groups-row .odt-el-group-card.elementor-position-top .elementor-image-box-wrapper .elementor-image-box-img {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+
+.elementor-page .elementor .odt-el-home-events-row .odt-el-event-card.elementor-position-top .elementor-image-box-img,
+.elementor-page .elementor .odt-el-home-groups-row .odt-el-group-card.elementor-position-top .elementor-image-box-img {
+    margin-bottom: 0 !important;
+}
+
+.elementor-page .elementor .odt-el-home-events-row .odt-el-event-card .elementor-image-box-img img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+.elementor-page .elementor .odt-el-home-groups-row .odt-el-group-card .elementor-image-box-img img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
 }
 
 /* Iteration 16: Solidarity full-bleed editable strips */
