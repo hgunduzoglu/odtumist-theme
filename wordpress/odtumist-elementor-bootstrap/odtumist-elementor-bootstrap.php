@@ -1723,9 +1723,9 @@ final class ODTUMIST_Elementor_Bootstrap
                 'id'     => $page_ids['uyelik'],
                 'children' => array(
                     array('title' => 'Neden Üye Olmalıyım?', 'slug' => 'neden-uye-olmaliyim', 'url' => $membership_url . '#neden-uye-olmaliyim'),
+                    array('title' => 'Üyelik Avantajları', 'slug' => 'uyelik-avantajlari', 'url' => $membership_url . '#uyelik-avantajlari'),
                     array('title' => 'Bilgi Güncelleme', 'slug' => 'bilgi-guncelleme', 'url' => $membership_url . '#bilgi-guncelleme'),
                     array('title' => 'Aidat Ödeme', 'slug' => 'aidat-odeme', 'url' => $membership_url . '#aidat-odeme'),
-                    array('title' => 'Üyelik Avantajları', 'slug' => 'uyelik-avantajlari', 'url' => $membership_url . '#uyelik-avantajlari'),
                     array('title' => 'Nasıl Üye Olabilirsiniz?', 'slug' => 'nasil-uye-olabilirsiniz', 'url' => $membership_url . '#nasil-uye-olabilirsiniz'),
                     array('title' => 'Yeni Mezunlar İçin Üyelik', 'slug' => 'yeni-mezunlar-icin-uyelik', 'url' => $membership_url . '#yeni-mezunlar-icin-uyelik'),
                     array('title' => 'Üyelik SSS', 'slug' => 'uyelik-sss', 'url' => $membership_url . '#uyelik-sss'),

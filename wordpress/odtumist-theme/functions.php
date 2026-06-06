@@ -655,14 +655,60 @@ function odtumist_is_solidarity_root_page($post_id = 0)
     return in_array($slug, array('dayanisma', 'solidarity'), true);
 }
 
+function odtumist_elementor_first_section_has_class($post_id, $class_name)
+{
+    $post_id = (int) $post_id;
+    $class_name = sanitize_html_class((string) $class_name);
+    if ($post_id <= 0 || $class_name === '') {
+        return false;
+    }
+
+    $elementor_data = get_post_meta($post_id, '_elementor_data', true);
+    if (!is_string($elementor_data) || trim($elementor_data) === '') {
+        return false;
+    }
+
+    $elements = json_decode(wp_unslash($elementor_data), true);
+    if (!is_array($elements)) {
+        return false;
+    }
+
+    foreach ($elements as $element) {
+        if (!is_array($element)) {
+            continue;
+        }
+
+        $element_type = isset($element['elType']) ? (string) $element['elType'] : '';
+        if (!in_array($element_type, array('section', 'container'), true)) {
+            continue;
+        }
+
+        $classes = isset($element['settings']['_css_classes']) ? $element['settings']['_css_classes'] : '';
+        if (is_array($classes)) {
+            $classes = implode(' ', $classes);
+        }
+        $classes = preg_split('/\s+/', trim((string) $classes));
+
+        return in_array($class_name, $classes, true);
+    }
+
+    return false;
+}
+
 function odtumist_add_context_body_classes($classes)
 {
     if (!is_array($classes)) {
         $classes = array();
     }
 
+    $runtime_page_id = odtumist_get_runtime_page_id();
+
     if (!is_admin() && odtumist_is_solidarity_root_page()) {
         $classes[] = 'odt-page-dayanisma';
+    }
+
+    if (!is_admin() && odtumist_elementor_first_section_has_class($runtime_page_id, 'odt-el-banner-section')) {
+        $classes[] = 'odt-has-top-elementor-banner';
     }
 
     return array_values(array_unique($classes));
@@ -1152,10 +1198,164 @@ function odtumist_get_footer_content()
     );
 }
 
+function odtumist_get_membership_menu_children($membership_url = '')
+{
+    $membership_url = trim((string) $membership_url);
+    if ($membership_url === '') {
+        $membership_page = odtumist_get_page_by_slug(array('uyelik', 'membership'));
+        $membership_url = $membership_page ? get_permalink($membership_page) : home_url('/uyelik/');
+    }
+
+    $children = array();
+    foreach (odtumist_get_membership_tab_defaults() as $tab) {
+        $tab_id = isset($tab['id']) ? sanitize_title((string) $tab['id']) : '';
+        if ($tab_id === '') {
+            continue;
+        }
+
+        $children[] = array(
+            'id'    => $tab_id,
+            'title' => isset($tab['label']) ? (string) $tab['label'] : $tab_id,
+            'url'   => $membership_url . '#' . $tab_id,
+        );
+    }
+
+    return $children;
+}
+
+function odtumist_get_url_fragment_slug($url)
+{
+    $fragment = wp_parse_url((string) $url, PHP_URL_FRAGMENT);
+    if (!is_string($fragment) || $fragment === '') {
+        return '';
+    }
+
+    return sanitize_title($fragment);
+}
+
+function odtumist_menu_item_matches_membership_parent($item, $membership_url)
+{
+    if (!is_object($item)) {
+        return false;
+    }
+
+    $title_slug = sanitize_title(wp_strip_all_tags((string) $item->title));
+    if (in_array($title_slug, array('uyelik', 'membership'), true)) {
+        return true;
+    }
+
+    $item_path = trim((string) wp_parse_url((string) $item->url, PHP_URL_PATH), '/');
+    $membership_path = trim((string) wp_parse_url((string) $membership_url, PHP_URL_PATH), '/');
+
+    return $membership_path !== '' && $item_path === $membership_path;
+}
+
+function odtumist_sync_primary_membership_menu_items($items)
+{
+    if (!is_array($items) || empty($items)) {
+        return $items;
+    }
+
+    $membership_page = odtumist_get_page_by_slug(array('uyelik', 'membership'));
+    $membership_url = $membership_page ? get_permalink($membership_page) : home_url('/uyelik/');
+    $membership_children = odtumist_get_membership_menu_children($membership_url);
+    if (empty($membership_children)) {
+        return $items;
+    }
+
+    $tab_map = array();
+    foreach ($membership_children as $index => $child) {
+        $tab_map[$child['id']] = array(
+            'order' => $index,
+            'title' => $child['title'],
+            'url'   => $child['url'],
+        );
+    }
+
+    $membership_parent_id = 0;
+    foreach ($items as $item) {
+        if (!is_object($item) || (int) $item->menu_item_parent !== 0) {
+            continue;
+        }
+
+        if (odtumist_menu_item_matches_membership_parent($item, $membership_url)) {
+            $membership_parent_id = (int) $item->ID;
+            break;
+        }
+    }
+
+    if ($membership_parent_id <= 0) {
+        return $items;
+    }
+
+    $membership_child_items = array();
+    $original_positions = array();
+    foreach ($items as $index => $item) {
+        if (!is_object($item)) {
+            continue;
+        }
+
+        $original_positions[(int) $item->ID] = $index;
+        if ((int) $item->menu_item_parent !== $membership_parent_id) {
+            continue;
+        }
+
+        $fragment = odtumist_get_url_fragment_slug($item->url);
+        if (isset($tab_map[$fragment])) {
+            $item->title = $tab_map[$fragment]['title'];
+            $item->url = $tab_map[$fragment]['url'];
+        }
+
+        $membership_child_items[] = $item;
+    }
+
+    if (empty($membership_child_items)) {
+        return $items;
+    }
+
+    usort($membership_child_items, function ($a, $b) use ($tab_map, $original_positions) {
+        $fragment_a = odtumist_get_url_fragment_slug($a->url);
+        $fragment_b = odtumist_get_url_fragment_slug($b->url);
+        $order_a = isset($tab_map[$fragment_a]) ? $tab_map[$fragment_a]['order'] : 1000 + ($original_positions[(int) $a->ID] ?? 0);
+        $order_b = isset($tab_map[$fragment_b]) ? $tab_map[$fragment_b]['order'] : 1000 + ($original_positions[(int) $b->ID] ?? 0);
+
+        if ($order_a === $order_b) {
+            return ($original_positions[(int) $a->ID] ?? 0) <=> ($original_positions[(int) $b->ID] ?? 0);
+        }
+
+        return $order_a <=> $order_b;
+    });
+
+    $synced_items = array();
+    foreach ($items as $item) {
+        if (!is_object($item)) {
+            $synced_items[] = $item;
+            continue;
+        }
+
+        if ((int) $item->menu_item_parent === $membership_parent_id) {
+            continue;
+        }
+
+        $synced_items[] = $item;
+        if ((int) $item->ID === $membership_parent_id) {
+            foreach ($membership_child_items as $child_item) {
+                $synced_items[] = $child_item;
+            }
+        }
+    }
+
+    return $synced_items;
+}
+
 function odtumist_filter_empty_menu_items($items, $args)
 {
     if (empty($args->theme_location) || !in_array($args->theme_location, array('primary-menu', 'footer-menu', 'footer-corporate-menu', 'footer-info-menu'), true)) {
         return $items;
+    }
+
+    if ('primary-menu' === (string) $args->theme_location) {
+        $items = odtumist_sync_primary_membership_menu_items($items);
     }
 
     $filtered = array();
@@ -1222,15 +1422,7 @@ function odtumist_render_fallback_menu($args)
             array(
                 'title' => 'ÜYELİK',
                 'url'   => $membership_url,
-                'children' => array(
-                    array('title' => 'Neden Üye Olmalıyım?', 'url' => $membership_url . '#neden-uye-olmaliyim'),
-                    array('title' => 'Bilgi Güncelleme', 'url' => $membership_url . '#bilgi-guncelleme'),
-                    array('title' => 'Aidat Ödeme', 'url' => $membership_url . '#aidat-odeme'),
-                    array('title' => 'Üyelik Avantajları', 'url' => $membership_url . '#uyelik-avantajlari'),
-                    array('title' => 'Nasıl Üye Olabilirsiniz?', 'url' => $membership_url . '#nasil-uye-olabilirsiniz'),
-                    array('title' => 'Yeni Mezunlar İçin Üyelik', 'url' => $membership_url . '#yeni-mezunlar-icin-uyelik'),
-                    array('title' => 'Üyelik SSS', 'url' => $membership_url . '#uyelik-sss'),
-                ),
+                'children' => odtumist_get_membership_menu_children($membership_url),
             ),
             array(
                 'title' => 'DAYANIŞMA',

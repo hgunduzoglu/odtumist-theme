@@ -6714,3 +6714,17 @@ body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity
     border: 0 !important;
     box-shadow: none !important;
 }
+
+/* Iteration 19: Banner-first Elementor pages should sit directly under the fixed header. */
+body.odt-has-top-elementor-banner .site-main,
+body.elementor-page .site-main:has(> .elementor-page-content > .elementor > .odt-el-banner-section:first-child) {
+    padding-top: 0;
+}
+
+.elementor-page .elementor .odt-el-section.odt-el-membership-hero.odt-el-banner-section + .odt-el-section.odt-el-membership-panel {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+}
