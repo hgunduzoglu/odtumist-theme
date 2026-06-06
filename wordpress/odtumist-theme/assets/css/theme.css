@@ -3582,25 +3582,30 @@ body.admin-bar .membership-nav {
 .elementor .odt-el-membership-panel .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
     background: #fff;
     border-radius: 24px;
-    border: 1px solid #e6edf8;
+    border-width: 1px;
+    border-style: solid;
     box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
     padding: clamp(1.3rem, 2vw, 1.8rem);
 }
 
 .elementor .odt-el-membership-panel-1 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
-    border-left: 8px solid #e33a4a;
+    border-left-width: 8px;
+    border-left-style: solid;
 }
 
 .elementor .odt-el-membership-panel-2 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
-    border-left: 8px solid #1c4d9a;
+    border-left-width: 8px;
+    border-left-style: solid;
 }
 
 .elementor .odt-el-membership-panel-3 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
-    border-left: 8px solid #f3901f;
+    border-left-width: 8px;
+    border-left-style: solid;
 }
 
 .elementor .odt-el-membership-panel-4 .elementor-column-gap-default > .elementor-column > .elementor-element-populated {
-    border-left: 8px solid #0f172a;
+    border-left-width: 8px;
+    border-left-style: solid;
 }
 
 .elementor .odt-el-membership-actions {
@@ -4656,7 +4661,8 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor .odt-el-membership-panel .elementor-column > .elementor-element-populated {
     border-radius: 30px;
-    border: 1px solid #e6edf8;
+    border-width: 1px;
+    border-style: solid;
     box-shadow: 0 12px 24px rgba(12, 22, 51, 0.08);
     padding: clamp(1.4rem, 2vw, 2rem);
     background: #fff;
@@ -4667,20 +4673,9 @@ body.admin-bar .elementor .odt-el-about-nav {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-left: 10px solid #e33a4a;
+    border-left-width: 10px;
+    border-left-style: solid;
     background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-}
-
-.elementor .odt-el-membership-panel-2.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
-    border-left-color: #1c4d9a;
-}
-
-.elementor .odt-el-membership-panel-3.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
-    border-left-color: #f97316;
-}
-
-.elementor .odt-el-membership-panel-4.odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated {
-    border-left-color: #0f172a;
 }
 
 .elementor .odt-el-membership-panel .odt-el-title .elementor-heading-title {
@@ -4705,7 +4700,8 @@ body.admin-bar .elementor .odt-el-about-nav {
     align-items: center;
     justify-content: center;
     background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
+    border-width: 1px;
+    border-style: solid;
 }
 
 .elementor .odt-el-membership-emoji .elementor-heading-title {
@@ -6174,35 +6170,10 @@ body.admin-bar .elementor .odt-el-about-nav {
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel {
-    --odt-membership-accent: #e33a4a;
     background: #fff;
     border-bottom: 1px solid #edf1f8;
     padding-top: clamp(1.4rem, 3.2vw, 2.4rem);
     padding-bottom: clamp(1.4rem, 3.2vw, 2.4rem);
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-bilgi-guncelleme {
-    --odt-membership-accent: #1c4d9a;
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-aidat-odeme {
-    --odt-membership-accent: #f97316;
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-uyelik-avantajlari {
-    --odt-membership-accent: #0f172a;
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-nasil-uye-olabilirsiniz {
-    --odt-membership-accent: #00529b;
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-yeni-mezunlar-icin-uyelik {
-    --odt-membership-accent: #0f766e;
-}
-
-.elementor-page .elementor .odt-el-section.odt-el-membership-uyelik-sss {
-    --odt-membership-accent: #334155;
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel > .elementor-container {
@@ -6212,8 +6183,10 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel .elementor-column:first-child > .elementor-element-populated {
     border-radius: 30px;
-    border: 1px solid #e6edf8;
-    border-left: 9px solid var(--odt-membership-accent);
+    border-width: 1px;
+    border-style: solid;
+    border-left-width: 9px;
+    border-left-style: solid;
     box-shadow: 0 12px 26px rgba(12, 22, 51, 0.08);
     background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
     padding: clamp(1.4rem, 2.2vw, 2.1rem);
@@ -6253,7 +6226,8 @@ body.admin-bar .elementor .odt-el-about-nav {
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-panel-has-aside .odt-el-membership-panel-aside > .elementor-element-populated {
     border-radius: 30px;
-    border: 1px solid #e2e8f0;
+    border-width: 1px;
+    border-style: solid;
     background: #f8fafc;
     display: flex;
     align-items: center;
@@ -6266,6 +6240,65 @@ body.admin-bar .elementor .odt-el-about-nav {
     font-size: clamp(3.8rem, 7vw, 6.8rem);
     line-height: 1;
     margin: 0;
+}
+
+/* Membership panel border colors are defaults only. Elementor border color controls should win. */
+:where(.elementor .odt-el-membership-panel) {
+    --odt-membership-card-border: #e6edf8;
+    --odt-membership-aside-border: #e2e8f0;
+    --odt-membership-accent: #ed1c24;
+}
+
+:where(.elementor .odt-el-membership-panel-1),
+:where(.elementor .odt-el-membership-uyeligim) {
+    --odt-membership-accent: #00529b;
+}
+
+:where(.elementor .odt-el-membership-panel-2),
+:where(.elementor .odt-el-membership-neden-uye-olmaliyim) {
+    --odt-membership-accent: #ed1c24;
+}
+
+:where(.elementor .odt-el-membership-panel-3),
+:where(.elementor .odt-el-membership-uyelik-avantajlari) {
+    --odt-membership-accent: #f97316;
+}
+
+:where(.elementor .odt-el-membership-panel-4),
+:where(.elementor .odt-el-membership-nasil-uye-olabilirsiniz) {
+    --odt-membership-accent: #00529b;
+}
+
+:where(.elementor .odt-el-membership-panel-5),
+:where(.elementor .odt-el-membership-bilgi-guncelleme) {
+    --odt-membership-accent: #0f172a;
+}
+
+:where(.elementor .odt-el-membership-panel-6),
+:where(.elementor .odt-el-membership-aidat-odeme) {
+    --odt-membership-accent: #f97316;
+}
+
+:where(.elementor .odt-el-membership-panel-7),
+:where(.elementor .odt-el-membership-yeni-mezunlar-icin-uyelik) {
+    --odt-membership-accent: #00529b;
+}
+
+:where(.elementor .odt-el-membership-panel-8),
+:where(.elementor .odt-el-membership-uyelik-sss) {
+    --odt-membership-accent: #0f172a;
+}
+
+:where(.elementor .odt-el-membership-panel .elementor-column > .elementor-element-populated) {
+    border-color: var(--odt-membership-card-border);
+}
+
+:where(.elementor .odt-el-membership-panel-has-aside .elementor-column:first-child > .elementor-element-populated) {
+    border-left-color: var(--odt-membership-accent);
+}
+
+:where(.elementor .odt-el-membership-panel-aside > .elementor-element-populated) {
+    border-color: var(--odt-membership-aside-border);
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-actions {
@@ -6599,6 +6632,57 @@ body.admin-bar .elementor .odt-el-about-nav {
     --odt-solidarity-icon-fg: #0f172a;
 }
 
+/* Automatic contrast for editable solidarity strips. Background remains Elementor-controlled. */
+.elementor-page .elementor .odt-on-dark {
+    --odt-solidarity-fg: #f8fafc;
+    --odt-solidarity-icon-bg: rgba(255, 255, 255, 0.16);
+    --odt-solidarity-icon-fg: #f8fafc;
+    --odt-solidarity-btn-bg: #f8fafc;
+    --odt-solidarity-btn-fg: #0f172a;
+    --odt-solidarity-btn-border: rgba(255, 255, 255, 0.24);
+    color: #f8fafc !important;
+}
+
+.elementor-page .elementor .odt-on-light {
+    --odt-solidarity-fg: #0f172a;
+    --odt-solidarity-icon-bg: rgba(15, 23, 42, 0.06);
+    --odt-solidarity-icon-fg: #0f172a;
+    --odt-solidarity-btn-bg: #0f172a;
+    --odt-solidarity-btn-fg: #f8fafc;
+    --odt-solidarity-btn-border: rgba(15, 23, 42, 0.12);
+    color: #0f172a !important;
+}
+
+.elementor-page .elementor .odt-on-dark .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-on-dark .odt-el-richtext,
+.elementor-page .elementor .odt-on-dark .odt-el-richtext p,
+.elementor-page .elementor .odt-on-dark .elementor-widget-text-editor,
+.elementor-page .elementor .odt-on-dark .elementor-widget-text-editor p {
+    color: #f8fafc !important;
+}
+
+.elementor-page .elementor .odt-on-light .odt-el-title .elementor-heading-title,
+.elementor-page .elementor .odt-on-light .odt-el-richtext,
+.elementor-page .elementor .odt-on-light .odt-el-richtext p,
+.elementor-page .elementor .odt-on-light .elementor-widget-text-editor,
+.elementor-page .elementor .odt-on-light .elementor-widget-text-editor p {
+    color: #0f172a !important;
+}
+
+.elementor-page .elementor .odt-on-dark .odt-el-richtext strong,
+.elementor-page .elementor .odt-on-light .odt-el-richtext strong,
+.elementor-page .elementor .odt-on-dark .elementor-widget-text-editor strong,
+.elementor-page .elementor .odt-on-light .elementor-widget-text-editor strong {
+    color: inherit !important;
+}
+
+.elementor-page .elementor .odt-on-dark .odt-el-btn .elementor-button,
+.elementor-page .elementor .odt-on-light .odt-el-btn .elementor-button {
+    background: var(--odt-solidarity-btn-bg) !important;
+    color: var(--odt-solidarity-btn-fg) !important;
+    border-color: var(--odt-solidarity-btn-border) !important;
+}
+
 @media (max-width: 1024px) {
     .elementor-page .elementor .odt-el-section.odt-el-solidarity-panel-layout > .elementor-container {
         padding-inline: clamp(1rem, 4vw, 2rem);
@@ -6719,6 +6803,21 @@ body.odt-page-dayanisma .elementor .elementor-top-section:not(.odt-el-solidarity
 body.odt-has-top-elementor-banner .site-main,
 body.elementor-page .site-main:has(> .elementor-page-content > .elementor > .odt-el-banner-section:first-child) {
     padding-top: 0;
+}
+
+/* Dayanisma banner should start after the fixed header, not underneath it. */
+body.odt-page-dayanisma.odt-has-top-elementor-banner .site-main {
+    padding-top: var(--odt-top-banner-header-offset, 82px) !important;
+}
+
+/* Hakkimizda banner uses the same fixed-header offset, scoped only to the about root page. */
+body.odt-page-hakkimizda.odt-has-top-elementor-banner .site-main {
+    padding-top: var(--odt-top-banner-header-offset, 82px) !important;
+}
+
+/* Home hero slider uses the same fixed-header offset as banner-first pages. */
+body.home .site-main {
+    padding-top: var(--odt-top-banner-header-offset, 82px) !important;
 }
 
 .elementor-page .elementor .odt-el-section.odt-el-membership-hero.odt-el-banner-section + .odt-el-section.odt-el-membership-panel {

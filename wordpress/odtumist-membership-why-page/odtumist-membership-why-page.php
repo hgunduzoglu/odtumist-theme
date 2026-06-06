@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ODTÜMİST Neden Üye Olmalıyım Sayfası
  * Description: Üyelik altında Elementor ile tamamen düzenlenebilir "Neden Üye Olmalıyım?" sayfasını güvenli şekilde oluşturur.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Hüsamettin Gündüzoğlu
  * Text Domain: odtumist-membership-why
  */
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
 
 final class ODTUMIST_Membership_Why_Page
 {
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.1';
     const TARGET_SLUG = 'neden-uye-olmaliyim';
     const PARENT_SLUG = 'uyelik';
     const PAGE_META = '_odtumist_membership_why_page';

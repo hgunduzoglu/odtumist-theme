@@ -11,6 +11,161 @@
     window.addEventListener('scroll', applyState, { passive: true });
   }
 
+  function initTopBannerHeaderOffset() {
+    var body = document.body;
+    var header = document.getElementById('site-header');
+    var main = document.querySelector('.site-main');
+    if (!body || !header || !main) return;
+
+    var isSolidarityRoot = body.classList.contains('odt-page-dayanisma') || /\/dayanisma\/?$/.test(window.location.pathname);
+    var hasHomeHero = body.classList.contains('home') && (
+      document.getElementById('hero-slider') ||
+      document.querySelector('.odt-el-home-hero, .odt-el-home-slider')
+    );
+    var isAboutRoot = body.classList.contains('odt-page-hakkimizda') ||
+      /\/(?:hakkimizda|about)\/?$/.test(window.location.pathname) ||
+      document.querySelector('.odt-el-about-hero.odt-el-banner-section');
+    if (!isSolidarityRoot && !hasHomeHero && !isAboutRoot) return;
+
+    function applyOffset() {
+      var headerRect = header.getBoundingClientRect();
+      var headerHeight = Math.ceil(header.offsetHeight || headerRect.height || 0);
+      if (!headerHeight || headerHeight < 0) {
+        headerHeight = 0;
+      }
+
+      if (headerHeight > 0) {
+        main.style.setProperty('--odt-top-banner-header-offset', headerHeight + 'px');
+        main.style.setProperty('padding-top', headerHeight + 'px', 'important');
+      }
+    }
+
+    applyOffset();
+    window.addEventListener('resize', applyOffset);
+    window.addEventListener('orientationchange', applyOffset);
+
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(applyOffset).observe(header);
+    }
+
+    window.setTimeout(applyOffset, 250);
+    window.setTimeout(applyOffset, 1000);
+  }
+
+  function parseCssColor(value) {
+    if (!value || typeof value !== 'string') return null;
+
+    var color = value.trim();
+    var hex = color.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (hex) {
+      var raw = hex[1];
+      if (raw.length === 3) {
+        raw = raw.split('').map(function (part) { return part + part; }).join('');
+      }
+
+      return {
+        r: parseInt(raw.slice(0, 2), 16),
+        g: parseInt(raw.slice(2, 4), 16),
+        b: parseInt(raw.slice(4, 6), 16),
+        a: 1
+      };
+    }
+
+    var rgb = color.match(/^rgba?\(([^)]+)\)$/i);
+    if (!rgb) return null;
+
+    var parts = rgb[1].split(',').map(function (part) { return part.trim(); });
+    if (parts.length < 3) return null;
+
+    return {
+      r: Number(parts[0]),
+      g: Number(parts[1]),
+      b: Number(parts[2]),
+      a: parts.length >= 4 ? Number(parts[3]) : 1
+    };
+  }
+
+  function getRelativeLuminance(color) {
+    function channel(value) {
+      var normalized = Math.max(0, Math.min(255, Number(value) || 0)) / 255;
+      return normalized <= 0.03928
+        ? normalized / 12.92
+        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+    }
+
+    return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b));
+  }
+
+  function getEffectiveBackgroundColor(element) {
+    var current = element;
+    while (current && current !== document.documentElement) {
+      var style = window.getComputedStyle(current);
+      var color = parseCssColor(style.backgroundColor);
+      if (color && color.a > 0.05) {
+        return color;
+      }
+
+      var solidarityBg = parseCssColor(style.getPropertyValue('--odt-solidarity-bg'));
+      if (solidarityBg && solidarityBg.a > 0.05) {
+        return solidarityBg;
+      }
+
+      current = current.parentElement;
+    }
+
+    return null;
+  }
+
+  function initSolidarityAutoContrast() {
+    var body = document.body;
+    if (!body || !body.classList.contains('odt-page-dayanisma')) return;
+
+    var panels = Array.prototype.slice.call(document.querySelectorAll('.odt-el-solidarity-panel-layout'));
+    Array.prototype.slice.call(document.querySelectorAll('.elementor-top-section')).forEach(function (section) {
+      if (
+        section.classList.contains('odt-el-solidarity-hero') ||
+        section.classList.contains('odt-el-solidarity-final-cta') ||
+        section.classList.contains('odt-el-banner-section') ||
+        section.classList.contains('odt-no-auto-strip')
+      ) {
+        return;
+      }
+
+      if (!section.classList.contains('odt-el-solidarity-panel-layout') && section.querySelector('.odt-el-title, .odt-el-richtext')) {
+        panels.push(section);
+      }
+    });
+
+    panels = panels.filter(function (panel, index) {
+      return panel && panels.indexOf(panel) === index;
+    });
+    if (!panels.length) return;
+
+    function applyContrast(panel) {
+      var bg = getEffectiveBackgroundColor(panel);
+      if (!bg) return;
+
+      var isLight = getRelativeLuminance(bg) > 0.48;
+      panel.classList.toggle('odt-on-light', isLight);
+      panel.classList.toggle('odt-on-dark', !isLight);
+    }
+
+    function applyAll() {
+      panels.forEach(applyContrast);
+    }
+
+    applyAll();
+    window.setTimeout(applyAll, 250);
+    window.setTimeout(applyAll, 1000);
+
+    if ('MutationObserver' in window) {
+      var observer = new MutationObserver(applyAll);
+      panels.forEach(function (panel) {
+        observer.observe(panel, { attributes: true, attributeFilter: ['class', 'style'] });
+      });
+    }
+  }
+
   function initMobileMenu() {
     var toggle = document.getElementById('mobile-toggle');
     var panel = document.getElementById('mobile-panel');
@@ -692,6 +847,105 @@
     window.scrollTo({ top: targetTop, behavior: 'smooth' });
   }
 
+  function odtumistSlugify(value) {
+    var map = {
+      'ı': 'i',
+      'ğ': 'g',
+      'ü': 'u',
+      'ş': 's',
+      'ö': 'o',
+      'ç': 'c',
+      'İ': 'i',
+      'I': 'i',
+      'Ğ': 'g',
+      'Ü': 'u',
+      'Ş': 's',
+      'Ö': 'o',
+      'Ç': 'c'
+    };
+
+    var normalized = String(value || '')
+      .replace(/[ıİIğĞüÜşŞöÖçÇ]/g, function (letter) { return map[letter] || letter; })
+      .toLowerCase();
+
+    if (typeof normalized.normalize === 'function') {
+      normalized = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    return normalized
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function getMembershipPanelTitle(panel) {
+    if (!panel) return '';
+    var titleEl = panel.querySelector('.odt-el-title .elementor-heading-title, .odt-el-title h1, .odt-el-title h2, .odt-el-title h3, .odt-el-title');
+    return titleEl ? titleEl.textContent.trim() : '';
+  }
+
+  function getMembershipDynamicTargets() {
+    var panels = Array.prototype.slice.call(document.querySelectorAll('.odt-el-membership-panel'));
+    var used = {};
+    var targets = {};
+
+    panels.forEach(function (panel) {
+      if (
+        panel.classList.contains('odt-el-membership-actions') ||
+        panel.classList.contains('odt-el-membership-hero') ||
+        panel.classList.contains('odt-el-membership-panel-aside')
+      ) {
+        return;
+      }
+
+      var slug = odtumistSlugify(getMembershipPanelTitle(panel));
+      if (!slug) return;
+
+      var baseSlug = slug;
+      var suffix = 2;
+      while (used[slug]) {
+        slug = baseSlug + '-' + suffix;
+        suffix += 1;
+      }
+      used[slug] = true;
+      panel.setAttribute('data-odt-membership-anchor', slug);
+      targets[slug] = panel;
+
+      if (!panel.id && !document.getElementById(slug)) {
+        panel.id = slug;
+      }
+    });
+
+    return targets;
+  }
+
+  function scrollToMembershipDynamicTarget(anchor, behavior) {
+    var targets = getMembershipDynamicTargets();
+    var target = targets[anchor] || document.getElementById(anchor);
+    if (!target) return false;
+
+    var headerOffset = 110;
+    var targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: targetTop, behavior: behavior || 'smooth' });
+    return true;
+  }
+
+  function initMembershipDynamicHashTargets() {
+    if (!document.querySelector('.odt-el-membership-panel')) return;
+
+    getMembershipDynamicTargets();
+
+    function focusFromHash(behavior) {
+      var anchor = (window.location.hash || '').replace(/^#/, '').trim();
+      if (!anchor) return;
+      scrollToMembershipDynamicTarget(anchor, behavior);
+    }
+
+    focusFromHash('auto');
+    window.addEventListener('hashchange', function () {
+      focusFromHash('smooth');
+    });
+  }
+
   function initChildSlugSectionFocus() {
     // Hash varsa kullanıcının explicit hedefini bozmayalım.
     if ((window.location.hash || '').trim() !== '') return;
@@ -754,6 +1008,8 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     initStickyHeader();
+    initTopBannerHeaderOffset();
+    initSolidarityAutoContrast();
     initMobileMenu();
     initHeroSlider();
     initCarousels();
@@ -764,6 +1020,7 @@
     initMembershipTabs();
     initAboutPagination();
     initSolidarityInitialAnchor();
+    initMembershipDynamicHashTargets();
     initChildSlugSectionFocus();
   });
 })();

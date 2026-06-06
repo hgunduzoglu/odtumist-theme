@@ -129,16 +129,25 @@ body .odt-mwhy {
 }
 
 .odt-mwhy-nav {
-    display: inline-flex;
-    width: auto;
+    --odt-mwhy-nav-size: 54px;
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    align-self: flex-start;
+    width: var(--odt-mwhy-nav-size) !important;
+    max-width: var(--odt-mwhy-nav-size);
     margin-top: clamp(1.4rem, 3vw, 2.6rem);
-    margin-right: 0.85rem;
+    margin-right: 0;
     margin-bottom: 0 !important;
 }
 
+.odt-mwhy-next {
+    margin-top: calc(-1 * var(--odt-mwhy-nav-size)) !important;
+    margin-left: calc(var(--odt-mwhy-nav-size) + 0.85rem) !important;
+}
+
 .odt-mwhy-nav .elementor-button {
-    width: 54px;
-    height: 54px;
+    width: var(--odt-mwhy-nav-size);
+    height: var(--odt-mwhy-nav-size);
     padding: 0 !important;
     border-radius: 999px;
     display: inline-flex;
