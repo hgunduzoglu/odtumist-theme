@@ -7143,3 +7143,78 @@ body.home .elementor-widget-posts .elementor-pagination {
         height: 62vw !important;
     }
 }
+
+/* Iteration 21: Keep user-managed event posters intact on frontend and make home posts scrollable. */
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail__link,
+body.odt-page-etkinlikler .elementor-widget-posts.elementor-posts--thumbnail-top .elementor-post__thumbnail__link,
+body.home .elementor-widget-posts .elementor-post__thumbnail__link,
+body.home .elementor-widget-posts.elementor-posts--thumbnail-top .elementor-post__thumbnail__link {
+    aspect-ratio: 4 / 5 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: block !important;
+    overflow: hidden !important;
+    background: #eef2f8 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail,
+body.home .elementor-widget-posts .elementor-post__thumbnail {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #eef2f8 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail img,
+body.home .elementor-widget-posts .elementor-post__thumbnail img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__card {
+    height: 100% !important;
+}
+
+body.home .elementor-widget-posts.odt-el-scrollable-row-host {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+body.home .elementor-widget-posts .elementor-posts-container.elementor-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-inline: 0.15rem !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__badge {
+    display: none !important;
+}
+
+body.home .elementor-widget-posts .odt-el-scroll-arrow-prev {
+    left: -0.85rem;
+}
+
+body.home .elementor-widget-posts .odt-el-scroll-arrow-next {
+    right: -0.85rem;
+}
+
+@media (max-width: 767px) {
+    body.home .elementor-widget-posts .odt-el-scroll-arrow-prev {
+        left: 0.15rem;
+    }
+
+    body.home .elementor-widget-posts .odt-el-scroll-arrow-next {
+        right: 0.15rem;
+    }
+}
