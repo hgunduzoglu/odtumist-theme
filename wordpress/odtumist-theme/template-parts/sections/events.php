@@ -3,6 +3,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+if (function_exists('odtumist_legacy_event_cards_enabled') && !odtumist_legacy_event_cards_enabled()) {
+    return;
+}
+
 $events_query = odtumist_get_featured_events(12);
 $events_page  = odtumist_get_page_by_slug(array('etkinlikler', 'events'));
 $events_copy  = odtumist_get_home_events_copy();

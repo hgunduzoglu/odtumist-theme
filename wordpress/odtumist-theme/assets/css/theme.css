@@ -4,6 +4,7 @@
     --odtu-dark: #0f172a;
     --odtu-muted: #64748b;
     --odtu-light: #f8fafc;
+    --odtu-font-family: 'Poppins', sans-serif;
     --max-width: 1280px;
     --radius-xl: 28px;
     --radius-lg: 18px;
@@ -20,10 +21,28 @@ html {
 
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--odtu-font-family);
     color: var(--odtu-dark);
     background: #fff;
     line-height: 1.5;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.site-header,
+.site-footer,
+.elementor,
+.elementor-widget,
+.elementor-widget-heading .elementor-heading-title,
+.elementor-widget-text-editor,
+.elementor-widget-button .elementor-button,
+.elementor-button,
+.elementor-tab-title,
+.elementor-tab-content {
+    font-family: var(--odtu-font-family) !important;
 }
 
 a {
@@ -247,6 +266,20 @@ body.admin-bar .site-header {
     padding: 0;
 }
 
+.site-header .desktop-menu,
+.site-header .desktop-menu ul,
+.site-header .desktop-menu li,
+.site-header .mobile-menu,
+.site-header .mobile-menu ul,
+.site-header .mobile-menu li {
+    list-style: none;
+}
+
+.site-header .desktop-menu li::marker,
+.site-header .mobile-menu li::marker {
+    content: "";
+}
+
 .desktop-menu {
     display: flex;
     align-items: center;
@@ -331,6 +364,8 @@ body.admin-bar .site-header {
     transform: translateY(8px);
     transition: all 0.22s ease;
     z-index: 40;
+    margin: 0;
+    list-style: none;
 }
 
 .desktop-menu li:hover > .sub-menu,
@@ -350,9 +385,10 @@ body.admin-bar .site-header {
     color: #334155;
 }
 
-.desktop-menu .sub-menu li a:hover {
-    background: #f8fafc;
-    color: var(--odtu-red);
+.desktop-menu .sub-menu li a:hover,
+.desktop-menu .sub-menu li a:focus {
+    background: var(--odtu-red);
+    color: #fff;
 }
 
 .desktop-menu .uyelikbuton > a {
@@ -461,6 +497,8 @@ body.admin-bar .site-header {
 
 .mobile-menu .sub-menu {
     padding: 0.35rem 0 0.8rem 1rem;
+    margin: 0;
+    list-style: none;
 }
 
 .mobile-menu .sub-menu a {
@@ -774,6 +812,13 @@ body.admin-bar .site-header {
     display: none;
 }
 
+body.odt-legacy-event-cards-disabled:not(.elementor-editor-active) .elementor .odt-el-home-events-row:has(a[href*="/etkinlik/"]),
+body.odt-legacy-event-cards-disabled:not(.elementor-editor-active) .elementor .odt-el-events-page-row:has(a[href*="/etkinlik/"]),
+body.odt-legacy-event-cards-disabled:not(.elementor-editor-active) .elementor .odt-el-events-page-dynamic:has(a[href*="/etkinlik/"]),
+body.odt-legacy-event-cards-disabled:not(.elementor-editor-active) .elementor .odt-el-event-card-row:has(a[href*="/etkinlik/"]) {
+    display: none !important;
+}
+
 .event-card,
 .group-card {
     width: min(360px, 84vw);
@@ -1000,7 +1045,15 @@ body.admin-bar .site-header {
 .footer-grid {
     display: grid;
     gap: 2rem;
-    grid-template-columns: 1.7fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: minmax(280px, 1.7fr) repeat(3, minmax(150px, max-content));
+    justify-content: space-between;
+    align-items: start;
+}
+
+.footer-menu-wrap,
+.footer-contact {
+    justify-self: end;
+    min-width: 150px;
 }
 
 .footer-logo {
@@ -1067,10 +1120,6 @@ body.admin-bar .site-header {
     border-left-color: var(--odtu-red);
 }
 
-.footer-grid > .footer-menu-wrap:nth-child(4) h3 {
-    border-left-color: var(--odtu-blue);
-}
-
 .footer-contact h3 {
     border-left-color: #94a3b8;
 }
@@ -1113,7 +1162,12 @@ body.admin-bar .site-header {
 
 @media (max-width: 1320px) {
     .footer-grid {
-        grid-template-columns: 1.4fr 1fr 1fr;
+        grid-template-columns: minmax(260px, 1.3fr) repeat(3, minmax(130px, 1fr));
+    }
+
+    .footer-menu-wrap,
+    .footer-contact {
+        justify-self: start;
     }
 }
 
@@ -6826,4 +6880,266 @@ body.home .site-main {
     border-top: 0 !important;
     border-right: 0 !important;
     border-left: 0 !important;
+}
+
+/* Iteration 20: User-managed post event cards and gallery polish */
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-posts-container.elementor-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: clamp(1.25rem, 2vw, 2.2rem) !important;
+    height: auto !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-posts-container.elementor-grid .elementor-post {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    width: auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__card {
+    width: 100% !important;
+    min-height: clamp(760px, 62vw, 930px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-radius: 30px !important;
+    background: #fff !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail__link {
+    width: 100% !important;
+    height: clamp(420px, 38vw, 620px) !important;
+    overflow: hidden !important;
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    padding-bottom: 0 !important;
+    transform: none !important;
+    overflow: hidden !important;
+    background: #eef2f8 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail img {
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    transform: none !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__text {
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    padding: clamp(1.35rem, 2.1vw, 2rem) clamp(1.15rem, 2vw, 1.8rem) !important;
+    margin-top: 0 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__title {
+    min-height: 3.6em !important;
+    margin: 0 0 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__excerpt {
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__excerpt p {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__read-more {
+    align-self: center !important;
+    margin-top: auto !important;
+    padding-top: 1.1rem !important;
+    text-decoration: none !important;
+    border-top: 2px solid currentColor !important;
+}
+
+body.odt-page-etkinlikler .elementor-widget-posts .e-load-more-spinner,
+body.odt-page-etkinlikler .elementor-widget-posts .e-load-more-anchor {
+    display: none !important;
+}
+
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .elementor-image-carousel-wrapper {
+    width: min(1100px, calc(100vw - 2rem)) !important;
+    max-width: 100% !important;
+    height: clamp(360px, 52vw, 640px) !important;
+    overflow: hidden !important;
+    margin-inline: auto !important;
+}
+
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .elementor-image-carousel,
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .swiper-slide,
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .swiper-slide-inner {
+    height: 100% !important;
+}
+
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .swiper-slide-inner {
+    display: block !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;
+    background: #eef2f8 !important;
+}
+
+body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .swiper-slide-image {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+body.home .elementor .odt-el-home-events-intro,
+body.home .elementor .odt-el-home-events-row:not(:has(a[href*="/etkinlik/"])) {
+    display: block !important;
+}
+
+body.home .elementor-widget-posts .elementor-posts-container.elementor-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: clamp(1.25rem, 2vw, 2rem) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none !important;
+    padding-bottom: 1rem !important;
+    height: auto !important;
+}
+
+body.home .elementor-widget-posts .elementor-posts-container.elementor-grid::-webkit-scrollbar {
+    display: none !important;
+}
+
+body.home .elementor-widget-posts .elementor-post {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: min(440px, 88vw) !important;
+    max-width: min(440px, 88vw) !important;
+    flex: 0 0 min(440px, 88vw) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    scroll-snap-align: start !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 28px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.11) !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__thumbnail__link {
+    width: 100% !important;
+    height: clamp(390px, 45vw, 610px) !important;
+    display: block !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    background: #eef2f8 !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__thumbnail img {
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    transform: none !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__text {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: clamp(1.25rem, 2vw, 1.8rem) !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__title {
+    min-height: 3.4em !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 1rem !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__excerpt {
+    flex: 1 1 auto !important;
+}
+
+body.home .elementor-widget-posts .elementor-post__excerpt p {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden !important;
+}
+
+body.home .elementor-widget-posts .elementor-pagination {
+    display: none !important;
+}
+
+@media (max-width: 1024px) {
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-posts-container.elementor-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__card {
+        min-height: 760px !important;
+    }
+
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail__link {
+        height: 470px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-posts-container.elementor-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__card {
+        min-height: 0 !important;
+    }
+
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__thumbnail__link {
+        height: min(112vw, 560px) !important;
+    }
+
+    body.odt-page-etkinlikler .elementor-widget-posts .elementor-post__title {
+        min-height: 0 !important;
+    }
+
+    body.odt-page-etkinlikler .elementor .e-con .elementor-widget-image-carousel .elementor-image-carousel-wrapper {
+        height: 62vw !important;
+    }
 }

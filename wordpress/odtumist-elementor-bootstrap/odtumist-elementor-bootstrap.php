@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ODTÜMİST Elementor Bootstrap
  * Description: Elementor Pro odaklı ODTÜMİST kurulumu için sayfa, menü, CPT ve temel içerikleri tek tıkla oluşturur/günceller.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Hüsamettin Gündüzoğlu
  */
 
@@ -27,12 +27,8 @@ final class ODTUMIST_Elementor_Bootstrap
         add_action('init', array(__CLASS__, 'register_cpts'), 20);
         add_action('init', array(__CLASS__, 'register_shortcodes'), 21);
         add_action('pre_post_update', array(__CLASS__, 'capture_page_card_snapshot_before_save'), 10, 2);
-        add_action('save_post_event', array(__CLASS__, 'handle_event_post_saved'), 25, 3);
         add_action('save_post_team', array(__CLASS__, 'handle_team_post_saved'), 25, 3);
         add_action('set_object_terms', array(__CLASS__, 'handle_team_term_relationships_updated'), 25, 6);
-        add_action('created_event-category', array(__CLASS__, 'handle_event_category_terms_changed'), 25, 2);
-        add_action('edited_event-category', array(__CLASS__, 'handle_event_category_terms_changed'), 25, 2);
-        add_action('delete_event-category', array(__CLASS__, 'handle_event_category_terms_deleted'), 25, 4);
         add_action('created_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
         add_action('edited_team-category', array(__CLASS__, 'handle_team_category_terms_changed'), 25, 2);
         add_action('delete_team-category', array(__CLASS__, 'handle_team_category_terms_deleted'), 25, 4);
@@ -45,6 +41,11 @@ final class ODTUMIST_Elementor_Bootstrap
         if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
             \WP_CLI::add_command('odtumist bootstrap', array(__CLASS__, 'cli_run'));
         }
+    }
+
+    private static function legacy_event_cards_enabled()
+    {
+        return (bool) apply_filters('odtumist_legacy_event_cards_enabled', false);
     }
 
     public static function register_cpts()
@@ -258,12 +259,20 @@ final class ODTUMIST_Elementor_Bootstrap
             if ($options['sync_event_cards'] && !$options['elementor_full_mode']) {
                 $report['warnings'][] = 'Etkinlik kart senkronu yalnizca Tam Elementor Modu ile uyumludur.';
             }
+            if ($options['sync_event_cards'] && !self::legacy_event_cards_enabled()) {
+                $report['warnings'][] = 'Etkinlik kart senkronu kapali: etkinlikler artik Yazilar/Elementor tarafindan manuel yonetiliyor.';
+                $options['sync_event_cards'] = false;
+            }
 
             self::ensure_elementor_edit_compatibility();
             self::ensure_permalink_structure($report);
             $page_ids = self::upsert_pages($report, (bool) $options['force_reseed']);
             self::upsert_teams($report, (bool) $options['force_reseed']);
-            self::upsert_events($report, (bool) $options['force_reseed']);
+            if (self::legacy_event_cards_enabled()) {
+                self::upsert_events($report, (bool) $options['force_reseed']);
+            } else {
+                $report['messages'][] = 'Ornek event CPT icerikleri atlandi; etkinlikler Yazilar/Elementor ile manuel yonetiliyor.';
+            }
             self::build_menus($page_ids, $report, (bool) $options['rebuild_menus']);
             self::apply_reading_settings($page_ids, $report);
             self::ensure_home_slider_theme_mods($page_ids, $report, (bool) $options['force_reseed']);
@@ -283,9 +292,8 @@ final class ODTUMIST_Elementor_Bootstrap
                 // Kart satirlari her zaman içerik tiplerinden canlı senkronlansın.
                 if ($options['elementor_full_mode']) {
                     self::sync_group_cards_into_elementor_pages($page_ids, $report);
-                    self::sync_event_cards_into_elementor_pages($page_ids, $report);
                     self::refresh_card_source_snapshots($page_ids);
-                    $report['messages'][] = 'Etkinlik/Calisma Grubu kartlari dinamik kaynaklardan zorunlu senkronlandi.';
+                    $report['messages'][] = 'Calisma Grubu kartlari dinamik kaynaklardan zorunlu senkronlandi.';
                 }
 
                 self::migrate_html_widgets_to_native_widgets($page_ids, $report);
@@ -305,6 +313,10 @@ final class ODTUMIST_Elementor_Bootstrap
 
     public static function handle_event_post_saved($post_id, $post, $update)
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return;
+        }
+
         self::handle_content_type_post_saved($post_id, $post, 'event');
     }
 
@@ -316,7 +328,7 @@ final class ODTUMIST_Elementor_Bootstrap
     public static function handle_team_term_relationships_updated($object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids)
     {
         $taxonomy = (string) $taxonomy;
-        if (!in_array($taxonomy, array('team-category', 'event-category'), true)) {
+        if ($taxonomy !== 'team-category') {
             return;
         }
 
@@ -332,24 +344,28 @@ final class ODTUMIST_Elementor_Bootstrap
         if ($taxonomy === 'team-category' && $post->post_type !== 'team') {
             return;
         }
-        if ($taxonomy === 'event-category' && $post->post_type !== 'event') {
-            return;
-        }
-
         if (!self::can_run_auto_card_sync($object_id, $post)) {
             return;
         }
 
-        self::auto_sync_card_sections($taxonomy === 'team-category' ? 'team' : 'event');
+        self::auto_sync_card_sections('team');
     }
 
     public static function handle_event_category_terms_changed($term_id, $tt_id)
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return;
+        }
+
         self::trigger_event_filter_and_cards_resync();
     }
 
     public static function handle_event_category_terms_deleted($term, $tt_id, $deleted_term, $object_ids)
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return;
+        }
+
         self::trigger_event_filter_and_cards_resync();
     }
 
@@ -378,6 +394,10 @@ final class ODTUMIST_Elementor_Bootstrap
 
     private static function trigger_event_filter_and_cards_resync()
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return;
+        }
+
         if (self::$is_bootstrap_running || self::$is_card_source_sync_running) {
             return;
         }
@@ -441,7 +461,9 @@ final class ODTUMIST_Elementor_Bootstrap
             self::sync_removed_cards_to_source_posts($post_id, $slug);
         }
 
-        self::auto_sync_card_sections('both');
+        if ($slug !== 'etkinlikler') {
+            self::auto_sync_card_sections('team');
+        }
     }
 
     private static function maybe_toggle_events_page_manual_mode($page_id)
@@ -527,7 +549,7 @@ final class ODTUMIST_Elementor_Bootstrap
             return;
         }
 
-        if (!in_array($post->post_type, array('event', 'team'), true)) {
+        if ($post->post_type !== 'team' && !(self::legacy_event_cards_enabled() && $post->post_type === 'event')) {
             return;
         }
 
@@ -555,7 +577,7 @@ final class ODTUMIST_Elementor_Bootstrap
         if (!($post instanceof WP_Post)) {
             return;
         }
-        if (!in_array($post->post_type, array('event', 'team'), true)) {
+        if ($post->post_type !== 'team' && !(self::legacy_event_cards_enabled() && $post->post_type === 'event')) {
             return;
         }
 
@@ -627,10 +649,10 @@ final class ODTUMIST_Elementor_Bootstrap
     {
         $slug = sanitize_title((string) $slug);
         if ($slug === 'anasayfa') {
-            return array('event', 'team');
+            return array('team');
         }
         if ($slug === 'etkinlikler') {
-            return array('event');
+            return array();
         }
         if (in_array($slug, array('hakkimizda', 'neler-yapiyoruz', 'calisma-gruplarimiz', 'calisma-gruplari', 'tarihce', 'yonetim'), true)) {
             return array('team');
@@ -849,6 +871,12 @@ final class ODTUMIST_Elementor_Bootstrap
         $valid_scopes = array('event', 'team', 'both');
         if (!in_array($scope, $valid_scopes, true)) {
             $scope = 'both';
+        }
+        if ($scope === 'event' && !self::legacy_event_cards_enabled()) {
+            return;
+        }
+        if ($scope === 'both' && !self::legacy_event_cards_enabled()) {
+            $scope = 'team';
         }
 
         $page_ids = self::resolve_core_page_ids_for_card_sync();
@@ -2490,6 +2518,11 @@ final class ODTUMIST_Elementor_Bootstrap
 
     private static function sync_event_cards_into_elementor_pages($page_ids, &$report)
     {
+        if (!self::legacy_event_cards_enabled()) {
+            $report['warnings'][] = 'Etkinlik kart senkronu kapali; mevcut manuel Yazilar/Elementor etkinlikleri korunuyor.';
+            return;
+        }
+
         if (!class_exists('Elementor\\Plugin')) {
             $report['warnings'][] = 'Elementor aktif degil, etkinlik kart senkronu atlandi.';
             return;
@@ -2539,6 +2572,10 @@ final class ODTUMIST_Elementor_Bootstrap
 
     private static function build_events_dynamic_sections_for_elementor()
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return array();
+        }
+
         return array(
             self::build_section_with_columns(
                 array(
@@ -4341,6 +4378,11 @@ final class ODTUMIST_Elementor_Bootstrap
 
     private static function build_card_sections_for_post_type($post_type, $limit, $fallback_image, $is_event = false, $single_row = false, $row_extra_class = '')
     {
+        $post_type = sanitize_key((string) $post_type);
+        if ($post_type === 'event' && !self::legacy_event_cards_enabled()) {
+            return array();
+        }
+
         $sections = array();
         $cards    = array();
 
@@ -4918,6 +4960,10 @@ final class ODTUMIST_Elementor_Bootstrap
 
     public static function shortcode_events_grid($atts)
     {
+        if (!self::legacy_event_cards_enabled()) {
+            return '';
+        }
+
         $atts = shortcode_atts(array(
             'limit' => 12,
             'show_filter' => '0',

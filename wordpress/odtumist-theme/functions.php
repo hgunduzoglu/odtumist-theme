@@ -29,7 +29,6 @@ function odtumist_setup_theme()
         'primary-menu'            => __('Primary Menu', 'odtumist'),
         'footer-menu'             => __('Footer Menu', 'odtumist'),
         'footer-corporate-menu'   => __('Footer Corporate Menu', 'odtumist'),
-        'footer-info-menu'        => __('Footer Info Menu', 'odtumist'),
     ));
 }
 add_action('after_setup_theme', 'odtumist_setup_theme');
@@ -350,7 +349,7 @@ function odtumist_enqueue_assets()
 {
     wp_enqueue_style(
         'odtumist-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
+        'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap',
         array(),
         null
     );
@@ -722,6 +721,13 @@ function odtumist_add_context_body_classes($classes)
 
     $runtime_page_id = odtumist_get_runtime_page_id();
 
+    if (!is_admin() && $runtime_page_id) {
+        $runtime_slug = get_post_field('post_name', $runtime_page_id);
+        if ($runtime_slug) {
+            $classes[] = 'odt-page-' . sanitize_html_class($runtime_slug);
+        }
+    }
+
     if (!is_admin() && odtumist_is_solidarity_root_page($runtime_page_id)) {
         $classes[] = 'odt-page-dayanisma';
     }
@@ -732,6 +738,10 @@ function odtumist_add_context_body_classes($classes)
 
     if (!is_admin() && odtumist_elementor_first_section_has_class($runtime_page_id, 'odt-el-banner-section')) {
         $classes[] = 'odt-has-top-elementor-banner';
+    }
+
+    if (!is_admin() && !odtumist_legacy_event_cards_enabled()) {
+        $classes[] = 'odt-legacy-event-cards-disabled';
     }
 
     return array_values(array_unique($classes));
@@ -906,6 +916,13 @@ function odtumist_get_event_location($post_id)
     }
 
     return __('Konum yakında eklenecek', 'odtumist');
+}
+
+function odtumist_legacy_event_cards_enabled()
+{
+    // Etkinlik kartlari artik Yazilar/Elementor tarafindan manuel yonetiliyor.
+    // Eski event CPT kaynakli kartlar yalnizca disaridan ozellikle acilirsa render edilir.
+    return (bool) apply_filters('odtumist_legacy_event_cards_enabled', false);
 }
 
 function odtumist_get_featured_events($limit = 8)
@@ -1215,7 +1232,6 @@ function odtumist_get_footer_content()
         'description' => get_theme_mod('odtumist_footer_description', __('ODTÜMİST; İstanbul\'daki ODTÜ mezunlarını dayanışma, burs, mentorluk ve ortak projelerde bir araya getiren mezunlar topluluğudur.', 'odtumist')),
         'quick_title'  => get_theme_mod('odtumist_footer_quick_title', __('Hızlı Erişim', 'odtumist')),
         'corp_title'   => get_theme_mod('odtumist_footer_corporate_title', __('Kurumsal', 'odtumist')),
-        'info_title'   => get_theme_mod('odtumist_footer_info_title', __('Bilgi Merkezi', 'odtumist')),
         'contact_title' => get_theme_mod('odtumist_footer_contact_title', __('İletişim', 'odtumist')),
         'copyright'    => get_theme_mod('odtumist_footer_copyright_text', __('Tüm hakları saklıdır.', 'odtumist')),
     );
@@ -1644,7 +1660,7 @@ function odtumist_sync_primary_membership_menu_items($items)
 
 function odtumist_filter_empty_menu_items($items, $args)
 {
-    if (empty($args->theme_location) || !in_array($args->theme_location, array('primary-menu', 'footer-menu', 'footer-corporate-menu', 'footer-info-menu'), true)) {
+    if (empty($args->theme_location) || !in_array($args->theme_location, array('primary-menu', 'footer-menu', 'footer-corporate-menu'), true)) {
         return $items;
     }
 
@@ -1791,22 +1807,6 @@ function odtumist_render_fallback_menu($args)
         return;
     }
 
-    if ('footer-info-menu' === $theme_location) {
-        $items = array(
-            array('title' => 'Yönetim', 'url' => $resolve_child_url('yonetim-organlari', home_url('/yonetim-organlari/'))),
-            array('title' => 'Tüzük', 'url' => $resolve_child_url('tuzuk', home_url('/tuzuk/'))),
-            array('title' => 'Yönetmelikler', 'url' => $resolve_child_url('yonetmelikler', home_url('/yonetmelikler/'))),
-            array('title' => 'Faaliyet Raporları', 'url' => $resolve_child_url('faaliyet-raporlari', home_url('/faaliyet-raporlari/'))),
-        );
-
-        echo '<ul class="' . esc_attr($menu_class) . '">';
-        foreach ($items as $item) {
-            echo '<li class="menu-item"><a href="' . esc_url($item['url']) . '">' . esc_html($item['title']) . '</a></li>';
-        }
-        echo '</ul>';
-        return;
-    }
-
     echo '<ul class="' . esc_attr($menu_class) . '">';
     wp_list_pages(array(
         'title_li'    => '',
@@ -1892,12 +1892,6 @@ function odtumist_customize_register($wp_customize)
         'odtumist_footer_corporate_title' => array(
             'label' => 'Footer Kolon 2 Başlık',
             'default' => 'Kurumsal',
-            'type' => 'text',
-            'sanitize' => 'sanitize_text_field',
-        ),
-        'odtumist_footer_info_title' => array(
-            'label' => 'Footer Kolon 3 Başlık',
-            'default' => 'Bilgi Merkezi',
             'type' => 'text',
             'sanitize' => 'sanitize_text_field',
         ),

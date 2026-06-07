@@ -3,16 +3,20 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$events_query = odtumist_get_featured_events(24);
+$legacy_event_cards_enabled = function_exists('odtumist_legacy_event_cards_enabled') ? odtumist_legacy_event_cards_enabled() : false;
+$events_query = $legacy_event_cards_enabled ? odtumist_get_featured_events(24) : null;
 $gallery_items = function_exists('odtumist_get_events_gallery_items') ? odtumist_get_events_gallery_items() : array();
-$event_filter_terms = get_terms(array(
-    'taxonomy'   => 'event-category',
-    'hide_empty' => true,
-    'orderby'    => 'name',
-    'order'      => 'ASC',
-));
-if (!is_array($event_filter_terms) || is_wp_error($event_filter_terms)) {
-    $event_filter_terms = array();
+$event_filter_terms = array();
+if ($legacy_event_cards_enabled) {
+    $event_filter_terms = get_terms(array(
+        'taxonomy'   => 'event-category',
+        'hide_empty' => true,
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ));
+    if (!is_array($event_filter_terms) || is_wp_error($event_filter_terms)) {
+        $event_filter_terms = array();
+    }
 }
 ?>
 <section class="page-hero page-hero-light">
@@ -67,6 +71,7 @@ if (!is_array($event_filter_terms) || is_wp_error($event_filter_terms)) {
     </div>
 </section>
 
+<?php if ($legacy_event_cards_enabled && $events_query instanceof WP_Query) : ?>
 <section class="events-page-grid">
     <div class="site-container">
         <div class="events-gallery-header">
@@ -136,6 +141,7 @@ if (!is_array($event_filter_terms) || is_wp_error($event_filter_terms)) {
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <?php if (!empty($gallery_items)) : ?>
 <section class="events-gallery">

@@ -68,30 +68,17 @@ $is_elementor_page = $queried_post_id > 0 ? odtumist_should_render_with_elemento
                 ?>
             </div>
 
-            <div class="footer-menu-wrap">
-                <h3><?php echo esc_html((string) $footer_content['info_title']); ?></h3>
-                <?php
-                wp_nav_menu(array(
-                    'theme_location' => 'footer-info-menu',
-                    'container'      => false,
-                    'menu_class'     => 'footer-menu',
-                    'fallback_cb'    => 'odtumist_render_fallback_menu',
-                    'depth'          => 1,
-                ));
-                ?>
+            <div class="footer-contact">
+                <h3><?php echo esc_html((string) $footer_content['contact_title']); ?></h3>
+                <ul>
+                    <li><?php echo nl2br(esc_html($contact_content['address'])); ?></li>
+                    <?php foreach ($contact_phones as $phone) : ?>
+                        <?php $phone_href = preg_replace('/[^0-9+]/', '', (string) $phone); ?>
+                        <li><a href="tel:<?php echo esc_attr($phone_href); ?>"><?php echo esc_html($phone); ?></a></li>
+                    <?php endforeach; ?>
+                    <li><a href="mailto:<?php echo esc_attr($contact_content['email']); ?>"><?php echo esc_html($contact_content['email']); ?></a></li>
+                </ul>
             </div>
-
-                <div class="footer-contact">
-                    <h3><?php echo esc_html((string) $footer_content['contact_title']); ?></h3>
-                    <ul>
-                        <li><?php echo nl2br(esc_html($contact_content['address'])); ?></li>
-                        <?php foreach ($contact_phones as $phone) : ?>
-                            <?php $phone_href = preg_replace('/[^0-9+]/', '', (string) $phone); ?>
-                            <li><a href="tel:<?php echo esc_attr($phone_href); ?>"><?php echo esc_html($phone); ?></a></li>
-                        <?php endforeach; ?>
-                        <li><a href="mailto:<?php echo esc_attr($contact_content['email']); ?>"><?php echo esc_html($contact_content['email']); ?></a></li>
-                    </ul>
-                </div>
         </div>
 
         <div class="site-container footer-bottom">
