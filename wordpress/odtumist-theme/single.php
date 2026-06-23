@@ -21,10 +21,10 @@ get_header();
                 </section>
 
                 <?php if (has_post_thumbnail()) : ?>
-                    <section class="archive-listing">
+                    <section class="archive-listing single-post-media-block">
                         <div class="site-container">
-                            <figure class="gallery-grid" style="grid-template-columns:1fr;">
-                                <?php the_post_thumbnail('full', array('loading' => 'eager')); ?>
+                            <figure class="single-post-featured-media">
+                                <?php the_post_thumbnail('large', array('loading' => 'eager')); ?>
                             </figure>
                         </div>
                     </section>

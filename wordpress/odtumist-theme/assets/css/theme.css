@@ -7218,3 +7218,386 @@ body.home .elementor-widget-posts .odt-el-scroll-arrow-next {
         right: 0.15rem;
     }
 }
+
+/* Iteration 22: Remove the white seam between the home CTA strip and working groups. */
+body.home .elementor .odt-el-home-ctas {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+body.home .elementor .odt-el-home-ctas + .odt-el-home-groups-intro {
+    margin-top: 0 !important;
+    border-top: 0 !important;
+}
+
+/* Iteration 23: Keep normal post detail featured images readable without dominating the page. */
+.single-post .single-post-media-block {
+    padding-top: clamp(1rem, 2vw, 1.6rem);
+    padding-bottom: clamp(1.2rem, 2.4vw, 2rem);
+    background: #fff;
+}
+
+.single-post .single-post-featured-media {
+    width: fit-content;
+    max-width: min(860px, 100%);
+    margin: 0 auto;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.single-post .single-post-featured-media img,
+.single-post .archive-listing .gallery-grid > .wp-post-image {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: min(68vh, 680px);
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    margin: 0 auto;
+}
+
+.single-post .page-content-block {
+    padding-top: clamp(1rem, 2vw, 1.6rem);
+}
+
+@media (max-width: 767px) {
+    .single-post .single-post-featured-media {
+        max-width: 100%;
+        border-radius: 14px;
+    }
+
+    .single-post .single-post-featured-media img,
+    .single-post .archive-listing .gallery-grid > .wp-post-image {
+        max-height: 64vh;
+    }
+}
+
+/* Iteration 24: Global responsive safety layer. */
+:root {
+    --odt-fluid-gutter: clamp(0.75rem, 3vw, 2rem);
+    --odt-mobile-gutter: clamp(0.75rem, 4vw, 1.15rem);
+}
+
+html,
+body {
+    max-width: 100%;
+}
+
+body {
+    overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+    body {
+        overflow-x: hidden;
+    }
+}
+
+.site-main,
+.site-footer,
+.elementor-page-content,
+.elementor,
+.elementor-section,
+.elementor-container,
+.e-con,
+.e-con-inner,
+.elementor-widget,
+.elementor-widget-container {
+    max-width: 100%;
+}
+
+.site-main,
+.elementor,
+.elementor * {
+    min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe,
+embed,
+object {
+    max-width: 100%;
+}
+
+video,
+canvas,
+iframe,
+embed,
+object {
+    display: block;
+}
+
+.prose-block table,
+.elementor-widget-text-editor table,
+.wp-block-table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.prose-block pre,
+.elementor-widget-text-editor pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+a,
+.elementor-heading-title,
+.elementor-widget-text-editor,
+.elementor-button {
+    overflow-wrap: break-word;
+}
+
+.elementor .elementor-button,
+.btn {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+}
+
+.elementor-widget-posts .elementor-posts-container.elementor-grid {
+    align-items: stretch;
+}
+
+.elementor-widget-posts .elementor-post,
+.elementor-widget-posts .elementor-post__card,
+.archive-card,
+.event-list-card,
+.event-card,
+.group-card,
+.group-grid-card,
+.about-group-card,
+.about-management-card,
+.why-step-card,
+.contact-card-item {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.elementor-widget-image:not(.odt-el-banner-image) img,
+.elementor-widget-image-box img {
+    max-width: 100%;
+}
+
+.mobile-panel {
+    max-height: calc(100dvh - var(--odt-top-banner-header-offset, 78px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1140px) {
+    .site-header .site-container.nav-inner {
+        width: min(var(--max-width), calc(100% - var(--odt-fluid-gutter)));
+    }
+
+    .mobile-panel {
+        max-height: calc(100dvh - var(--odt-top-banner-header-offset, 76px));
+    }
+}
+
+@media (max-width: 1024px) {
+    .section-head,
+    .contact-grid,
+    .contact-grid-enhanced,
+    .footer-grid,
+    .form-grid,
+    .about-join-grid,
+    .about-history-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .elementor-widget-posts .elementor-posts-container.elementor-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .archive-grid,
+    .events-grid,
+    .events-page-grid .events-grid,
+    .gallery-grid,
+    .groups-grid,
+    .facts-grid,
+    .steps-grid,
+    .about-groups-grid,
+    .events-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .desktop-right {
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .site-container,
+    .elementor .odt-el-section:not(.odt-el-banner-section) > .elementor-container {
+        width: min(var(--max-width), calc(100% - var(--odt-mobile-gutter)));
+    }
+
+    .site-main {
+        padding-top: 76px;
+    }
+
+    .home .site-main,
+    body.odt-page-dayanisma.odt-has-top-elementor-banner .site-main,
+    body.odt-page-hakkimizda.odt-has-top-elementor-banner .site-main {
+        padding-top: var(--odt-top-banner-header-offset, 76px) !important;
+    }
+
+    .elementor .elementor-section > .elementor-container {
+        flex-wrap: wrap;
+    }
+
+    .elementor .elementor-column {
+        width: 100% !important;
+    }
+
+    .elementor .e-con {
+        max-width: 100%;
+    }
+
+    .page-hero {
+        padding-top: clamp(2.2rem, 8vw, 3.4rem);
+        padding-bottom: clamp(2.2rem, 8vw, 3.4rem);
+    }
+
+    .page-hero h1,
+    .elementor-page .elementor .elementor-widget-heading h1.elementor-heading-title {
+        font-size: clamp(2rem, 10vw, 3.35rem) !important;
+        line-height: 1.06 !important;
+    }
+
+    .elementor-page .elementor .elementor-widget-heading h2.elementor-heading-title,
+    .elementor-page .elementor .odt-el-title .elementor-heading-title,
+    .section-title {
+        font-size: clamp(1.65rem, 8vw, 2.75rem);
+        line-height: 1.08;
+    }
+
+    .elementor-widget-text-editor,
+    .elementor-widget-text-editor p,
+    .prose-block,
+    .prose-block p,
+    .prose-block li {
+        font-size: clamp(0.95rem, 4vw, 1.08rem);
+        line-height: 1.65;
+    }
+
+    .elementor .odt-el-btn .elementor-button,
+    .elementor .elementor-button,
+    .btn {
+        width: auto;
+        min-height: 44px;
+        padding: 0.78rem 1rem;
+        font-size: clamp(0.72rem, 3.2vw, 0.88rem);
+    }
+
+    .archive-grid,
+    .events-grid,
+    .events-page-grid .events-grid,
+    .gallery-grid,
+    .groups-grid,
+    .facts-grid,
+    .steps-grid,
+    .about-groups-grid,
+    .events-gallery-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .archive-card,
+    .event-list-card,
+    .group-grid-card,
+    .about-group-card,
+    .about-management-card,
+    .why-step-card,
+    .contact-card-item {
+        width: 100%;
+    }
+
+    .event-card,
+    .group-card {
+        width: min(100%, 420px);
+    }
+
+    .footer-grid {
+        gap: 1.6rem;
+    }
+
+    .footer-brand,
+    .footer-menu-wrap,
+    .footer-contact {
+        max-width: 100%;
+    }
+
+    .footer-menu a,
+    .footer-contact li,
+    .footer-desc {
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-container,
+    .elementor .odt-el-section:not(.odt-el-banner-section) > .elementor-container {
+        width: min(var(--max-width), calc(100% - 0.9rem));
+    }
+
+    .nav-inner {
+        min-height: 70px;
+    }
+
+    .site-brand-title {
+        font-size: clamp(1.35rem, 8vw, 1.7rem);
+    }
+
+    .site-brand-logo .custom-logo {
+        max-height: 38px;
+    }
+
+    .mobile-toggle {
+        width: 42px;
+        height: 42px;
+    }
+
+    .mobile-panel {
+        padding: 0.85rem;
+        max-height: calc(100dvh - 70px);
+    }
+
+    .page-hero h1,
+    .elementor-page .elementor .elementor-widget-heading h1.elementor-heading-title {
+        font-size: clamp(1.75rem, 11vw, 2.7rem) !important;
+    }
+
+    .elementor-page .elementor .elementor-widget-heading h2.elementor-heading-title,
+    .elementor-page .elementor .odt-el-title .elementor-heading-title,
+    .section-title {
+        font-size: clamp(1.45rem, 9vw, 2.25rem);
+    }
+
+    .elementor .elementor-button,
+    .btn {
+        width: 100%;
+    }
+
+    .footer-social,
+    .contact-cards .social-links {
+        flex-wrap: wrap;
+    }
+}
