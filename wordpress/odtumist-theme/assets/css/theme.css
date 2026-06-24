@@ -167,6 +167,18 @@ body.admin-bar .site-header {
     }
 }
 
+.elementor .odt-el-about-overview-image,
+.elementor .odt-el-about-overview-image .elementor-widget-container,
+.elementor .odt-el-about-overview-image img {
+    width: 100%;
+    max-width: 100%;
+}
+
+.elementor .odt-el-about-overview-image img {
+    height: auto;
+    object-fit: contain;
+}
+
 .nav-inner {
     min-height: 78px;
     display: flex;
@@ -7835,5 +7847,135 @@ a,
 
     body.home .elementor .odt-el-home-groups-row .odt-el-scroll-arrow-next {
         right: 0.2rem;
+    }
+}
+
+/* Iteration 29: About tabs must leave the viewport with the page on mobile. */
+@media (max-width: 767px) {
+    body.odt-page-hakkimizda .about-page-nav,
+    body.odt-page-hakkimizda .elementor .odt-el-about-nav,
+    body.admin-bar.odt-page-hakkimizda .about-page-nav,
+    body.admin-bar.odt-page-hakkimizda .elementor .odt-el-about-nav {
+        position: relative !important;
+        top: auto !important;
+        inset-block-start: auto !important;
+    }
+}
+
+/* Iteration 30: Persistent white header and unified footer rule colors. */
+.site-header,
+.site-header.is-scrolled {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 10000;
+    background: #fff !important;
+    border-bottom: 1px solid #d7dce4 !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    backdrop-filter: none !important;
+}
+
+body.admin-bar .site-header,
+body.admin-bar .site-header.is-scrolled {
+    top: 32px;
+}
+
+.site-header .site-brand-title,
+.site-header.is-scrolled .site-brand-title,
+.site-header .desktop-menu > li > a,
+.site-header.is-scrolled .desktop-menu > li > a,
+.site-header .social-links a,
+.site-header.is-scrolled .social-links a {
+    color: #172033;
+}
+
+.site-header .social-links,
+.site-header.is-scrolled .social-links {
+    border-right-color: #cbd2dc;
+}
+
+.site-header .desktop-menu > li:hover > a,
+.site-header .desktop-menu > li.current-menu-item > a,
+.site-header .desktop-menu > li.current-menu-ancestor > a {
+    color: var(--odtu-red);
+    border-bottom-color: var(--odtu-red);
+}
+
+.site-header:not(.is-scrolled) .btn-outline,
+.site-header.is-scrolled .btn-outline {
+    background: #fff;
+    color: var(--odtu-red);
+    border-color: var(--odtu-red);
+}
+
+.site-header:not(.is-scrolled) .btn-outline:hover,
+.site-header.is-scrolled .btn-outline:hover {
+    background: var(--odtu-red);
+    color: #fff;
+    border-color: var(--odtu-red);
+}
+
+.site-header .mobile-toggle,
+.site-header.is-scrolled .mobile-toggle {
+    background: #fff;
+    border-color: #cbd2dc;
+}
+
+.site-header .mobile-toggle span,
+.site-header.is-scrolled .mobile-toggle span {
+    background: #172033;
+}
+
+.site-header .mobile-panel,
+.site-header.is-scrolled .mobile-panel {
+    background: #fff;
+    border-top-color: #d7dce4;
+}
+
+.site-header .mobile-menu > li > a,
+.site-header.is-scrolled .mobile-menu > li > a {
+    color: #172033;
+    border-bottom-color: #d7dce4;
+}
+
+.site-header .mobile-menu .sub-menu a,
+.site-header.is-scrolled .mobile-menu .sub-menu a {
+    color: #475569;
+}
+
+.site-header .mobile-social,
+.site-header.is-scrolled .mobile-social {
+    background: #fff;
+}
+
+.site-footer {
+    border-top-color: var(--odtu-red);
+}
+
+.site-footer .footer-menu-wrap h3 {
+    border-left-color: var(--odtu-red);
+}
+
+.site-footer .footer-contact h3 {
+    border-left-color: var(--odtu-red);
+}
+
+.site-footer .footer-social a {
+    border-color: var(--odtu-red);
+}
+
+.site-footer .footer-social a:hover {
+    border-color: var(--odtu-red);
+}
+
+.site-footer .footer-bottom {
+    border-top-color: var(--odtu-red);
+}
+
+@media (max-width: 782px) {
+    body.admin-bar .site-header,
+    body.admin-bar .site-header.is-scrolled {
+        top: 46px;
     }
 }

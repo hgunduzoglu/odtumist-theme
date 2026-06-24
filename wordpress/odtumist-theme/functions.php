@@ -2649,3 +2649,202 @@ function odtumist_customize_register_extra($wp_customize)
     }
 }
 add_action('customize_register', 'odtumist_customize_register_extra');
+
+/**
+ * Replace the flattened "Bir Bakışta" atomic image with a classic Elementor
+ * image widget without reseeding or touching the surrounding manual content.
+ */
+function odtumist_migrate_about_overview_to_classic_image()
+{
+    $migration_key = 'odtumist_about_overview_classic_image_v1';
+    if (get_option($migration_key) || !is_admin() || !current_user_can('edit_pages')) {
+        return;
+    }
+
+    $about_page = get_page_by_path('hakkimizda', OBJECT, 'page');
+    if (!($about_page instanceof WP_Post) || !current_user_can('edit_post', (int) $about_page->ID)) {
+        return;
+    }
+
+    $raw_data = trim((string) get_post_meta((int) $about_page->ID, '_elementor_data', true));
+    if ($raw_data === '') {
+        return;
+    }
+
+    $document = json_decode($raw_data, true);
+    if (!is_array($document)) {
+        return;
+    }
+
+    $result = array(
+        'found'           => false,
+        'converted'       => false,
+        'already_classic' => false,
+    );
+    odtumist_convert_about_overview_image_nodes($document, $result);
+
+    if (!$result['found']) {
+        return;
+    }
+
+    if (!$result['converted'] && !$result['already_classic']) {
+        return;
+    }
+
+    if ($result['converted']) {
+        update_post_meta(
+            (int) $about_page->ID,
+            '_odtumist_elementor_backup_before_about_overview_image_v1',
+            wp_slash($raw_data)
+        );
+        update_post_meta(
+            (int) $about_page->ID,
+            '_elementor_data',
+            wp_slash(wp_json_encode($document))
+        );
+        delete_post_meta((int) $about_page->ID, '_elementor_css');
+
+        if (class_exists('Elementor\\Plugin') && isset(Elementor\Plugin::$instance->files_manager)) {
+            Elementor\Plugin::$instance->files_manager->clear_cache();
+        }
+
+        set_transient('odtumist_about_overview_image_migrated_notice', '1', 5 * MINUTE_IN_SECONDS);
+    }
+
+    update_option($migration_key, '1', false);
+}
+add_action('admin_init', 'odtumist_migrate_about_overview_to_classic_image', 30);
+
+function odtumist_convert_about_overview_image_nodes(&$nodes, &$result)
+{
+    if (!is_array($nodes)) {
+        return;
+    }
+
+    foreach ($nodes as &$node) {
+        if (!is_array($node)) {
+            continue;
+        }
+
+        $node_id = isset($node['id']) ? (string) $node['id'] : '';
+        $node_without_children = $node;
+        unset($node_without_children['elements']);
+        $node_summary = wp_json_encode($node_without_children);
+        $has_target_file = is_string($node_summary)
+            && stripos($node_summary, 'BIR-BAKISTA') !== false;
+        $is_target = $node_id === 'ef2248a' || $has_target_file;
+
+        if ($is_target) {
+            $result['found'] = true;
+
+            if (isset($node['elType'], $node['widgetType'])
+                && $node['elType'] === 'widget'
+                && $node['widgetType'] === 'image') {
+                $result['already_classic'] = true;
+                continue;
+            }
+
+            $image = odtumist_find_about_overview_media($node_without_children);
+            if ($image['id'] <= 0 || $image['url'] === '') {
+                $fallback_id = odtumist_find_attachment_id_by_filename('BIR-BAKISTA-e1779045651635.jpg');
+                if ($image['id'] <= 0) {
+                    $image['id'] = $fallback_id;
+                }
+                if ($image['url'] === '' && $image['id'] > 0) {
+                    $image['url'] = (string) wp_get_attachment_url($image['id']);
+                }
+            }
+
+            if ($image['url'] === '') {
+                continue;
+            }
+
+            $node = array(
+                'id'         => $node_id !== '' ? $node_id : substr(md5(uniqid('', true)), 0, 8),
+                'elType'     => 'widget',
+                'widgetType' => 'image',
+                'isInner'    => false,
+                'settings'   => array(
+                    'image'        => array(
+                        'id'  => (int) $image['id'],
+                        'url' => esc_url_raw($image['url']),
+                    ),
+                    'image_size'   => 'full',
+                    'align'        => 'center',
+                    '_css_classes' => 'odt-el-about-overview-image',
+                ),
+                'elements'   => array(),
+            );
+            $result['converted'] = true;
+            continue;
+        }
+
+        if (isset($node['elements']) && is_array($node['elements'])) {
+            odtumist_convert_about_overview_image_nodes($node['elements'], $result);
+        }
+    }
+    unset($node);
+}
+
+function odtumist_find_about_overview_media($value)
+{
+    $media = array('id' => 0, 'url' => '');
+    odtumist_collect_about_overview_media($value, $media);
+    return $media;
+}
+
+function odtumist_collect_about_overview_media($value, &$media)
+{
+    if (!is_array($value)) {
+        return;
+    }
+
+    foreach ($value as $key => $item) {
+        if (is_array($item)) {
+            odtumist_collect_about_overview_media($item, $media);
+            continue;
+        }
+
+        if ($media['url'] === '' && is_string($item) && stripos($item, 'BIR-BAKISTA') !== false) {
+            $media['url'] = esc_url_raw($item);
+        }
+        if ($media['id'] <= 0 && in_array((string) $key, array('id', 'attachment_id'), true) && is_numeric($item)) {
+            $candidate_id = (int) $item;
+            if ($candidate_id > 0 && get_post_type($candidate_id) === 'attachment') {
+                $media['id'] = $candidate_id;
+            }
+        }
+    }
+}
+
+function odtumist_find_attachment_id_by_filename($filename)
+{
+    global $wpdb;
+
+    $filename = sanitize_file_name((string) $filename);
+    if ($filename === '') {
+        return 0;
+    }
+
+    $attachment_id = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1",
+            '%' . $wpdb->esc_like($filename)
+        )
+    );
+
+    return (int) $attachment_id;
+}
+
+function odtumist_about_overview_image_migration_notice()
+{
+    if (!current_user_can('edit_pages') || !get_transient('odtumist_about_overview_image_migrated_notice')) {
+        return;
+    }
+
+    delete_transient('odtumist_about_overview_image_migrated_notice');
+    echo '<div class="notice notice-success is-dismissible"><p>'
+        . esc_html__('Hakkımızda sayfasındaki Bir Bakışta görseli klasik Elementor Görsel widget’ına dönüştürüldü.', 'odtumist')
+        . '</p></div>';
+}
+add_action('admin_notices', 'odtumist_about_overview_image_migration_notice');
