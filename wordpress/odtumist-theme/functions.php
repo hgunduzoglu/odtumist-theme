@@ -2848,3 +2848,126 @@ function odtumist_about_overview_image_migration_notice()
         . '</p></div>';
 }
 add_action('admin_notices', 'odtumist_about_overview_image_migration_notice');
+
+/**
+ * Add project-specific sizing controls to Elementor Pro's Slides widget.
+ *
+ * The controls write CSS custom properties consumed by theme.css, so editors
+ * can resize and fit the home slider without touching CSS classes or code.
+ */
+function odtumist_add_slides_layout_controls($element, $section_id, $args)
+{
+    if (!is_object($element)
+        || !method_exists($element, 'get_name')
+        || $element->get_name() !== 'slides'
+        || $section_id !== 'section_slides'
+        || !class_exists('Elementor\\Controls_Manager')) {
+        return;
+    }
+
+    $element->start_controls_section(
+        'odtumist_slider_layout_section',
+        array(
+            'label' => esc_html__('ODTÜMİST Slider Yerleşimi', 'odtumist'),
+            'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+        )
+    );
+
+    $element->add_responsive_control(
+        'odtumist_slider_width',
+        array(
+            'label'       => esc_html__('Slider genişliği', 'odtumist'),
+            'type'        => \Elementor\Controls_Manager::SLIDER,
+            'size_units'  => array('%', 'px'),
+            'range'       => array(
+                '%'  => array('min' => 50, 'max' => 100, 'step' => 1),
+                'px' => array('min' => 640, 'max' => 2560, 'step' => 10),
+            ),
+            'default'        => array('unit' => '%', 'size' => 94),
+            'tablet_default' => array('unit' => '%', 'size' => 96),
+            'mobile_default' => array('unit' => '%', 'size' => 100),
+            'selectors'      => array(
+                '{{WRAPPER}}' => '--odt-home-slider-width: {{SIZE}}{{UNIT}};',
+            ),
+        )
+    );
+
+    $element->add_control(
+        'odtumist_slider_ratio',
+        array(
+            'label'   => esc_html__('Slider çerçeve oranı', 'odtumist'),
+            'type'    => \Elementor\Controls_Manager::SELECT,
+            'default' => '1280 / 497',
+            'options' => array(
+                '1280 / 497' => esc_html__('2560 × 994 (önerilen)', 'odtumist'),
+                '16 / 9'     => esc_html__('16:9 yatay', 'odtumist'),
+                '3 / 2'      => esc_html__('3:2 yatay', 'odtumist'),
+                '4 / 3'      => esc_html__('4:3 yatay', 'odtumist'),
+                '1 / 1'      => esc_html__('1:1 kare', 'odtumist'),
+            ),
+            'selectors' => array(
+                '{{WRAPPER}}' => '--odt-home-slider-ratio: {{VALUE}};',
+            ),
+        )
+    );
+
+    $element->add_control(
+        'odtumist_slider_image_fit',
+        array(
+            'label'   => esc_html__('Görseli çerçeveye oturt', 'odtumist'),
+            'type'    => \Elementor\Controls_Manager::SELECT,
+            'default' => 'cover',
+            'options' => array(
+                'cover'     => esc_html__('Kapla (kırpabilir)', 'odtumist'),
+                'contain'   => esc_html__('Sığdır (tamamı görünür)', 'odtumist'),
+                '100% 100%' => esc_html__('Esnet (kırpmaz, oranı bozabilir)', 'odtumist'),
+            ),
+            'selectors' => array(
+                '{{WRAPPER}}' => '--odt-home-slider-fit: {{VALUE}};',
+            ),
+        )
+    );
+
+    $element->add_control(
+        'odtumist_slider_image_position',
+        array(
+            'label'   => esc_html__('Görsel odağı', 'odtumist'),
+            'type'    => \Elementor\Controls_Manager::SELECT,
+            'default' => 'center center',
+            'options' => array(
+                'center center' => esc_html__('Orta', 'odtumist'),
+                'center top'    => esc_html__('Üst orta', 'odtumist'),
+                'center bottom' => esc_html__('Alt orta', 'odtumist'),
+                'left center'   => esc_html__('Sol orta', 'odtumist'),
+                'right center'  => esc_html__('Sağ orta', 'odtumist'),
+            ),
+            'selectors' => array(
+                '{{WRAPPER}}' => '--odt-home-slider-position: {{VALUE}};',
+            ),
+        )
+    );
+
+    $element->add_control(
+        'odtumist_slider_background_color',
+        array(
+            'label'     => esc_html__('Sığdırma boşluğu rengi', 'odtumist'),
+            'type'      => \Elementor\Controls_Manager::COLOR,
+            'default'   => '#0f172a',
+            'selectors' => array(
+                '{{WRAPPER}}' => '--odt-home-slider-background: {{VALUE}};',
+            ),
+        )
+    );
+
+    $element->add_control(
+        'odtumist_slider_size_note',
+        array(
+            'type'            => \Elementor\Controls_Manager::RAW_HTML,
+            'raw'             => esc_html__('Kırpma ve boşluk olmaması için tüm slayt görsellerini aynı oranda hazırlayın. Önerilen ölçü: 2560 × 994 px; daha küçük alternatif: 1280 × 497 px.', 'odtumist'),
+            'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+        )
+    );
+
+    $element->end_controls_section();
+}
+add_action('elementor/element/after_section_end', 'odtumist_add_slides_layout_controls', 10, 3);

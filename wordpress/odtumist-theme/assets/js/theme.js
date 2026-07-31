@@ -166,6 +166,16 @@
     }
   }
 
+  function closeMobileMenu() {
+    var toggle = document.getElementById('mobile-toggle');
+    var panel = document.getElementById('mobile-panel');
+
+    if (!toggle || !panel) return;
+
+    toggle.setAttribute('aria-expanded', 'false');
+    panel.hidden = true;
+  }
+
   function initMobileMenu() {
     var toggle = document.getElementById('mobile-toggle');
     var panel = document.getElementById('mobile-panel');
@@ -176,6 +186,38 @@
       var isOpen = toggle.getAttribute('aria-expanded') === 'true';
       toggle.setAttribute('aria-expanded', String(!isOpen));
       panel.hidden = isOpen;
+    });
+
+    panel.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href]');
+      if (!link || !panel.contains(link)) return;
+
+      var repeatsCurrentHash = false;
+      try {
+        var targetUrl = new URL(link.href, window.location.href);
+        repeatsCurrentHash = targetUrl.origin === window.location.origin &&
+          targetUrl.pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '') &&
+          !!targetUrl.hash && targetUrl.hash === window.location.hash;
+      } catch (error) {
+        repeatsCurrentHash = false;
+      }
+
+      closeMobileMenu();
+
+      // Ayni ankor tekrar tiklandiginda tarayici hashchange uretmez.
+      if (repeatsCurrentHash) {
+        window.setTimeout(function () {
+          window.dispatchEvent(new Event('hashchange'));
+        }, 0);
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 1024) closeMobileMenu();
     });
   }
 
@@ -799,6 +841,20 @@
       return !!anchorToTab[hash];
     });
 
+    var headerAnchorLinks = Array.prototype.slice.call(
+      document.querySelectorAll('.desktop-menu a[href*="#"], .mobile-menu a[href*="#"]')
+    ).filter(function (link) {
+      try {
+        var url = new URL(link.href, window.location.href);
+        var hash = url.hash.replace(/^#/, '');
+        return url.origin === window.location.origin &&
+          url.pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '') &&
+          !!anchorToTab[hash];
+      } catch (error) {
+        return false;
+      }
+    });
+
     function getInitialTab() {
       var hash = (window.location.hash || '').replace(/^#/, '').trim();
       if (hash && anchorToTab[hash]) return anchorToTab[hash];
@@ -856,6 +912,7 @@
 
     navLinks.forEach(bindAnchorAsTab);
     paginationLinks.forEach(bindAnchorAsTab);
+    headerAnchorLinks.forEach(bindAnchorAsTab);
 
     function activateElementorFromHash() {
       var hash = (window.location.hash || '').replace(/^#/, '').trim();
@@ -1053,6 +1110,29 @@
     focusFromHash('auto');
     window.addEventListener('hashchange', function () {
       focusFromHash('smooth');
+    });
+
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href*="#"]');
+      if (!link) return;
+
+      try {
+        var url = new URL(link.href, window.location.href);
+        var isSamePage = url.origin === window.location.origin &&
+          url.pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '');
+        var anchor = url.hash.replace(/^#/, '').trim();
+        if (!isSamePage || !anchor) return;
+
+        var targets = getMembershipDynamicTargets();
+        if (!targets[anchor] && !document.getElementById(anchor)) return;
+
+        // Hem yeni hem de ayni hash tiklamalarinda sabit header offsetini uygula.
+        window.setTimeout(function () {
+          scrollToMembershipDynamicTarget(anchor, 'smooth');
+        }, 0);
+      } catch (error) {
+        return;
+      }
     });
   }
 

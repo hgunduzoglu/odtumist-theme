@@ -7777,12 +7777,18 @@ a,
 }
 
 .elementor .odt-el-home-slider {
-    width: 100% !important;
+    --odt-home-slider-width: 94%;
+    --odt-home-slider-ratio: 1280 / 497;
+    --odt-home-slider-fit: cover;
+    --odt-home-slider-position: center center;
+    --odt-home-slider-background: #0f172a;
+    width: min(var(--odt-home-slider-width), 100%) !important;
     height: auto !important;
     min-height: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    aspect-ratio: 1280 / 497;
+    max-width: 100% !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    aspect-ratio: var(--odt-home-slider-ratio);
 }
 
 .elementor .odt-el-home-slider .elementor-slides-wrapper,
@@ -7796,9 +7802,29 @@ a,
 }
 
 .elementor .odt-el-home-slider .swiper-slide-bg {
-    background-size: cover !important;
+    background-color: var(--odt-home-slider-background) !important;
+    background-size: var(--odt-home-slider-fit) !important;
     background-repeat: no-repeat !important;
-    background-position: center !important;
+    background-position: var(--odt-home-slider-position) !important;
+}
+
+/* Iteration 32: Keep the slider's parent full width while the widget width remains editable. */
+body.home .elementor .elementor-section:has(.odt-el-home-slider),
+body.home .elementor .elementor-section:has(.odt-el-home-slider) > .elementor-container,
+body.home .elementor .elementor-column:has(.odt-el-home-slider),
+body.home .elementor .elementor-widget-wrap:has(.odt-el-home-slider),
+body.home .elementor .elementor-element-populated:has(.odt-el-home-slider),
+body.home .elementor .e-con:has(.odt-el-home-slider) {
+    width: 100% !important;
+    max-width: none !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+body.home .elementor .odt-el-home-slider > .elementor-widget-container {
+    overflow: hidden;
 }
 
 /* Iteration 28: Mobile home CTA alignment and horizontal card navigation. */
@@ -7859,6 +7885,19 @@ a,
         position: relative !important;
         top: auto !important;
         inset-block-start: auto !important;
+    }
+
+    /* Elementor text widgets may retain copied desktop pixel widths. */
+    body.odt-page-hakkimizda .elementor .odt-el-about-panel .odt-el-richtext,
+    body.odt-page-hakkimizda .elementor .odt-el-about-panel .odt-el-richtext section,
+    body.odt-page-hakkimizda .elementor .odt-el-about-panel .odt-el-richtext [data-element_type],
+    body.odt-page-hakkimizda .elementor .odt-el-about-panel .odt-el-richtext [style*="width:"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        box-sizing: border-box !important;
     }
 }
 
