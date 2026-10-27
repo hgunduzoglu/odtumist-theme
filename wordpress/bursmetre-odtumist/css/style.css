@@ -1,0 +1,836 @@
+.burs-dashboard {
+  --burs-red: var(--odtu-red, #e31e24);
+  --burs-blue: var(--odtu-blue, #00529b);
+  --burs-dark: var(--odtu-dark, #0f172a);
+  width: calc(100% - 2rem);
+  max-width: var(--max-width, 1280px);
+  margin: 0 auto;
+  padding: 40px 0 72px;
+  color: var(--burs-dark);
+  font-family: var(--odtu-font-family, inherit);
+  line-height: 1.5;
+}
+
+.burs-dashboard h1,
+.burs-dashboard h2,
+.burs-dashboard h3 {
+  margin: 0;
+}
+
+.burs-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.burs-breadcrumb__back {
+  color: var(--burs-red);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.burs-breadcrumb__back:hover {
+  color: #b91c1c;
+}
+
+.burs-breadcrumb__meta {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.burs-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 56px 48px 64px;
+  margin-bottom: 32px;
+  color: #ffffff;
+  background: var(--burs-dark);
+  border-top: 4px solid var(--burs-red);
+  box-shadow: var(--shadow-lg, 0 20px 40px -20px rgba(15, 23, 42, 0.4));
+}
+
+.burs-hero__body {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.burs-hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.burs-hero__meta {
+  margin-bottom: 0;
+}
+
+.burs-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.burs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: none;
+}
+
+.burs-btn--ghost {
+  background: #f1f5f9;
+  color: #0f172a;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.burs-btn--ghost:hover {
+  background: #e2e8f0;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.25);
+}
+
+.burs-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.burs-dashboard--yurtdisi .burs-hero__top {
+  justify-content: space-between;
+}
+
+.burs-hero__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.burs-hero__chip svg {
+  flex: 0 0 auto;
+}
+
+.burs-hero h1 {
+  font-size: clamp(26px, 3.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.burs-hero p {
+  font-size: 18px;
+  opacity: 0.94;
+  margin: 0;
+}
+.burs-hero__sub {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 18px auto 0;
+}
+.burs-hero__chip--meta {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+.burs-hero__chip--meta svg {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+.burs-hero__chip--students {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18));
+  box-shadow: 0 20px 36px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+.burs-hero__chip--students svg {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+.burs-hero__chip--students span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.burs-hero__chip--students span strong {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.burs-hero__progress {
+  margin-top: 36px;
+}
+
+.burs-hero__totals {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  gap: 12px;
+}
+
+.burs-hero__label {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+
+.burs-hero__percentage {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.burs-hero__divider {
+  margin: 0 8px;
+  opacity: 0.4;
+}
+
+.burs-progress {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.burs-progress__inner {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399 0%, #10b981 45%, #059669 100%);
+  transition: width 1s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.burs-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 32px;
+}
+
+.burs-stat {
+  position: relative;
+  border-radius: 22px;
+  padding: 24px 22px 26px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+
+}
+
+.burs-stat h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 18px;
+}
+
+.burs-stat p {
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 6px;
+  color: #0f172a;
+}
+
+.burs-stat__sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.burs-stat__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.burs-stat__icon svg {
+  width: 26px;
+  height: 26px;
+  max-width: 26px;
+  max-height: 26px;
+  flex: 0 0 auto;
+}
+
+.burs-stat--primary {
+  background: #fff;
+  border-top: 3px solid var(--burs-red);
+  border-color: rgba(255, 200, 214, 0.55);
+}
+
+.burs-stat--primary .burs-stat__icon {
+  background: var(--burs-red);
+}
+
+.burs-stat--focus {
+  background: #fff;
+  border-top: 3px solid var(--burs-blue);
+  border-color: rgba(174, 198, 255, 0.5);
+}
+
+.burs-stat--focus .burs-stat__icon {
+  background: var(--burs-blue);
+}
+
+.burs-stat--info {
+  background: #fff;
+  border-top: 3px solid #0891b2;
+  border-color: rgba(168, 232, 255, 0.5);
+}
+
+.burs-stat--info .burs-stat__icon {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+.burs-stat--growth {
+  background: linear-gradient(145deg, rgba(232, 249, 239, 0.92), rgba(255, 255, 255, 0.92));
+  border-color: rgba(178, 235, 195, 0.5);
+}
+
+.burs-stat--growth .burs-stat__icon {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.burs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.burs-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 22px;
+  padding: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.burs-panel--chart {
+  min-height: 360px;
+}
+
+.burs-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.burs-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.burs-panel__title .burs-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, #ffb703, #fb8500);
+}
+
+.burs-panel h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.burs-panel canvas {
+  width: 100%;
+  max-width: 100%;
+  height: 320px;
+}
+
+.burs-empty {
+  padding: 32px;
+  text-align: center;
+  border-radius: 18px;
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.burs-alert {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.burs-alert--warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.burs-panel--ranking {
+  margin-bottom: 32px;
+}
+
+.burs-icon--trophy {
+  background: linear-gradient(135deg, #ffda79, #f59e0b);
+}
+
+.burs-icon--medal {
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+}
+
+.burs-icon--badge {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.burs-icon--chart {
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
+}
+
+.burs-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.burs-ranking__item {
+  display: grid;
+  grid-template-columns: 64px 70px 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.burs-ranking__order {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #cbd5f5, #7c83fd);
+}
+
+.burs-ranking__order--1 {
+  background: linear-gradient(135deg, #ffcd3c, #f7921a);
+}
+
+.burs-ranking__order--2 {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+}
+
+.burs-ranking__order--3 {
+  background: linear-gradient(135deg, #f6ad55, #f97316);
+}
+
+.burs-ranking__avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.burs-ranking__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.burs-ranking__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.burs-ranking__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.burs-ranking__top h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.burs-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.burs-ranking__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.burs-ranking__amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.burs-ranking__amount strong {
+  font-size: 18px;
+  color: #064e3b;
+}
+
+.burs-ranking__amount span {
+  font-size: 13px;
+  color: #475569;
+}
+
+.burs-ranking__currency {
+  font-weight: 700;
+  color: #0f172a;
+  margin: 8px 0 10px;
+}
+
+.burs-ranking__currency small {
+  font-weight: 500;
+  color: #475569;
+  margin-left: 6px;
+}
+
+.burs-ranking__link {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  color: #b91c1c;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.burs-ranking__link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.burs-ranking__link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(185, 28, 28, 0.16);
+}
+
+.burs-ranking__extra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.burs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.burs-badge--donors {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.burs-badge--donors svg {
+  display: inline-block;
+}
+
+.burs-progress--ranking {
+  height: 12px;
+  background: #e2e8f0;
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06);
+}
+
+.burs-progress--ranking .burs-progress__inner {
+  background: linear-gradient(90deg, #16a34a 0%, #22c55e 50%, #84cc16 100%);
+}
+
+.burs-panel--departments .burs-panel__title .burs-icon {
+  background: linear-gradient(135deg, #6c5ce7, #7860ff);
+}
+
+.burs-departments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.burs-departments__item {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(249, 250, 251, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.burs-departments__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.burs-departments__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.burs-departments__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.burs-departments__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.burs-departments__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-weight: 700;
+}
+
+.burs-departments__amount {
+  font-weight: 700;
+  color: #0f766e;
+}
+
+.burs-progress--departments {
+  height: 10px;
+  background: #e2e8f0;
+}
+
+.burs-progress--departments .burs-progress__inner {
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+@media (max-width: 1100px) {
+  .burs-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .burs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .burs-hero {
+    padding: 40px 28px 48px;
+  }
+  .burs-hero__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .burs-hero__actions {
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    padding-top: 4px;
+  }
+  .burs-hero h1 {
+    font-size: 32px;
+    white-space: normal;
+  }
+  .burs-hero__sub {
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .burs-hero__chip--students {
+    font-size: 16px;
+  }
+  .burs-hero__chip--students span {
+    gap: 4px;
+  }
+  .burs-hero__chip--students span strong {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .burs-stats {
+    grid-template-columns: 1fr;
+  }
+  .burs-hero__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .burs-hero__actions {
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    padding-top: 4px;
+  }
+  .burs-ranking__item {
+    grid-template-columns: 52px 52px 1fr;
+  }
+  .burs-panel canvas {
+    height: 280px;
+  }
+}
+
+@media (max-width: 580px) {
+  .burs-hero h1 {
+    font-size: 28px;
+    white-space: normal;
+  }
+  .burs-hero__sub {
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .burs-hero__chip--students {
+    font-size: 15px;
+  }
+  .burs-hero__chip--students span strong {
+    font-size: 18px;
+  }
+  .burs-hero__totals {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .burs-ranking__item {
+    grid-template-columns: 48px 1fr;
+    grid-template-areas:
+      "order body"
+      "avatar body";
+    gap: 14px;
+  }
+  .burs-ranking__order {
+    grid-area: order;
+  }
+  .burs-ranking__avatar {
+    grid-area: avatar;
+  }
+  .burs-ranking__body {
+    grid-area: body;
+  }
+}
+
+/* Shared with the theme and Elementor shortcode widgets. */
+.burs-dashboard *,
+.burs-dashboard *::before,
+.burs-dashboard *::after { box-sizing: border-box; }
+.burs-dashboard a { text-decoration: none; }
+.burs-dashboard a:focus-visible,
+.bursmetre-link:focus-visible { outline: 3px solid #00529b; outline-offset: 4px; }
+.burs-dashboard .burs-panel,
+.burs-dashboard .burs-ranking__body { min-width: 0; }
+.burs-dashboard .burs-ranking__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.burs-dashboard .burs-ranking__header h3 { font-size: 18px; overflow-wrap: anywhere; }
+.burs-chart { position: relative; height: 360px; min-width: 0; }
+.burs-chart canvas { display: block; width: 100% !important; height: 100% !important; }
+.burs-stat p { overflow-wrap: anywhere; }
+.burs-dashboard--yurtdisi .burs-stat--info p { font-size: 20px; }
+.burs-dashboard--yurtdisi .burs-departments__badge { width: auto; min-width: 42px; padding: 4px 8px; margin-bottom: 10px; }
+.bursmetre-link { display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 999px; background: var(--odtu-blue, #00529b); color: #fff; font-weight: 700; text-decoration: none; }
+.elementor-widget-shortcode .burs-dashboard { width: 100%; }
+@media (max-width: 580px) {
+  .burs-dashboard { padding-top: 24px; }
+  .burs-hero { padding: 28px 20px 32px; border-radius: 18px; }
+  .burs-panel { padding: 20px 16px; }
+  .burs-panel h2 { font-size: 18px; }
+  .burs-breadcrumb { align-items: flex-start; flex-direction: column; }
+  .burs-ranking__item { padding: 16px 12px; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; }
+  .burs-ranking__order { width: 34px; height: 34px; border-radius: 10px; font-size: 15px; }
+  .burs-ranking__avatar { width: 34px; height: 34px; border-radius: 10px; }
+  .burs-ranking__top h3 { font-size: 16px; overflow-wrap: anywhere; }
+  .burs-ranking__amount { flex-wrap: wrap; }
+  .burs-hero__chip--students span { display: inline; }
+  .burs-departments__header, .burs-departments__top { flex-wrap: wrap; }
+  .burs-hero__chip--students { padding: 10px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .burs-dashboard *, .burs-dashboard *::before, .burs-dashboard *::after { animation: none !important; transition: none !important; }
+}
