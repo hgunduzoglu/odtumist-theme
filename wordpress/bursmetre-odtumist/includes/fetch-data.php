@@ -11,7 +11,7 @@ $kamp_gid = isset($options['kamp_gid']) ? $options['kamp_gid'] : '0';
 $goal_raw = isset($options['goal_amount']) ? $options['goal_amount'] : '';
 $goal = bursmetre_parse_amount($goal_raw);
 if ($goal <= 0) {
-    $goal = 8606250;
+    $goal = 16000000;
 }
 $yurtdisi_page_url = apply_filters('bursmetre_yurtdisi_page_url', bursmetre_get_dashboard_url('yurtdisi'));
 
@@ -184,7 +184,7 @@ $progress = ($goal > 0)
     ? min(100, round(($total_donation / $goal) * 100, 1))
     : 0;
 
-$students_per_burs = 38250;
+$students_per_burs = 49500;
 $burs_students_collected = ($students_per_burs > 0)
     ? round($total_donation / $students_per_burs)
     : 0;

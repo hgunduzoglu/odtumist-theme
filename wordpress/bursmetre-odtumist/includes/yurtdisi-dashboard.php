@@ -372,7 +372,7 @@ function bursmetre_render_yurtdisi_dashboard()
     $total_try = isset($data['total_try']) ? $data['total_try'] : 0.0;
     $progress = ($goal > 0) ? min(100, round(($total_try / $goal) * 100, 1)) : 0;
     $campaign_count = isset($data['campaigns']) ? count($data['campaigns']) : 0;
-    $students = $total_try > 0 ? max(0, (int) floor($total_try / 38250)) : 0;
+    $students = $total_try > 0 ? max(0, (int) floor($total_try / 49500)) : 0;
 
     $breakdown_tooltip = bursmetre_yurtdisi_format_breakdown_tooltip($data['currency_breakdown']);
     $chart_payload = isset($data['chart_payload']) ? wp_json_encode($data['chart_payload'], JSON_UNESCAPED_UNICODE) : '{}';
