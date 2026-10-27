@@ -1,0 +1,27 @@
+[Unit]
+Description=ODTUMIST Give Lively and TCMB collector
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/srv/odtumist/app/backend/src/collect.js
+
+[Service]
+Type=oneshot
+User=bursmetre
+Group=bursmetre
+WorkingDirectory=/srv/odtumist/app/backend
+EnvironmentFile=/etc/odtumist-bursmetre.env
+ExecStart=/usr/local/bin/node src/collect.js
+TimeoutStartSec=120
+TimeoutStopSec=10
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/odtumist-bursmetre
+MemoryHigh=768M
+MemoryMax=1G
+CPUQuota=75%
+TasksMax=256
+Nice=10
+IOSchedulingClass=idle
