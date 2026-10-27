@@ -2,7 +2,7 @@
 /*
 Plugin Name: Burs Metre Dashboard
 Description: Google Sheets verisiyle dinamik bursmetre panosu (progress, grafikler, sıralamalar). Shortcode: [bursmetre-dashboard].
-Version: 1.1.1
+Version: 1.1.2
 Author: Hüsamettin Gündüzoğlu
 Requires at least: 6.0
 Requires PHP: 7.4
