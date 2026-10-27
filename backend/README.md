@@ -15,6 +15,8 @@ WordPress'ten ayrı çalışan, Docker ve PM2 gerektirmeyen Node.js servisidir. 
 
 **Önemli kaynak kısıtı:** Give Lively, sunucunun hem HTTP hem de gerçek Chromium isteğine `403` erişim kontrolü döndürüyor. Tarayıcı kurulumu çalışıyor; canlı kampanyaların okunması henüz doğrulanamadı. Ayrıştırıcı sentetik HTML/JSON örnekleriyle test edildi. Erişim sağlandığında gerçek DOM ile ayrıca doğrulanmalıdır. Kod CAPTCHA çözmez, proxy/stealth kullanmaz veya erişim kontrolünü aşmaya çalışmaz. Kaynak engelliyken boş veriyi gerçek bağış tutarı gibi yayımlamaz.
 
+Xvfb üzerinde pencereli Chromium ile BTF'nin sitesinden kampanya bağlantısına tıklanarak da denendi. Son deneme `403 / DataDome` ve görünür CAPTCHA ekranıyla durdu. BTF'ye iletilebilecek hazır erişim talebi, gerekli veri alanları ve deneme ayrıntıları [BTF-DATA-ACCESS.md](docs/BTF-DATA-ACCESS.md) dosyasında.
+
 ## Kodun yapısı
 
 | Dosya | Görevi |
