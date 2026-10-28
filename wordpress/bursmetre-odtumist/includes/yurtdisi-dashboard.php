@@ -35,12 +35,6 @@ function bursmetre_render_yurtdisi_dashboard()
     $chart_payload = isset($data['chart_payload']) ? wp_json_encode($data['chart_payload'], JSON_UNESCAPED_UNICODE) : '{}';
     $error_message = isset($data['error']) ? $data['error'] : '';
 
-    $last_updated_raw = isset($data['last_updated']) ? $data['last_updated'] : '';
-    $timestamp = $last_updated_raw ? strtotime($last_updated_raw) : false;
-    $formatted_last_updated = $timestamp
-        ? wp_date('d F Y H:i', $timestamp)
-        : __('Bilinmiyor', 'bursmetre');
-
     $yurti_ci_url = apply_filters('bursmetre_dashboard_home_url', bursmetre_get_dashboard_url());
     $rank_list = isset($data['campaigns']) ? $data['campaigns'] : [];
 
@@ -51,14 +45,6 @@ function bursmetre_render_yurtdisi_dashboard()
             <a class="burs-breadcrumb__back" href="<?php echo esc_url($yurti_ci_url); ?>">
                 ← <?php esc_html_e('Yurt İçi Bursmetre', 'bursmetre'); ?>
             </a>
-            <span class="burs-breadcrumb__meta">
-                <?php
-                printf(
-                    esc_html__('Son güncelleme: %s', 'bursmetre'),
-                    esc_html($formatted_last_updated)
-                );
-                ?>
-            </span>
         </div>
 
         <?php if (!empty($error_message)) : ?>
@@ -116,9 +102,8 @@ function bursmetre_render_yurtdisi_dashboard()
             </div>
         </section>
 
-        <?php if (!empty($data['fx']['date'])) : ?>
+        <?php if (!empty($data['currency_breakdown'])) : ?>
             <p class="burs-fx-note">
-                <?php echo esc_html('TCMB döviz alış · ' . date_i18n('d.m.Y', strtotime($data['fx']['date'] . ' UTC'))); ?>
                 <?php foreach ($data['currency_breakdown'] as $entry) : ?>
                     <?php if ($entry['currency'] !== 'TRY') : ?>
                         <span><?php echo esc_html('1 ' . $entry['currency'] . ' = ' . number_format($data['fx']['rates'][$entry['currency']], 4, ',', '.') . ' TL'); ?></span>
@@ -149,8 +134,8 @@ function bursmetre_render_yurtdisi_dashboard()
                 <div class="burs-stat__icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3s1.34 3 3 3m-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5S5 6.34 5 8s1.34 3 3 3m0 2c-2.33 0-7 1.17-7 3.5V20h14v-3.5c0-2.33-4.67-3.5-7-3.5m8 0c-.29 0-.62.02-.97.05c1.16.84 1.97 1.97 1.97 3.45V20h6v-3.5c0-2.33-4.67-3.5-7-3.5"/></svg>
                 </div>
-                <h3><?php esc_html_e('Son Güncelleme', 'bursmetre'); ?></h3>
-                <p><?php echo esc_html($formatted_last_updated); ?></p>
+                <h3><?php esc_html_e('Toplam Hedef', 'bursmetre'); ?></h3>
+                <p><?php echo $goal > 0 ? esc_html(bursmetre_yurtdisi_format_try($goal)) : '—'; ?></p>
             </article>
         </section>
 

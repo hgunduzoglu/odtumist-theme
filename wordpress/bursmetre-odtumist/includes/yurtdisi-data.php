@@ -19,7 +19,8 @@ function bursmetre_yurtdisi_endpoint()
 function bursmetre_yurtdisi_cache_key($kind)
 {
     // A new source/schema must never reuse the old API's fixed-rate snapshots.
-    return 'bursmetre_yd_v2_' . $kind . '_' . md5(bursmetre_yurtdisi_endpoint());
+    $version = $kind === 'payload' ? '3' : '2';
+    return 'bursmetre_yd_v' . $version . '_' . $kind . '_' . md5(bursmetre_yurtdisi_endpoint());
 }
 
 function bursmetre_yurtdisi_empty_payload($error = '')
@@ -219,7 +220,7 @@ function bursmetre_yurtdisi_parse_tcmb($body)
 
 function bursmetre_yurtdisi_fetch_tcmb($force_refresh = false)
 {
-    $key = 'bursmetre_yd_tcmb_v1';
+    $key = 'bursmetre_yd_tcmb_v2';
     if (!$force_refresh && ($cached = get_transient($key)) !== false) {
         return $cached;
     }
@@ -230,7 +231,11 @@ function bursmetre_yurtdisi_fetch_tcmb($force_refresh = false)
         $result = bursmetre_yurtdisi_parse_tcmb(wp_remote_retrieve_body($response));
     }
     if (is_wp_error($result)) {
-        return bursmetre_yurtdisi_source_failure($result, $key, 'TCMB kuru');
+        // Keep USD campaigns available even on hosts that cannot reach TCMB.
+        // No bulletin date is assigned to the configured rate.
+        $result = ['rates' => ['TRY' => 1.0, 'USD' => 49.6997], 'date' => '', 'fetched_at' => time(), 'warning' => ''];
+        set_transient($key, $result, 5 * MINUTE_IN_SECONDS);
+        return $result;
     }
     set_transient($key, $result, HOUR_IN_SECONDS);
     update_option($key . '_last', $result, false);
@@ -306,10 +311,7 @@ function bursmetre_yurtdisi_build_payload($force_refresh = false)
         $total_try += $try;
         $goal_try += bursmetre_yurtdisi_convert_to_try($goals[$currency] / 100, $currency, $fx['rates']);
     }
-    $warnings = array_filter([$sheet['warning'], $fx['warning']]);
-    if (strtotime($fx['date'] . ' UTC') < time() - 7 * DAY_IN_SECONDS) {
-        $warnings[] = 'Kullanılan TCMB bülteni 7 günden eski. Kur tarihi aşağıda gösterilmiştir.';
-    }
+    $warnings = array_filter([$sheet['warning']]);
     return [
         'campaigns' => $campaigns, 'total_try' => round($total_try, 2), 'goal_try' => round($goal_try, 2),
         'currency_breakdown' => $breakdown, 'last_updated' => $sheet['lastUpdated'], 'fx' => $fx,

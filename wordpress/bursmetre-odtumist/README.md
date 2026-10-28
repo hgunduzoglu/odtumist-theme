@@ -1,6 +1,6 @@
 # ODTÜMİST Bursmetre — WordPress entegrasyonu
 
-1.2.0 sürümünde yurtdışı kampanyaları da Google Sheets'ten okunur. Bağışlar ve kampanya hedefleri, WordPress üzerinden alınan son yayımlanmış TCMB döviz alış kurlarıyla TL'ye çevrilir. Ayrı backend veya API anahtarı gerekmez. Yurt içi veri okuma ve sayfa içerikleri korunur.
+1.2.1 sürümünde yurtdışı kampanyaları Google Sheets'ten okunur. Bağışlar ve kampanya hedefleri WordPress üzerinden alınan TCMB döviz alış kurlarıyla TL'ye çevrilir. TCMB okunamazsa USD için 49.6997 kullanılır; kampanyaların gösterimi devam eder. Ayrı backend veya API anahtarı gerekmez. Yurt içi veri okuma ve sayfa içerikleri korunur.
 
 ## Kurulum
 
@@ -36,11 +36,11 @@ Her satır bir kampanyadır. İlk sütundaki sıra numarası dikkate alınmaz:
 
 ## TCMB kuru ve yenileme
 
-[TCMB today.xml](https://www.tcmb.gov.tr/kurlar/today.xml) içindeki `ForexBuying / Unit` kullanılır. Nakit alış veya satış kuru kullanılmaz. Hafta sonu ve tatillerde son yayımlanan bülten geçerlidir; kur tarihi ve kullanılan oran panoda görünür. Kur yoksa eski sabit oranlara dönülmez. Yıllık burs tutarı **49.500 TL** olarak korunur.
+[TCMB today.xml](https://www.tcmb.gov.tr/kurlar/today.xml) içindeki `ForexBuying / Unit` kullanılır. Hafta sonu ve tatillerde son yayımlanan bülten geçerlidir. TCMB isteği başarısızsa veya XML okunamazsa USD için **49.6997 TL** kullanılır; bu orana bülten tarihi atanmaz. Diğer para birimleri için bu USD oranı kullanılmaz. Panoda kullanılan oran gösterilir; son güncelleme, kur tarihi ve yedek kur uyarısı gösterilmez. Yıllık burs tutarı **49.500 TL** olarak korunur.
 
 Sheet ve pano 10 dakika, kur 1 saat önbelleğe alınır. WordPress zamanlayıcısı trafik geldikçe yaklaşık 15 dakikada bir yenilemeyi dener. Anında yenilemek için **Ayarlar → Burs Metre → Yurtdışı Verilerini ve Kuru Yenile** düğmesine basın. Sayfa/CDN önbelleği kullanılıyorsa ayrıca yurtdışı sayfasını temizleyin.
 
-Sheet veya TCMB geçici olarak okunamazsa son başarılı kayıt korunur ve uyarı gösterilir. Farklı Sheet'lerin ve eski API'nin önbellekleri karışmaz. “Son güncelleme” Sheet'in eklenti tarafından son başarılı okunma zamanıdır; elle yapılan düzenlemenin saati değildir. `bursmetre_yurtdisi_page_url` ve `bursmetre_dashboard_home_url` filtreleri korunur; eski JSON endpoint ve sabit kur filtreleri artık kullanılmaz.
+Sheet okunamazsa son başarılı Sheet kaydı korunur ve ilgili uyarı gösterilir. TCMB erişim hatası USD kampanyalarını engellemez; 5 dakika sonra kur yeniden denenebilir. Farklı Sheet'lerin ve eski API'nin önbellekleri karışmaz; 1.2.0 sürümündeki kur hatası içeren pano önbelleği kullanılmaz. `bursmetre_yurtdisi_page_url` ve `bursmetre_dashboard_home_url` filtreleri korunur; eski JSON endpoint ve sabit kur filtreleri artık kullanılmaz.
 
 ## Kısa kodlar
 

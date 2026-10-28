@@ -2,7 +2,7 @@
 /*
 Plugin Name: Burs Metre Dashboard
 Description: Google Sheets verisiyle dinamik bursmetre panosu (progress, grafikler, sıralamalar). Shortcode: [bursmetre-dashboard].
-Version: 1.2.0
+Version: 1.2.1
 Author: Hüsamettin Gündüzoğlu
 Requires at least: 6.0
 Requires PHP: 7.4
@@ -11,7 +11,7 @@ Text Domain: bursmetre
 
 if (!defined('ABSPATH')) exit;
 
-define('BURSMETRE_VERSION', '1.2.0');
+define('BURSMETRE_VERSION', '1.2.1');
 define('BURSMETRE_FILE', __FILE__);
 require_once plugin_dir_path(__FILE__) . 'includes/data-helpers.php';
 require_once plugin_dir_path(__FILE__) . 'includes/yurtdisi-dashboard.php';
@@ -77,7 +77,7 @@ function bursmetre_render_settings_page() {
     <div class="wrap">
       <h1>Burs Metre Ayarları</h1>
       <?php if (isset($_GET['yurtdisi_refreshed'])) : $refreshed = bursmetre_yurtdisi_get_data(); ?>
-        <div class="notice <?php echo empty($refreshed['error']) ? 'notice-success' : 'notice-warning'; ?>"><p><?php echo esc_html($refreshed['error'] ?: 'Yurtdışı kampanyaları ve TCMB kuru yenilendi.'); ?></p></div>
+        <div class="notice <?php echo empty($refreshed['error']) ? 'notice-success' : 'notice-warning'; ?>"><p><?php echo esc_html($refreshed['error'] ?: 'Yurtdışı verileri hazır.'); ?></p></div>
       <?php endif; ?>
       <p>Google Sheets tablolarınızı bağlantıya sahip kişilerin okuyabileceği şekilde paylaşın. Sheet ID ve GID alanları önceki sürümle aynı şekilde çalışır.</p>
       <?php settings_errors(); bursmetre_render_integration_status(); ?>

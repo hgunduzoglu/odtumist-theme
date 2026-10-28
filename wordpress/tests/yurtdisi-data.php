@@ -19,6 +19,8 @@ $requests = [];
 $sheet_body = '';
 $fx_body = '';
 $offline = false;
+$tcmb_offline = false;
+$fx_code = 200;
 function is_wp_error($value) { return $value instanceof WP_Error; }
 function get_option($key, $default = false) { global $options; return $options[$key] ?? $default; }
 function update_option($key, $value, $autoload = null) { global $options; $options[$key] = $value; }
@@ -28,10 +30,11 @@ function absint($value) { return abs((int) $value); }
 function wp_strip_all_tags($value) { return strip_tags($value); }
 function esc_url_raw($value, $protocols = []) { return preg_match('~^https?://~i', $value) ? $value : ''; }
 function wp_safe_remote_get($url, $args) {
-    global $requests, $sheet_body, $fx_body, $offline;
+    global $requests, $sheet_body, $fx_body, $offline, $tcmb_offline, $fx_code;
     $requests[] = $url;
-    if ($offline) return new WP_Error('offline', 'offline');
-    return ['body' => strpos($url, 'tcmb.gov.tr') !== false ? $fx_body : $sheet_body, 'response' => ['code' => 200]];
+    $is_tcmb = strpos($url, 'tcmb.gov.tr') !== false;
+    if ($offline || ($is_tcmb && $tcmb_offline)) return new WP_Error('offline', 'offline');
+    return ['body' => $is_tcmb ? $fx_body : $sheet_body, 'response' => ['code' => $is_tcmb ? $fx_code : 200]];
 }
 function wp_remote_retrieve_body($response) { return $response['body']; }
 function wp_remote_retrieve_response_code($response) { return $response['response']['code']; }
@@ -106,7 +109,8 @@ $html = bursmetre_render_yurtdisi_dashboard();
 check(strpos($html, 'data-progress="41.3"') !== false, 'Progress not based on campaign goal');
 check(strpos($html, '<img src="https://example.org/a.png"') !== false, 'Campaign image not rendered');
 check(strpos($html, 'Hedef: $10.000 USD') !== false, 'Campaign goal not rendered');
-check(strpos($html, 'TCMB döviz alış') !== false, 'Rate date/type not disclosed');
+check(strpos($html, '1 USD = 49,6997 TL') !== false, 'Applied conversion rate missing');
+check(stripos($html, 'Son Güncelleme') === false && strpos($html, date('d.m.Y')) === false, 'Update/date information still displayed');
 $offline = true;
 $stale = bursmetre_yurtdisi_get_data(true);
 check(near($stale['total_try'], $payload['total_try']) && $stale['error'] !== '', 'Failed sources lost last good totals / no warning');
@@ -126,6 +130,40 @@ check(is_wp_error($duplicate), 'Duplicate fundraiser double-counted');
 check(is_wp_error(bursmetre_yurtdisi_parse_sheet('<html>Sign in</html>')), 'Google sign-in page accepted');
 check(!is_wp_error(bursmetre_yurtdisi_parse_sheet(sheet_csv([]))), 'A valid empty sheet should be supported');
 
+// TCMB failure must not prevent fresh Sheet data from appearing on first use.
+$options = [];
+$transients = [];
+$sheet_body = sheet_csv([[1, 'USD campaign', '100', '1000', 'USD', 'https://example.org/usd', '']]);
+$tcmb_offline = true;
+$old_payload_key = 'bursmetre_yd_v2_payload_' . md5(bursmetre_yurtdisi_endpoint());
+$transients[$old_payload_key] = bursmetre_yurtdisi_empty_payload('TCMB döviz alış kurlarına ulaşılamadı.');
+$transients['bursmetre_yd_tcmb_v1'] = new WP_Error('old_error', 'old error');
+$fixed = bursmetre_yurtdisi_get_data();
+check(count($fixed['campaigns']) === 1 && near($fixed['total_try'], 4969.97), 'Cold start with TCMB offline hid Sheet data');
+check(near($fixed['goal_try'], 49699.70), 'Configured USD rate not applied to goals');
+check($fixed['error'] === '' && $fixed['fx']['date'] === '', 'Rate outage exposed warning / fabricated bulletin date');
+$fixed_html = bursmetre_render_yurtdisi_dashboard();
+check(strpos($fixed_html, 'burs-alert') === false && stripos($fixed_html, 'Son Güncelleme') === false, 'Outage notice / update label remains');
+$sheet_body = sheet_csv([[1, 'USD campaign', '200', '1000', 'USD', 'https://example.org/usd', '']]);
+$updated = bursmetre_yurtdisi_get_data(true);
+check(near($updated['total_try'], 9939.94), 'TCMB outage prevented newer Sheet amounts');
+$tcmb_offline = false;
+$fx_code = 503;
+check(bursmetre_yurtdisi_get_data(true)['error'] === '', 'TCMB HTTP failure prevented USD conversion');
+$fx_code = 200;
+$fx_body = '<html>unavailable</html>';
+check(bursmetre_yurtdisi_get_data(true)['error'] === '', 'Invalid TCMB XML prevented USD conversion');
+$fx_body = str_replace('49.6997', '50.0000', tcmb_xml());
+$recovered = bursmetre_yurtdisi_get_data(true);
+check(near($recovered['total_try'], 10000), 'Fresh TCMB rate was not restored after recovery');
+$options = [];
+$transients = [];
+$tcmb_offline = true;
+$sheet_body = sheet_csv([[1, 'JPY campaign', '100', '1000', 'JPY', '', '']]);
+$unsupported = bursmetre_yurtdisi_get_data(true);
+check($unsupported['campaigns'] === [] && $unsupported['error'] !== '', 'USD-only configured rate applied to another currency');
+$tcmb_offline = false;
+
 // Optional real provider snapshots downloaded separately, never bundled in ZIP.
 if (!empty($argv[1])) {
     $options = [];
@@ -141,5 +179,12 @@ if (!empty($argv[1])) {
     check(near($live['goal_try'], 3142263.53), 'Real source goal total');
     file_put_contents($argv[1] . '/rendered.html', bursmetre_render_yurtdisi_dashboard());
     echo json_encode(['campaigns' => count($live['campaigns']), 'total_try' => $live['total_try'], 'goal_try' => $live['goal_try'], 'fx_date' => $live['fx']['date']], JSON_UNESCAPED_UNICODE) . PHP_EOL;
+    $options = [];
+    $transients = [];
+    $tcmb_offline = true;
+    $outage_live = bursmetre_yurtdisi_get_data(true);
+    check(count($outage_live['campaigns']) === 15 && near($outage_live['total_try'], 759461.12), 'Real Sheet campaigns unavailable during TCMB outage');
+    check($outage_live['error'] === '', 'Real Sheet outage notice not suppressed');
+    file_put_contents($argv[1] . '/rendered-fallback.html', bursmetre_render_yurtdisi_dashboard());
 }
 echo $checks . ' checks passed.' . PHP_EOL;
