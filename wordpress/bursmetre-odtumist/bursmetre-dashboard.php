@@ -2,7 +2,7 @@
 /*
 Plugin Name: Burs Metre Dashboard
 Description: Google Sheets verisiyle dinamik bursmetre panosu (progress, grafikler, sıralamalar). Shortcode: [bursmetre-dashboard].
-Version: 1.1.2
+Version: 1.2.0
 Author: Hüsamettin Gündüzoğlu
 Requires at least: 6.0
 Requires PHP: 7.4
@@ -11,7 +11,7 @@ Text Domain: bursmetre
 
 if (!defined('ABSPATH')) exit;
 
-define('BURSMETRE_VERSION', '1.1.1');
+define('BURSMETRE_VERSION', '1.2.0');
 define('BURSMETRE_FILE', __FILE__);
 require_once plugin_dir_path(__FILE__) . 'includes/data-helpers.php';
 require_once plugin_dir_path(__FILE__) . 'includes/yurtdisi-dashboard.php';
@@ -27,8 +27,9 @@ function bursmetre_register_settings() {
     add_settings_field('kamp_sheet_id', 'Kampanyalar Sheet ID', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'kamp_sheet_id']);
     add_settings_field('kamp_gid', 'Kampanyalar GID (varsayılan 0)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'kamp_gid']);
     add_settings_field('goal_amount', 'Genel Hedef Tutarı (₺)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'goal_amount']);
-    add_settings_field('yurtdisi_goal_amount', 'Yurtdışı Hedef Tutarı (₺)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'yurtdisi_goal_amount']);
-    add_settings_field('yurtdisi_endpoint', 'Yurtdışı Veri Adresi (JSON API)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'yurtdisi_endpoint']);
+    add_settings_field('yurtdisi_sheet_id', 'Yurtdışı Kampanyalar Sheet ID', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'yurtdisi_sheet_id']);
+    add_settings_field('yurtdisi_gid', 'Yurtdışı GID (varsayılan 0)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'yurtdisi_gid']);
+    add_settings_field('yurtdisi_goal_amount', 'Yurtdışı Yedek Hedef Tutarı (₺)', 'bursmetre_field_callback', 'bursmetre_settings', 'bursmetre_main_section', ['key'=>'yurtdisi_goal_amount']);
     add_settings_section('bursmetre_pages_section', 'Maraton Sayfası Entegrasyonu', '__return_false', 'bursmetre_settings');
     add_settings_field('marathon_page_id', 'Maraton Üst Sayfası', 'bursmetre_parent_field', 'bursmetre_settings', 'bursmetre_pages_section');
 }
@@ -37,11 +38,13 @@ add_action('admin_init', 'bursmetre_register_settings');
 function bursmetre_field_callback($args) {
     $options = get_option('bursmetre_options', []);
     $key = $args['key'];
-    $val = isset($options[$key]) ? esc_attr($options[$key]) : '';
-    $type = $key === 'yurtdisi_endpoint' ? 'url' : 'text';
-    echo '<input type="' . esc_attr($type) . '" class="regular-text" name="bursmetre_options[' . esc_attr($key) . ']" value="' . $val . '" />';
-    if ($key === 'yurtdisi_endpoint') {
-        echo '<p class="description">Boş bırakılırsa mevcut kaynak kullanılır: <code>https://odtuluyuz.antpooleuropa.com/api/yurtdisi</code>. Kampanyalar sayfası yerine aynı JSON biçimini döndüren API adresini girin.</p>';
+    $defaults = ['yurtdisi_sheet_id' => bursmetre_yurtdisi_default_sheet_id(), 'yurtdisi_gid' => '0'];
+    $val = !empty($options[$key]) ? $options[$key] : ($defaults[$key] ?? '');
+    echo '<input type="text" class="regular-text" name="bursmetre_options[' . esc_attr($key) . ']" value="' . esc_attr($val) . '" />';
+    if ($key === 'yurtdisi_sheet_id') {
+        echo '<p class="description">Kampanya Adı, Toplanan, Hedef, Para Birimi, Link ve Resim URL sütunları okunur. Gönderdiğiniz yurtdışı tablosu varsayılan olarak tanımlıdır.</p>';
+    } elseif ($key === 'yurtdisi_goal_amount') {
+        echo '<p class="description">Öncelikle Sheet’teki kampanya hedeflerinin TL karşılığı toplanır. Hiç hedef girilmemişse bu tutar kullanılır. Dövizler son yayımlanan TCMB döviz alış kuruyla çevrilir.</p>';
     }
 }
 
@@ -51,12 +54,15 @@ function bursmetre_sanitize_options($input) {
     foreach (['burs_sheet_id', 'kamp_sheet_id', 'goal_amount', 'yurtdisi_goal_amount'] as $key) {
         $clean[$key] = isset($input[$key]) && is_scalar($input[$key]) ? sanitize_text_field($input[$key]) : '';
     }
-    foreach (['burs_gid', 'kamp_gid'] as $key) {
+    $sheet_id = isset($input['yurtdisi_sheet_id']) && is_scalar($input['yurtdisi_sheet_id']) ? trim((string) $input['yurtdisi_sheet_id']) : '';
+    if (preg_match('~/spreadsheets/d/([A-Za-z0-9_-]+)~', $sheet_id, $match)) {
+        $sheet_id = $match[1];
+    }
+    $clean['yurtdisi_sheet_id'] = preg_match('/^[A-Za-z0-9_-]+$/D', $sheet_id) ? $sheet_id : bursmetre_yurtdisi_default_sheet_id();
+    foreach (['burs_gid', 'kamp_gid', 'yurtdisi_gid'] as $key) {
         $clean[$key] = isset($input[$key]) && is_scalar($input[$key]) ? (string) absint($input[$key]) : '0';
     }
     $clean['marathon_page_id'] = isset($input['marathon_page_id']) ? absint($input['marathon_page_id']) : 0;
-    $clean['yurtdisi_endpoint'] = isset($input['yurtdisi_endpoint']) && is_string($input['yurtdisi_endpoint'])
-        ? esc_url_raw($input['yurtdisi_endpoint'], ['http', 'https']) : '';
     return $clean;
 }
 
@@ -70,6 +76,9 @@ function bursmetre_render_settings_page() {
     ?>
     <div class="wrap">
       <h1>Burs Metre Ayarları</h1>
+      <?php if (isset($_GET['yurtdisi_refreshed'])) : $refreshed = bursmetre_yurtdisi_get_data(); ?>
+        <div class="notice <?php echo empty($refreshed['error']) ? 'notice-success' : 'notice-warning'; ?>"><p><?php echo esc_html($refreshed['error'] ?: 'Yurtdışı kampanyaları ve TCMB kuru yenilendi.'); ?></p></div>
+      <?php endif; ?>
       <p>Google Sheets tablolarınızı bağlantıya sahip kişilerin okuyabileceği şekilde paylaşın. Sheet ID ve GID alanları önceki sürümle aynı şekilde çalışır.</p>
       <?php settings_errors(); bursmetre_render_integration_status(); ?>
       <form method="post" action="options.php">
@@ -87,6 +96,12 @@ function bursmetre_render_settings_page() {
         <input type="hidden" name="action" value="bursmetre_setup_pages" />
         <?php submit_button('Bursmetre Sayfalarını Kur / Bağlantıları Güncelle', 'secondary'); ?>
         <p class="description">Seçili maraton sayfasının altında Bursmetre ve Yurtdışı sayfalarını oluşturur. Var olan sayfa içerikleri korunur. Üst sayfayı değiştirdiyseniz önce ayarları kaydedin.</p>
+      </form>
+      <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+        <?php wp_nonce_field('bursmetre_refresh_yurtdisi'); ?>
+        <input type="hidden" name="action" value="bursmetre_refresh_yurtdisi" />
+        <?php submit_button('Yurtdışı Verilerini ve Kuru Yenile', 'secondary'); ?>
+        <p class="description">Sheet’i düzenledikten sonra önbelleği beklemeden günceller. Sheet ID/GID değiştirdiyseniz önce ayarları kaydedin.</p>
       </form>
     </div>
     <?php
@@ -140,10 +155,10 @@ function bursmetre_button_shortcode($atts = []) {
 add_shortcode('bursmetre_button', 'bursmetre_button_shortcode');
 
 function bursmetre_register_cron_schedules($schedules) {
-    if (!isset($schedules['bursmetre_3_hours'])) {
-        $schedules['bursmetre_3_hours'] = [
-            'interval' => 3 * HOUR_IN_SECONDS,
-            'display'  => __('Her 3 saatte bir', 'bursmetre'),
+    if (!isset($schedules['bursmetre_15_minutes'])) {
+        $schedules['bursmetre_15_minutes'] = [
+            'interval' => 15 * MINUTE_IN_SECONDS,
+            'display'  => __('Her 15 dakikada bir', 'bursmetre'),
         ];
     }
     return $schedules;
@@ -151,8 +166,11 @@ function bursmetre_register_cron_schedules($schedules) {
 add_filter('cron_schedules', 'bursmetre_register_cron_schedules');
 
 function bursmetre_schedule_yurtdisi_event() {
+    if (wp_next_scheduled('bursmetre_refresh_yurtdisi_data') && wp_get_schedule('bursmetre_refresh_yurtdisi_data') !== 'bursmetre_15_minutes') {
+        wp_clear_scheduled_hook('bursmetre_refresh_yurtdisi_data');
+    }
     if (!wp_next_scheduled('bursmetre_refresh_yurtdisi_data')) {
-        wp_schedule_event(time() + MINUTE_IN_SECONDS, 'bursmetre_3_hours', 'bursmetre_refresh_yurtdisi_data');
+        wp_schedule_event(time() + MINUTE_IN_SECONDS, 'bursmetre_15_minutes', 'bursmetre_refresh_yurtdisi_data');
     }
 }
 add_action('init', 'bursmetre_schedule_yurtdisi_event');
@@ -162,6 +180,17 @@ function bursmetre_refresh_yurtdisi_data_callback() {
     bursmetre_yurtdisi_get_data(true);
 }
 add_action('bursmetre_refresh_yurtdisi_data', 'bursmetre_refresh_yurtdisi_data_callback');
+
+function bursmetre_refresh_yurtdisi_admin() {
+    if (!current_user_can('manage_options')) {
+        wp_die('Bu işlem için yetkiniz yok.');
+    }
+    check_admin_referer('bursmetre_refresh_yurtdisi');
+    bursmetre_yurtdisi_get_data(true);
+    wp_safe_redirect(admin_url('options-general.php?page=bursmetre_settings&yurtdisi_refreshed=1'));
+    exit;
+}
+add_action('admin_post_bursmetre_refresh_yurtdisi', 'bursmetre_refresh_yurtdisi_admin');
 
 function bursmetre_clear_yurtdisi_schedule() {
     $timestamp = wp_next_scheduled('bursmetre_refresh_yurtdisi_data');

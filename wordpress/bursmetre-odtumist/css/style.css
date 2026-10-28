@@ -496,6 +496,13 @@
   display: block;
 }
 
+.burs-dashboard--yurtdisi .burs-ranking__avatar { position: relative; }
+.burs-dashboard--yurtdisi .burs-ranking__avatar img { position: absolute; inset: 0; object-fit: contain; background: #fff; }
+.burs-dashboard--yurtdisi .burs-ranking__avatar img[hidden] { display: none; }
+.burs-dashboard--yurtdisi .burs-ranking__goal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin: 0; color: #475569; font-size: 13px; }
+.burs-dashboard--yurtdisi .burs-ranking__goal strong { color: #064e3b; }
+.burs-fx-note { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: -10px 0 24px; color: #475569; font-size: 13px; }
+
 .burs-ranking__body {
   display: flex;
   flex-direction: column;

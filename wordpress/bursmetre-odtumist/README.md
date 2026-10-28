@@ -1,6 +1,6 @@
 # ODTÜMİST Bursmetre — WordPress entegrasyonu
 
-Google Sheets CSV okuma, sütun eşleştirme, toplamlar, sıralamalar, yurtdışı JSON verisini işleme ve önbellek süreleri önceki sürümle aynıdır. Sheet ID/GID ayarları ve eski kısa kodlar korunur.
+1.2.0 sürümünde yurtdışı kampanyaları da Google Sheets'ten okunur. Bağışlar ve kampanya hedefleri, WordPress üzerinden alınan son yayımlanmış TCMB döviz alış kurlarıyla TL'ye çevrilir. Ayrı backend veya API anahtarı gerekmez. Yurt içi veri okuma ve sayfa içerikleri korunur.
 
 ## Kurulum
 
@@ -16,23 +16,31 @@ Maraton sayfasındaki metninde **Bursmetre** veya **Burs Metre** geçen mevcut b
 
 Kurulum mevcut maraton içeriğini ve menüleri yeniden oluşturmaz. Kendi oluşturduğu iki sayfayı tekrar üretmez; bu sayfalarda sonradan yaptığınız düzenlemeleri korur. Hedef adreste başka bir sayfa varsa içeriği değiştirmeden durur ve ayarlar ekranında uyarı verir. Üst sayfayı değiştirdikten sonra kurulum düğmesine basılması, eklentinin oluşturduğu sayfaları yeni üst sayfanın altına taşır.
 
-## Yurtdışı kaynak adresi
+## Yurtdışı Google Sheets ve hedefler
 
-**Yurtdışı Veri Adresi (JSON API)** alanı boşsa önceki kaynak kullanılır:
-`https://odtuluyuz.antpooleuropa.com/api/yurtdisi`
+Varsayılan tablo, gönderilen [yurtdışı kampanyalar Sheet'i](https://docs.google.com/spreadsheets/d/1kj26qQyLsYr2gdaRdx7jf2g7FiGNQITULjPoP6_atcU/edit?gid=0) ve `GID=0` olarak tanımlıdır. ZIP'i mevcut eklentinin üzerine yüklemek yeterlidir. Değiştirmek için **Ayarlar → Burs Metre → Yurtdışı Kampanyalar Sheet ID / Yurtdışı GID** alanlarını kullanın. Eski JSON API adresi artık kullanılmaz.
 
-Adres değiştiyse aynı veri yapısını döndüren yeni API adresini bu alana girin. Beklenen yapı değişmedi:
+Her satır bir kampanyadır. İlk sütundaki sıra numarası dikkate alınmaz:
 
-```json
-{
-  "lastUpdated": "2026-10-22T09:00:00Z",
-  "campaigns": [
-    {"ad": "Kampanya adı", "url": "https://example.org/kampanya", "raised": 100, "currency": "USD"}
-  ]
-}
-```
+| Kampanya Adı | Toplanan | Hedef | Para Birimi | Link | Resim URL |
+|---|---:|---:|---|---|---|
+| Örnek kampanya | 1250,50 | 10000 | USD | https://example.org/kampanya | https://example.org/resim.png |
 
-Mevcut `bursmetre_yurtdisi_endpoint`, `bursmetre_yurtdisi_rates`, `bursmetre_yurtdisi_page_url` ve `bursmetre_dashboard_home_url` filtreleri çalışmaya devam eder. Öğrenci bursu hesabı ve mevcut döviz dönüşüm oranları değiştirilmedi.
+- **Kampanya Adı** ve **Toplanan** zorunludur. Henüz bağış yoksa `0` yazın. Hatalı tutarlar sessizce sıfır kabul edilmez.
+- **Hedef** aynı satırdaki para birimindedir. Kartta hedef tutarı ve gerçekleşme yüzdesi gösterilir. Boş bırakılabilir.
+- Üst panonun hedefi kampanya hedeflerinin TL karşılıklarının toplamıdır. Hiçbir hedef girilmemişse ayarlardaki **Yurtdışı Yedek Hedef Tutarı (₺)** kullanılır.
+- Boş para birimi USD sayılır. TCMB'nin kur yayımlamadığı bir kod TL gibi değerlendirilmez; uyarı ve varsa son başarılı veri gösterilir.
+- **Link** ve **Resim URL** hücrelerine doğrudan adres yazın. `IMAGE()` formülü gerekmiyor. Resim boşsa veya yüklenemezse adın ilk harfleri gösterilir.
+- `1.250,50`, `1,250.50`, `1250,50` ve `1250.50` tutarları desteklenir. Negatif/bozuk tutarlar ve tekrar eden kampanya bağlantıları uyarı verir.
+- Genel toplamı kampanya satırı olarak eklemeyin. Adı `Toplam`, `Genel Toplam`, `Total` veya `Grand Total` olan özet satırlar tekrar sayılmamak için atlanır. Doğrudan takıma yapılan ve kampanyalara dahil olmayan bağışlar için ayrı bir satır kullanılabilir.
+
+## TCMB kuru ve yenileme
+
+[TCMB today.xml](https://www.tcmb.gov.tr/kurlar/today.xml) içindeki `ForexBuying / Unit` kullanılır. Nakit alış veya satış kuru kullanılmaz. Hafta sonu ve tatillerde son yayımlanan bülten geçerlidir; kur tarihi ve kullanılan oran panoda görünür. Kur yoksa eski sabit oranlara dönülmez. Yıllık burs tutarı **49.500 TL** olarak korunur.
+
+Sheet ve pano 10 dakika, kur 1 saat önbelleğe alınır. WordPress zamanlayıcısı trafik geldikçe yaklaşık 15 dakikada bir yenilemeyi dener. Anında yenilemek için **Ayarlar → Burs Metre → Yurtdışı Verilerini ve Kuru Yenile** düğmesine basın. Sayfa/CDN önbelleği kullanılıyorsa ayrıca yurtdışı sayfasını temizleyin.
+
+Sheet veya TCMB geçici olarak okunamazsa son başarılı kayıt korunur ve uyarı gösterilir. Farklı Sheet'lerin ve eski API'nin önbellekleri karışmaz. “Son güncelleme” Sheet'in eklenti tarafından son başarılı okunma zamanıdır; elle yapılan düzenlemenin saati değildir. `bursmetre_yurtdisi_page_url` ve `bursmetre_dashboard_home_url` filtreleri korunur; eski JSON endpoint ve sabit kur filtreleri artık kullanılmaz.
 
 ## Kısa kodlar
 
@@ -47,11 +55,10 @@ Eski `/maraton/bursmetre/` ve `/maraton/bursmetre/yurtdisi/` adresleri, hedef sa
 
 ## Yerel doğrulama
 
-PHP 7.4+ ve WordPress 6.0+ gerekir. Testler sadece geçici bir WordPress kurulumunda çalıştırılmalıdır:
+PHP 7.4+, SimpleXML ve WordPress 6.0+ gerekir. Veri işleme, hesaplama, hata/önbellek ve HTML çıktısı regresyon kontrolleri WordPress veritabanına dokunmadan PHP CLI ile çalışır:
 
-1. Geçici kurulumun `wp-config.php` dosyasına `define('BURSMETRE_TEST_MODE', true);` ekleyin.
-2. Eklentiyi bu kurulumun `wp-content/plugins/bursmetre-odtumist` klasörüne kopyalayın.
-3. `tests/fixtures.php` dosyasını geçici kurulumun `wp-content/mu-plugins` klasörüne kopyalayın. Bu dosya yalnızca örnek veriler sağlar; canlıya yüklenmez.
-4. `BURSMETRE_WP_ROOT` ortam değişkenini geçici WordPress klasörüne ayarlayıp `php tests/wordpress-integration.php` çalıştırın.
+```bash
+php wordpress/tests/yurtdisi-data.php
+```
 
-Testler sayfa hiyerarşisini, tekrar kurulumu, içerik korumayı, hedef adres çakışmalarını, Elementor bağlantısını, koşullu dosya yüklemeyi, birden fazla panoyu ve örnek verilerle önceki hesaplamaları kontrol eder. Kurulum ZIP'i testleri, `.git` klasörünü ve `.bak` dosyalarını içermez.
+Testler WordPress fonksiyonlarının sınırlı test karşılıklarını kullanır; gerçek hosting, HTTP API, zamanlayıcı ve tema/Elementor entegrasyonu ayrıca sitede denenmelidir. Kurulum ZIP'i testleri veya geçici kaynak verilerini içermez.

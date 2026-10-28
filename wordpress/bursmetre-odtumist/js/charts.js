@@ -7,6 +7,14 @@
 
   function initialize(scope) {
     const root = scope && scope.querySelectorAll ? scope : document;
+    root.querySelectorAll('[data-burs-avatar] img').forEach((img) => {
+      if (img.dataset.bursFallbackReady) return;
+      img.dataset.bursFallbackReady = '1';
+      const fallback = () => { img.hidden = true; };
+      img.addEventListener('load', () => { img.hidden = false; });
+      img.addEventListener('error', fallback, { once: true });
+      if (img.complete && img.currentSrc && img.naturalWidth === 0) fallback();
+    });
     root.querySelectorAll(".burs-progress__inner[data-progress]").forEach((bar) => {
       const value = Number.parseFloat(bar.dataset.progress || "0");
       requestAnimationFrame(() => {

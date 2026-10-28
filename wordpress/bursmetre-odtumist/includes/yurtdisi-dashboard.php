@@ -3,350 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function bursmetre_yurtdisi_endpoint()
-{
-    $options = get_option('bursmetre_options', []);
-    $default = !empty($options['yurtdisi_endpoint']) ? $options['yurtdisi_endpoint'] : 'https://odtuluyuz.antpooleuropa.com/api/yurtdisi';
-    return apply_filters('bursmetre_yurtdisi_endpoint', $default);
-}
-
-function bursmetre_yurtdisi_empty_payload($error = '')
-{
-    return [
-        'campaigns'          => [],
-        'total_try'          => 0.0,
-        'currency_breakdown' => [],
-        'last_updated'       => '',
-        'chart_payload'      => ['labels' => [], 'values' => [], 'colors' => [], 'originals' => []],
-        'max_amount'         => 0.0,
-        'error'              => $error,
-        'fetched_at'         => time(),
-    ];
-}
-
-function bursmetre_yurtdisi_currency_rates()
-{
-    $rates = [
-        'USD' => 42.0,
-        'EUR' => 49.0,
-        'CAD' => 30.0,
-        'CHF' => 53.0,
-        'GBP' => 55.0,
-        'TRY' => 1.0,
-    ];
-
-    return apply_filters('bursmetre_yurtdisi_rates', $rates);
-}
-
-function bursmetre_yurtdisi_parse_amount($value)
-{
-    if (is_numeric($value)) {
-        return (float) $value;
-    }
-
-    $value = (string) $value;
-    $value = str_replace(["\u{00A0}", ' '], '', $value);
-    $value = preg_replace('/[^\d,.\-]/', '', $value);
-
-    $comma_count = substr_count($value, ',');
-    $dot_count = substr_count($value, '.');
-
-    if ($comma_count > 0 && $dot_count > 0) {
-        $value = str_replace('.', '', $value);
-        $value = str_replace(',', '.', $value);
-    } elseif ($comma_count > 0) {
-        $value = str_replace(',', '.', $value);
-    } elseif ($dot_count > 1) {
-        $value = str_replace('.', '', $value);
-    }
-
-    $value = trim($value);
-    if ($value === '' || $value === '.') {
-        return 0.0;
-    }
-
-    return (float) $value;
-}
-
-function bursmetre_yurtdisi_convert_to_try($amount, $currency, $rates = null)
-{
-    if ($rates === null) {
-        $rates = bursmetre_yurtdisi_currency_rates();
-    }
-
-    $currency = strtoupper($currency ?: 'TRY');
-    if (!isset($rates[$currency])) {
-        return (float) $amount;
-    }
-
-    return (float) $amount * (float) $rates[$currency];
-}
-
-function bursmetre_yurtdisi_format_try($amount)
-{
-    return '₺' . number_format((float) $amount, 0, ',', '.');
-}
-
-function bursmetre_yurtdisi_format_original($amount, $currency)
-{
-    $currency = strtoupper($currency ?: 'USD');
-    $symbol_map = [
-        'USD' => '$',
-        'EUR' => '€',
-        'GBP' => '£',
-        'CAD' => '$',
-        'TRY' => '₺',
-    ];
-
-    $symbol = isset($symbol_map[$currency]) ? $symbol_map[$currency] : '';
-    return sprintf('%s%s %s', $symbol, number_format((float) $amount, 0, ',', '.'), $currency);
-}
-
-function bursmetre_yurtdisi_slug($value)
-{
-    if ($value === null) {
-        return '';
-    }
-
-    $value = (string) $value;
-    $value = trim($value);
-    if ($value === '') {
-        return '';
-    }
-
-    $map = [
-        'Ş' => 'S', 'ş' => 's',
-        'Ü' => 'U', 'ü' => 'u',
-        'İ' => 'I', 'ı' => 'i',
-        'Ö' => 'O', 'ö' => 'o',
-        'Ç' => 'C', 'ç' => 'c',
-        'Ğ' => 'G', 'ğ' => 'g',
-    ];
-    $value = strtr($value, $map);
-    $value = strtolower($value);
-    $value = preg_replace('/[^a-z0-9]+/', '', $value);
-
-    return $value ?: '';
-}
-
-function bursmetre_yurtdisi_find_column($headers, array $needles)
-{
-    $needle_slugs = array_filter(array_map('bursmetre_yurtdisi_slug', $needles));
-
-    foreach ($headers as $header) {
-        $header_slug = bursmetre_yurtdisi_slug($header);
-        if ($header_slug === '') {
-            continue;
-        }
-        foreach ($needle_slugs as $needle) {
-            if ($needle !== '' && strpos($header_slug, $needle) !== false) {
-                return $header;
-            }
-        }
-    }
-
-    return null;
-}
-
-function bursmetre_yurtdisi_get_value($row, $headers, $header)
-{
-    if ($header === null) {
-        return '';
-    }
-
-    $index = array_search($header, $headers, true);
-    if ($index === false || !isset($row[$index])) {
-        return '';
-    }
-
-    return trim($row[$index]);
-}
-
-function bursmetre_yurtdisi_fetch_remote()
-{
-    $url = bursmetre_yurtdisi_endpoint();
-    $cache_key = 'bursmetre_yurtdisi_remote_' . md5($url);
-    $cached = get_transient($cache_key);
-    if ($cached !== false) {
-        return $cached;
-    }
-
-    $response = wp_remote_get($url, [
-        'timeout' => 20,
-        'headers' => [
-            'Accept' => 'application/json',
-            'User-Agent' => 'BursMetre/1.0 ' . home_url('/'),
-        ],
-    ]);
-
-    if (is_wp_error($response)) {
-        return $response;
-    }
-
-    $code = wp_remote_retrieve_response_code($response);
-    if ($code >= 400) {
-        return new WP_Error('bursmetre_yurtdisi_http_error', sprintf('Remote request failed (%d)', $code));
-    }
-
-    $body = wp_remote_retrieve_body($response);
-    $json = json_decode($body, true);
-    if (!is_array($json) || !isset($json['campaigns'])) {
-        return new WP_Error('bursmetre_yurtdisi_invalid_json', 'Remote payload is invalid.');
-    }
-
-    set_transient($cache_key, $json, HOUR_IN_SECONDS);
-    return $json;
-}
-
-function bursmetre_yurtdisi_normalize_currency($currency_raw)
-{
-    $currency_raw = strtoupper(trim((string) $currency_raw));
-    if ($currency_raw === '') {
-        return 'USD';
-    }
-
-    foreach (['CAD', 'EUR', 'GBP', 'TRY', 'USD'] as $code) {
-        if (strpos($currency_raw, $code) !== false) {
-            return $code;
-        }
-    }
-
-    if (preg_match('/([A-Z]{3})/', $currency_raw, $match)) {
-        return $match[1];
-    }
-
-    return 'USD';
-}
-
-function bursmetre_yurtdisi_prepare_chart($campaigns)
-{
-    $top = array_slice($campaigns, 0, 10);
-    $palette = ['#ffcd56', '#ff6384', '#36a2eb', '#4bc0c0', '#9966ff', '#ff9f40', '#c9cbcf', '#ff6f91', '#845ef7', '#51cf66'];
-
-    $labels = [];
-    $values = [];
-    $colors = [];
-    $originals = [];
-
-    foreach ($top as $index => $campaign) {
-        $labels[] = $campaign['name'];
-        $values[] = $campaign['amount_try'];
-        $colors[] = $palette[$index % count($palette)];
-        $originals[] = $campaign['amount_original_formatted'];
-    }
-
-    return [
-        'labels'    => $labels,
-        'values'    => $values,
-        'colors'    => $colors,
-        'originals' => $originals,
-    ];
-}
-
-function bursmetre_yurtdisi_build_payload()
-{
-    $remote = bursmetre_yurtdisi_fetch_remote();
-    if (is_wp_error($remote)) {
-        return $remote;
-    }
-
-    $rows = isset($remote['campaigns']) && is_array($remote['campaigns']) ? $remote['campaigns'] : [];
-    $rates = bursmetre_yurtdisi_currency_rates();
-    $campaigns = [];
-    $currency_totals = [];
-    $total_try = 0.0;
-
-    foreach ($rows as $row) {
-        $name = isset($row['ad']) ? trim(wp_strip_all_tags($row['ad'])) : '';
-        $url  = isset($row['url']) ? esc_url_raw($row['url']) : '';
-        if ($name === '' || $url === '') {
-            continue;
-        }
-
-        $amount_original = isset($row['raised']) ? (float) $row['raised'] : 0.0;
-        $currency_raw = isset($row['currency']) ? $row['currency'] : 'USD';
-        $currency = bursmetre_yurtdisi_normalize_currency($currency_raw);
-        $amount_try = bursmetre_yurtdisi_convert_to_try($amount_original, $currency, $rates);
-
-        $campaigns[] = [
-            'name'                     => $name,
-            'url'                      => $url,
-            'currency'                 => $currency,
-            'amount_original'          => $amount_original,
-            'amount_try'               => $amount_try,
-            'amount_original_formatted'=> bursmetre_yurtdisi_format_original($amount_original, $currency),
-        ];
-
-        if (!isset($currency_totals[$currency])) {
-            $currency_totals[$currency] = 0.0;
-        }
-        $currency_totals[$currency] += $amount_original;
-        $total_try += $amount_try;
-    }
-
-    if (empty($campaigns)) {
-        return new WP_Error('bursmetre_yurtdisi_no_campaigns', 'Geçerli bir kampanya kaydı bulunamadı.');
-    }
-
-    usort($campaigns, function ($a, $b) {
-        return $b['amount_try'] <=> $a['amount_try'];
-    });
-
-    $currency_breakdown = [];
-    foreach ($currency_totals as $currency => $amount) {
-        $try_value = bursmetre_yurtdisi_convert_to_try($amount, $currency, $rates);
-        $currency_breakdown[] = [
-            'currency'  => $currency,
-            'amount'    => $amount,
-            'amount_try'=> $try_value,
-            'formatted' => bursmetre_yurtdisi_format_original($amount, $currency),
-        ];
-    }
-
-    usort($currency_breakdown, function ($a, $b) {
-        return $b['amount_try'] <=> $a['amount_try'];
-    });
-
-    return [
-        'campaigns'          => $campaigns,
-        'total_try'          => $total_try,
-        'currency_breakdown' => $currency_breakdown,
-        'last_updated'       => isset($remote['lastUpdated']) ? $remote['lastUpdated'] : current_time('mysql'),
-        'chart_payload'      => bursmetre_yurtdisi_prepare_chart($campaigns),
-        'max_amount'         => max(array_column($campaigns, 'amount_try')),
-        'error'              => '',
-        'fetched_at'         => time(),
-    ];
-}
-
-function bursmetre_yurtdisi_get_data($force_refresh = false)
-{
-    $cache_key = 'bursmetre_yurtdisi_payload';
-    $cache_ttl = 10 * MINUTE_IN_SECONDS;
-
-    if (!$force_refresh) {
-        $cached = get_transient($cache_key);
-        if ($cached !== false) {
-            return $cached;
-        }
-    }
-
-    $payload = bursmetre_yurtdisi_build_payload();
-    if (is_wp_error($payload)) {
-        $fallback = get_option('bursmetre_yurtdisi_cache');
-        if ($fallback) {
-            $fallback['error'] = $payload->get_error_message();
-            return $fallback;
-        }
-
-        return bursmetre_yurtdisi_empty_payload($payload->get_error_message());
-    }
-
-    set_transient($cache_key, $payload, $cache_ttl);
-    update_option('bursmetre_yurtdisi_cache', $payload, false);
-
-    return $payload;
-}
+require_once __DIR__ . '/yurtdisi-data.php';
 
 function bursmetre_yurtdisi_format_breakdown_tooltip($breakdown)
 {
@@ -367,10 +24,10 @@ function bursmetre_render_yurtdisi_dashboard()
     $options = get_option('bursmetre_options', []);
 
     $goal_raw = isset($options['yurtdisi_goal_amount']) ? $options['yurtdisi_goal_amount'] : '';
-    $goal = bursmetre_yurtdisi_parse_amount($goal_raw);
+    $goal = !empty($data['goal_try']) ? $data['goal_try'] : (bursmetre_yurtdisi_parse_amount($goal_raw) ?? 0);
 
     $total_try = isset($data['total_try']) ? $data['total_try'] : 0.0;
-    $progress = ($goal > 0) ? min(100, round(($total_try / $goal) * 100, 1)) : 0;
+    $progress = ($goal > 0) ? round(($total_try / $goal) * 100, 1) : 0;
     $campaign_count = isset($data['campaigns']) ? count($data['campaigns']) : 0;
     $students = $total_try > 0 ? max(0, (int) floor($total_try / 49500)) : 0;
 
@@ -381,12 +38,11 @@ function bursmetre_render_yurtdisi_dashboard()
     $last_updated_raw = isset($data['last_updated']) ? $data['last_updated'] : '';
     $timestamp = $last_updated_raw ? strtotime($last_updated_raw) : false;
     $formatted_last_updated = $timestamp
-        ? date_i18n('d F Y H:i', $timestamp)
+        ? wp_date('d F Y H:i', $timestamp)
         : __('Bilinmiyor', 'bursmetre');
 
     $yurti_ci_url = apply_filters('bursmetre_dashboard_home_url', bursmetre_get_dashboard_url());
     $rank_list = isset($data['campaigns']) ? $data['campaigns'] : [];
-    $max_amount = isset($data['max_amount']) && $data['max_amount'] > 0 ? $data['max_amount'] : 1;
 
     ob_start();
     ?>
@@ -430,7 +86,7 @@ function bursmetre_render_yurtdisi_dashboard()
                     </div>
                 </div>
                 <h1><?php esc_html_e('Yurtdışı Kampanyaları', 'bursmetre'); ?></h1>
-                <p><?php esc_html_e('Yurtdışı burs kampanyalarının anlık durumu', 'bursmetre'); ?></p>
+                <p><?php esc_html_e('Yurtdışı burs kampanyalarının güncel durumu', 'bursmetre'); ?></p>
                 <div class="burs-hero__sub">
                     <span class="burs-hero__chip burs-hero__chip--students">
                         <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3L1 9l11 6l9-4.91V17h2V9zM12 21l-8-4.5V11l8 4.5l8-4.5v5.5z"/></svg>
@@ -459,6 +115,17 @@ function bursmetre_render_yurtdisi_dashboard()
                 </div>
             </div>
         </section>
+
+        <?php if (!empty($data['fx']['date'])) : ?>
+            <p class="burs-fx-note">
+                <?php echo esc_html('TCMB döviz alış · ' . date_i18n('d.m.Y', strtotime($data['fx']['date'] . ' UTC'))); ?>
+                <?php foreach ($data['currency_breakdown'] as $entry) : ?>
+                    <?php if ($entry['currency'] !== 'TRY') : ?>
+                        <span><?php echo esc_html('1 ' . $entry['currency'] . ' = ' . number_format($data['fx']['rates'][$entry['currency']], 4, ',', '.') . ' TL'); ?></span>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </p>
+        <?php endif; ?>
 
         <section class="burs-stats">
             <article class="burs-stat burs-stat--primary">
@@ -547,19 +214,22 @@ function bursmetre_render_yurtdisi_dashboard()
                     <?php
                     $position = 1;
                     foreach ($rank_list as $campaign) :
-                        $pct = $campaign['amount_try'] > 0
-                            ? min(100, round(($campaign['amount_try'] / $max_amount) * 100, 1))
+                        $pct = $campaign['goal_original'] > 0
+                            ? round(($campaign['amount_original'] / $campaign['goal_original']) * 100, 1)
                             : 0;
                         ?>
                         <article class="burs-ranking__item">
                             <div class="burs-ranking__order">#<?php echo esc_html($position); ?></div>
-                            <div class="burs-ranking__avatar">
+                            <div class="burs-ranking__avatar" data-burs-avatar>
                                 <?php
                                 $initials = function_exists('mb_substr')
                                     ? mb_substr($campaign['name'], 0, 2, 'UTF-8')
                                     : substr($campaign['name'], 0, 2);
                                 ?>
-                                <span><?php echo esc_html($initials); ?></span>
+                                <span aria-hidden="true"><?php echo esc_html($initials); ?></span>
+                                <?php if (!empty($campaign['image'])) : ?>
+                                    <img src="<?php echo esc_url($campaign['image']); ?>" alt="" width="60" height="60" loading="lazy" decoding="async" />
+                                <?php endif; ?>
                             </div>
                             <div class="burs-ranking__body">
                                 <div class="burs-ranking__header">
@@ -574,9 +244,15 @@ function bursmetre_render_yurtdisi_dashboard()
                                     <?php echo esc_html(bursmetre_yurtdisi_format_try($campaign['amount_try'])); ?>
                                     <small><?php echo esc_html($campaign['amount_original_formatted']); ?></small>
                                 </p>
-                                <div class="burs-progress burs-progress--ranking">
-                                    <div class="burs-progress__inner" data-progress="<?php echo esc_attr($pct); ?>"></div>
-                                </div>
+                                <?php if ($campaign['goal_original'] > 0) : ?>
+                                    <p class="burs-ranking__goal">
+                                        <?php echo esc_html('Hedef: ' . $campaign['goal_original_formatted']); ?>
+                                        <strong><?php echo esc_html('%' . number_format_i18n($pct, 1)); ?></strong>
+                                    </p>
+                                    <div class="burs-progress burs-progress--ranking" aria-label="<?php echo esc_attr('Hedefe ulaşma oranı: %' . number_format_i18n($pct, 1)); ?>">
+                                        <div class="burs-progress__inner" data-progress="<?php echo esc_attr($pct); ?>"></div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </article>
                         <?php
@@ -596,7 +272,6 @@ function bursmetre_render_yurtdisi_dashboard()
 if (!function_exists('bursmetre_yurtdisi_remote_refresh_job')) {
     function bursmetre_yurtdisi_remote_refresh_job()
     {
-        delete_transient('bursmetre_yurtdisi_payload');
         bursmetre_yurtdisi_get_data(true);
     }
     add_action('bursmetre_yurtdisi_remote_refresh', 'bursmetre_yurtdisi_remote_refresh_job');
